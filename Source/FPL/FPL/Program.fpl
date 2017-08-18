@@ -1,4 +1,4 @@
 ﻿while(true)
 {
-	i;
+	int i = "fdsf"+"sdff";
 }

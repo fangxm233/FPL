@@ -9,6 +9,6 @@ G:\GIT\FPL\Source\FPL\FPL\bin\Debug\Program.fpl
 G:\GIT\FPL\Source\FPL\FPL\bin\Debug\FPL.exe.config
 G:\GIT\FPL\Source\FPL\FPL\bin\Debug\FPL.exe
 G:\GIT\FPL\Source\FPL\FPL\bin\Debug\FPL.pdb
-G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.csprojResolveAssemblyReference.cache
 G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.exe
 G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.pdb
+G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.csprojResolveAssemblyReference.cache

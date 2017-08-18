@@ -6,7 +6,6 @@ using System.Text;
 
 namespace FPL.lexer
 {
-    [Serializable]
     public class Token
     {
         public readonly int tag;
@@ -20,7 +19,6 @@ namespace FPL.lexer
         }
     }
 
-    [Serializable]
     public class Num : Token
     {
         public readonly int value;
@@ -34,7 +32,6 @@ namespace FPL.lexer
         }
     }
 
-    [Serializable]
     public class Real : Token
     {
         public readonly float value;

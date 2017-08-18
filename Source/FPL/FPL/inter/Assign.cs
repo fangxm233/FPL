@@ -23,6 +23,7 @@ namespace FPL.inter
             GetName(((Word)Lexer.Peek).lexeme);
             left = new Var(Lexer.Peek);
             lex.Scan();
+            if (Lexer.Peek.tag != Tag.ASSIGN) Error("应输入\"=\"");
             right = new Expr().BuildStart(lex);
             return this;
         }

@@ -38,6 +38,11 @@ namespace FPL.inter
                         right = new Num(Lexer.Peek);
                         break;
                     }
+                case Tag.STR:
+                    {
+                        right = new Str(Lexer.Peek);
+                        break;
+                    }
                 default:
                     {
                         Error("表达式无效");
@@ -112,6 +117,11 @@ namespace FPL.inter
                         }
                         break;
                     }
+                default:
+                    {
+                        Error("表达式无效");
+                        break;
+                    }
             }
             return this;
         }
@@ -141,6 +151,11 @@ namespace FPL.inter
                 case Tag.NUM:
                     {
                         left = new Num(Lexer.Peek);
+                        break;
+                    }
+                case Tag.STR:
+                    {
+                        right = new Str(Lexer.Peek);
                         break;
                     }
                 default:
@@ -181,6 +196,17 @@ namespace FPL.inter
                         right.Build(lex);
                         switch (Lexer.Peek.tag)
                         {
+                            case Tag.SEMICOLON:
+                            case Tag.RPARENTHESIS:
+                            case Tag.AND:
+                            case Tag.OR:
+                            case Tag.EQ:
+                            case Tag.NE:
+                            case Tag.LE:
+                            case Tag.GE:
+                                {
+                                    break;
+                                }
                             case Tag.PLUS:
                                 {
                                     right = new Plus(right);
@@ -191,6 +217,11 @@ namespace FPL.inter
                                 {
                                     right = new Minus(right);
                                     right.Build(lex);
+                                    break;
+                                }
+                            default:
+                                {
+                                    Error("表达式无效");
                                     break;
                                 }
                         }
@@ -202,6 +233,17 @@ namespace FPL.inter
                         right.Build(lex);
                         switch (Lexer.Peek.tag)
                         {
+                            case Tag.SEMICOLON:
+                            case Tag.RPARENTHESIS:
+                            case Tag.AND:
+                            case Tag.OR:
+                            case Tag.EQ:
+                            case Tag.NE:
+                            case Tag.LE:
+                            case Tag.GE:
+                                {
+                                    break;
+                                }
                             case Tag.PLUS:
                                 {
                                     right = new Plus(right);
@@ -214,7 +256,17 @@ namespace FPL.inter
                                     right.Build(lex);
                                     break;
                                 }
+                            default:
+                                {
+                                    Error("表达式无效");
+                                    break;
+                                }
                         }
+                        break;
+                    }
+                default:
+                    {
+                        Error("表达式无效");
                         break;
                     }
             }
@@ -236,6 +288,13 @@ namespace FPL.inter
         public Plus(Expr l)
         {
             left = l;
+        }
+    }
+    public class PlusString : Expr
+    {
+        public PlusString()
+        {
+
         }
     }
     public class Minus : Expr
@@ -393,6 +452,13 @@ namespace FPL.inter
     public class False : Expr
     {
         public False(Token c)
+        {
+            content = c;
+        }
+    }
+    public class Str : Expr
+    {
+        public Str(Token c)
         {
             content = c;
         }
