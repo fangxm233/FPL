@@ -161,7 +161,7 @@ namespace FPL.inter
                 case Tag.LE:
                 case Tag.GE:
                     {
-                        break;
+                        return left;
                     }
                 case Tag.PLUS:
                     {

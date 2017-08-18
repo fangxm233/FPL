@@ -59,6 +59,7 @@ namespace FPL.inter
             {
                 Error("应输入标识符");
             }
+            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
     }
