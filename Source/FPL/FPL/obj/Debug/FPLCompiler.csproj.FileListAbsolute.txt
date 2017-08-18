@@ -1,0 +1,6 @@
+C:\Users\fangxm\documents\visual studio 2017\Projects\FPL\FPL\bin\Debug\FPL.exe.config
+C:\Users\fangxm\documents\visual studio 2017\Projects\FPL\FPL\bin\Debug\FPL.exe
+C:\Users\fangxm\documents\visual studio 2017\Projects\FPL\FPL\bin\Debug\FPL.pdb
+C:\Users\fangxm\documents\visual studio 2017\Projects\FPL\FPL\obj\Debug\FPLCompiler.csprojResolveAssemblyReference.cache
+C:\Users\fangxm\documents\visual studio 2017\Projects\FPL\FPL\obj\Debug\FPL.exe
+C:\Users\fangxm\documents\visual studio 2017\Projects\FPL\FPL\obj\Debug\FPL.pdb
