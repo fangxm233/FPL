@@ -8,30 +8,18 @@ using FPL.symbols;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class Rel : Node
     {
-        Token op;
         public Expr left;
         public Expr right;
-        public Token content;
+        //public Token content;
 
         public virtual Rel Build(Lexer lex)
         {
             left = new Expr().BuildStart(lex);
             switch (Lexer.Peek.tag)
             {
-                case Tag.AND:
-                    {
-                        And a = new And(left);
-                        a.Build(lex);
-                        return a;
-                    }
-                case Tag.OR:
-                    {
-                        Or a = new Or(left);
-                        a.Build(lex);
-                        return a;
-                    }
                 case Tag.EQ:
                     {
                         Eq a = new Eq(left);
@@ -71,34 +59,19 @@ namespace FPL.inter
             }
             return this;
         }
+
+        public virtual void Check()
+        {
+            if (left.content.tag != Tag.TRUE && left.content.tag != Tag.FALSE)
+            {
+                Error(this, "表达式无效");
+                return;
+            }
+            return;
+        }
     }
 
-    public class And : Rel
-    {
-        public And(Expr l)
-        {
-            left = l;
-        }
-
-        public override Rel Build(Lexer lex)
-        {
-            right = new Expr().BuildStart(lex);
-            return this;
-        }
-    }
-    public class Or : Rel
-    {
-        public Or(Expr l)
-        {
-            left = l;
-        }
-
-        public override Rel Build(Lexer lex)
-        {
-            right = new Expr().BuildStart(lex);
-            return this;
-        }
-    }
+    [Serializable]
     public class Eq : Rel
     {
         public Eq(Expr l)
@@ -111,7 +84,43 @@ namespace FPL.inter
             right = new Expr().BuildStart(lex);
             return this;
         }
+
+        public override void Check()
+        {
+            left.Check();
+            if (Expr.turn_to_string)
+            {
+                left = left.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            switch (left.type.type)
+            {
+                case "string":
+                    {
+                        if (right.type.type != "string") Error(this, "表达式无效");
+                        return;
+                    }
+                case "int":
+                case "float":
+                    {
+                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        return;
+                    }
+                case "bool":
+                    {
+                        if (right.type.type != "bool") Error(this, "表达式无效");
+                        return;
+                    }
+            }
+        }
     }
+    [Serializable]
     public class Ne : Rel
     {
         public Ne(Expr l)
@@ -124,7 +133,43 @@ namespace FPL.inter
             right = new Expr().BuildStart(lex);
             return this;
         }
+
+        public override void Check()
+        {
+            left.Check();
+            if (Expr.turn_to_string)
+            {
+                left = left.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            switch (left.type.type)
+            {
+                case "string":
+                    {
+                        if (right.type.type != "string") Error(this, "表达式无效");
+                        return;
+                    }
+                case "int":
+                case "float":
+                    {
+                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        return;
+                    }
+                case "bool":
+                    {
+                        if (right.type.type != "bool") Error(this, "表达式无效");
+                        return;
+                    }
+            }
+        }
     }
+    [Serializable]
     public class Le : Rel
     {
         public Le(Expr l)
@@ -137,7 +182,34 @@ namespace FPL.inter
             right = new Expr().BuildStart(lex);
             return this;
         }
+
+        public override void Check()
+        {
+            left.Check();
+            if (Expr.turn_to_string)
+            {
+                left = left.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            switch (left.type.type)
+            {
+                case "int":
+                case "float":
+                    {
+                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        return;
+                    }
+            }
+        }
+
     }
+    [Serializable]
     public class Ge : Rel
     {
         public Ge(Expr l)
@@ -150,7 +222,33 @@ namespace FPL.inter
             right = new Expr().BuildStart(lex);
             return this;
         }
+
+        public override void Check()
+        {
+            left.Check();
+            if (Expr.turn_to_string)
+            {
+                left = left.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            switch (left.type.type)
+            {
+                case "int":
+                case "float":
+                    {
+                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        return;
+                    }
+            }
+        }
     }
+    [Serializable]
     public class More : Rel
     {
         public More(Expr l)
@@ -163,7 +261,33 @@ namespace FPL.inter
             right = new Expr().BuildStart(lex);
             return this;
         }
+
+        public override void Check()
+        {
+            left.Check();
+            if (Expr.turn_to_string)
+            {
+                left = left.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            switch (left.type.type)
+            {
+                case "int":
+                case "float":
+                    {
+                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        return;
+                    }
+            }
+        }
     }
+    [Serializable]
     public class Less : Rel
     {
         public Less(Expr l)
@@ -176,5 +300,31 @@ namespace FPL.inter
             right = new Expr().BuildStart(lex);
             return this;
         }
+
+        public override void Check()
+        {
+            left.Check();
+            if (Expr.turn_to_string)
+            {
+                left = left.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            switch (left.type.type)
+            {
+                case "int":
+                case "float":
+                    {
+                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        return;
+                    }
+            }
+        }
+
     }
 }

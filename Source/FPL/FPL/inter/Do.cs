@@ -7,6 +7,7 @@ using FPL.lexer;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class Do : Stmt
     {
         Rel rel;
@@ -35,6 +36,17 @@ namespace FPL.inter
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             DestroyScope();
             return this;
+        }
+
+        public override void Check()
+        {
+            rel.Check();
+            foreach (Stmt item in stmts)
+            {
+                in_loop = true;
+                item.Check();
+            }
+            in_loop = false;
         }
     }
 }

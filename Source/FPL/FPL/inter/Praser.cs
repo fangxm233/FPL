@@ -22,9 +22,18 @@ namespace FPL.inter
         {
             this.lex = lex;
         }
-        public void Compile()
+        public List<Stmt> Compile()
         {
             stmts = new Stmt(1).Buildsstart(lex);
+            Check();
+            return stmts;
+        }
+        public void Check()
+        {
+            foreach (Stmt item in stmts)
+            {
+                item.Check();
+            }
         }
     }
 

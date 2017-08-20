@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="inter\Assign.cs" />
     <Compile Include="inter\Break.cs" />
+    <Compile Include="inter\Continue.cs" />
     <Compile Include="inter\Do.cs" />
     <Compile Include="inter\Expr.cs" />
     <Compile Include="inter\For.cs" />

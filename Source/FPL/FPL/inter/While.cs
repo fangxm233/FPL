@@ -7,6 +7,7 @@ using FPL.lexer;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class While : Stmt
     {
         Rel rel;
@@ -24,14 +25,25 @@ namespace FPL.inter
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
             rel = new Rel();
             //rel = 
-            rel.Build(lex);
+            rel = rel.Build(lex);
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
             lex.Scan();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = base.Builds(lex);
+            stmts = Builds(lex);
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;
+        }
+
+        public override void Check()
+        {
+            rel.Check();
+            foreach (Stmt item in stmts)
+            {
+                in_loop = true;
+                item.Check();
+            }
+            in_loop = false;
         }
     }
 }

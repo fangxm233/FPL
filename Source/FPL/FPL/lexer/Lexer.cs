@@ -29,6 +29,7 @@ namespace FPL.lexer
             Reserve(new Word("while", Tag.WHILE));
             Reserve(new Word("do", Tag.DO));
             Reserve(new Word("break", Tag.BREAK));
+            Reserve(new Word("continue", Tag.CONTINUE));
             Reserve(new Word("for", Tag.FOR));
             Reserve(Word.True);
             Reserve(Word.False);
@@ -148,7 +149,7 @@ namespace FPL.lexer
                 {
                     for (; ; Readch())
                     {
-                        if (peek == '\n')
+                        if (peek == '\r')
                         {
                             line++;
                             Readch();

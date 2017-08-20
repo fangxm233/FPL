@@ -8,6 +8,7 @@ using FPL.symbols;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class If : Stmt
     {
         Rel rel;
@@ -32,6 +33,15 @@ namespace FPL.inter
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;
+        }
+
+        public override void Check()
+        {
+            rel.Check();
+            foreach (Stmt item in stmts)
+            {
+                item.Check();
+            }
         }
     }
 }

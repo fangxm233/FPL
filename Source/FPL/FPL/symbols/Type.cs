@@ -7,12 +7,15 @@ using FPL.lexer;
 
 namespace FPL.symbols
 {
+    [Serializable]
     public class Type : Word
     {
         public int width = 0;
+        public readonly string type;
         public Type(string s, int tag, int w) : base(s, tag)
         {
             width = w;
+            type = s;
         }
         public static readonly Type
             Int    = new Type("int",    Tag.BASIC, 4),

@@ -7,14 +7,16 @@ using FPL.lexer;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class Stmt : Node
     {
+        public static bool in_loop;
         public int tag;
         public Stmt(int tag)
         {
             this.tag = tag;
         }
-        public virtual List<Stmt> Builds(Lexer lex)//这是建立一个语句块
+        public List<Stmt> Builds(Lexer lex)//这是建立一个语句块
         {
             List<Stmt> stmts = new List<Stmt>();
             while (true)
@@ -62,6 +64,12 @@ namespace FPL.inter
                             stmts[stmts.Count - 1].Build(lex);
                             break;
                         }
+                    case Tag.CONTINUE:
+                        {
+                            stmts.Add(new Continue(Tag.CONTINUE));
+                            stmts[stmts.Count - 1].Build(lex);
+                            break;
+                        }
                     case Tag.ID:
                         {
                             stmts.Add(new Assign(Tag.ASSIGN));
@@ -78,7 +86,7 @@ namespace FPL.inter
             }
         }
 
-        public virtual List<Stmt> Buildsstart(Lexer lex)//这是建立一个语句块
+        public List<Stmt> Buildsstart(Lexer lex)
         {
             List<Stmt> stmts = new List<Stmt>();
             while (true)
@@ -131,6 +139,12 @@ namespace FPL.inter
                             stmts[stmts.Count - 1].Build(lex);
                             break;
                         }
+                    case Tag.CONTINUE:
+                        {
+                            stmts.Add(new Continue(Tag.CONTINUE));
+                            stmts[stmts.Count - 1].Build(lex);
+                            break;
+                        }
                     case Tag.ID:
                         {
                             stmts.Add(new Assign(Tag.ASSIGN));
@@ -150,7 +164,11 @@ namespace FPL.inter
         {
             return this;
         }
-        public virtual void Check() { }
+
+        public virtual void Check()
+        {
+            return;
+        }
         public virtual void Run() { }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace FPL.lexer
 {
+    [Serializable]
     public class Word : Token
     {
         public string lexeme = "";

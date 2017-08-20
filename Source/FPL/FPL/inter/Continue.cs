@@ -8,11 +8,11 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class Break : Stmt
+    class Continue : Stmt
     {
-        public Break(int tag) : base(tag)
+        public Continue(int tag) : base(tag)
         {
-            
+
         }
 
         public override Stmt Build(Lexer lex)

@@ -8,14 +8,14 @@ using FPL.symbols;
 
 namespace FPL.inter
 {
+    [Serializable]
     class Statement : Stmt
     {
         Stmt assign;
         public Statement(int tag) : base(tag)
         {
-            
+
         }
-        
         public override Stmt Build(Lexer lex)
         {
             switch (((symbols.Type)Lexer.Peek).lexeme)
@@ -61,6 +61,11 @@ namespace FPL.inter
             }
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
+        }
+
+        public override void Check()
+        {
+            assign.Check();
         }
     }
 }

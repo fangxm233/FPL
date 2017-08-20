@@ -8,12 +8,15 @@ using FPL.symbols;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class Expr : Node
     {
         //Token op;
+        public static bool turn_to_string;
         public Expr left;
         public Expr right;
         public Token content;
+        public symbols.Type type = symbols.Type.Int;
 
         public virtual Expr Build(Lexer lex)
         {
@@ -38,6 +41,11 @@ namespace FPL.inter
                         right = new Num(Lexer.Peek);
                         break;
                     }
+                case Tag.REAL:
+                    {
+                        left = new Real(Lexer.Peek);
+                        break;
+                    }
                 case Tag.STR:
                     {
                         right = new Str(Lexer.Peek);
@@ -60,6 +68,8 @@ namespace FPL.inter
                 case Tag.NE:
                 case Tag.LE:
                 case Tag.GE:
+                case Tag.MORE:
+                case Tag.LESS:
                     {
                         break;
                     }
@@ -126,7 +136,7 @@ namespace FPL.inter
             return this;
         }
 
-        public virtual Expr BuildStart(Lexer lex)
+        public Expr BuildStart(Lexer lex)
         {
             lex.Scan();
             switch (Lexer.Peek.tag)
@@ -153,9 +163,14 @@ namespace FPL.inter
                         left = new Num(Lexer.Peek);
                         break;
                     }
+                case Tag.REAL:
+                    {
+                        left = new Real(Lexer.Peek);
+                        break;
+                    }
                 case Tag.STR:
                     {
-                        right = new Str(Lexer.Peek);
+                        left = new Str(Lexer.Peek);
                         break;
                     }
                 default:
@@ -175,6 +190,8 @@ namespace FPL.inter
                 case Tag.NE:
                 case Tag.LE:
                 case Tag.GE:
+                case Tag.MORE:
+                case Tag.LESS:
                     {
                         return left;
                     }
@@ -204,6 +221,8 @@ namespace FPL.inter
                             case Tag.NE:
                             case Tag.LE:
                             case Tag.GE:
+                            case Tag.MORE:
+                            case Tag.LESS:
                                 {
                                     break;
                                 }
@@ -241,6 +260,8 @@ namespace FPL.inter
                             case Tag.NE:
                             case Tag.LE:
                             case Tag.GE:
+                            case Tag.MORE:
+                            case Tag.LESS:
                                 {
                                     break;
                                 }
@@ -273,9 +294,66 @@ namespace FPL.inter
             return right;
         }
 
-        public virtual void Check()
+        public virtual Expr Check()
         {
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type)
+            {
+                case "int":
+                    {
+                        break;
+                    }
+                case "string":
+                    {
+                        type = symbols.Type.String;
+                        turn_to_string = true;
+                        break;
+                    }
+                case "float":
+                    {
+                        if (type == symbols.Type.String) break;
+                        type = symbols.Type.Float;
+                        break;
+                    }
+                default:
+                    {
+                        Error(left,"表达式无效");
+                        break;
+                    }
+            }
+            switch (right.type.type)
+            {
+                case "int":
+                    {
+                        break;
+                    }
+                case "string":
+                    {
+                        type = symbols.Type.String;
+                        turn_to_string = true;
+                        break;
+                    }
+                case "float":
+                    {
+                        if (type == symbols.Type.String) break;
+                        type = symbols.Type.Float;
+                        break;
+                    }
+                default:
+                    {
+                        Error(right, "表达式无效");
+                        break;
+                    }
+            }
+            return this;
+        }
 
+        public virtual Expr ToStringPlus()
+        {
+            left = left.ToStringPlus();
+            right = right.ToStringPlus();
+            return this;
         }
 
         public virtual void Run()
@@ -283,20 +361,88 @@ namespace FPL.inter
 
         }
     }
+
+    [Serializable]
     public class Plus : Expr
     {
         public Plus(Expr l)
         {
             left = l;
         }
-    }
-    public class PlusString : Expr
-    {
-        public PlusString()
-        {
 
+        public override Expr Check()
+        {
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type)
+            {
+                case "int":
+                    {
+                        break;
+                    }
+                case "string":
+                    {
+                        type = symbols.Type.String;
+                        turn_to_string = true;
+                        break;
+                    }
+                case "float":
+                    {
+                        if (type == symbols.Type.String) break;
+                        type = symbols.Type.Float;
+                        break;
+                    }
+                default:
+                    {
+                        Error(left, "表达式无效");
+                        break;
+                    }
+            }
+            switch (left.type.type)
+            {
+                case "int":
+                    {
+                        break;
+                    }
+                case "string":
+                    {
+                        type = symbols.Type.String;
+                        turn_to_string = true;
+                        break;
+                    }
+                case "float":
+                    {
+                        if (type == symbols.Type.String) break;
+                        type = symbols.Type.Float;
+                        break;
+                    }
+                default:
+                    {
+                        Error(right, "表达式无效");
+                        break;
+                    }
+            }
+            return this;
+        }
+
+        public override Expr ToStringPlus()
+        {
+            PlusString s = new PlusString(this);
+            s.ToStringPlus();
+            return s;
         }
     }
+    [Serializable]
+    public class PlusString : Expr
+    {
+        public PlusString(Expr e)
+        {
+            left = e.left;
+            right = e.right;
+            type = e.type;
+        }
+    }
+    [Serializable]
     public class Minus : Expr
     {
         public Minus(Expr l)
@@ -304,6 +450,7 @@ namespace FPL.inter
             left = l;
         }
     }
+    [Serializable]
     public class Multiply : Expr
     {
         public Multiply(Expr l)
@@ -326,6 +473,11 @@ namespace FPL.inter
                         right = new Num(Lexer.Peek);
                         break;
                     }
+                case Tag.REAL:
+                    {
+                        left = new Real(Lexer.Peek);
+                        break;
+                    }
                 default:
                     {
                         Error("表达式无效");
@@ -343,6 +495,8 @@ namespace FPL.inter
                 case Tag.NE:
                 case Tag.LE:
                 case Tag.GE:
+                case Tag.MORE:
+                case Tag.LESS:
                     {
                         break;
                     }
@@ -362,6 +516,7 @@ namespace FPL.inter
             return this;
         }
     }
+    [Serializable]
     public class Divide : Expr
     {
         public Divide(Expr l)
@@ -383,6 +538,11 @@ namespace FPL.inter
                         right = new Num(Lexer.Peek);
                         break;
                     }
+                case Tag.REAL:
+                    {
+                        left = new Real(Lexer.Peek);
+                        break;
+                    }
                 default:
                     {
                         Error("表达式无效");
@@ -400,6 +560,8 @@ namespace FPL.inter
                 case Tag.NE:
                 case Tag.LE:
                 case Tag.GE:
+                case Tag.MORE:
+                case Tag.LESS:
                     {
                         break;
                     }
@@ -420,47 +582,106 @@ namespace FPL.inter
         }
     }
 
+    [Serializable]
     public class Var : Expr
     {
         public Var(Token c)
         {
             content = c;
-            GetName(((Word)content).lexeme);
+            type = (symbols.Type)GetName(((Word)content).lexeme);
+        }
+        public override Expr Check()
+        {
+            return this;
+        }
+        public override Expr ToStringPlus()
+        {
+            return this;
         }
     }
+    [Serializable]
     public class Num : Expr
     {
         public Num(Token c)
         {
             content = c;
+            type = symbols.Type.Int;
+        }
+        public override Expr Check()
+        {
+            return this;
+        }
+        public override Expr ToStringPlus()
+        {
+            return this;
         }
     }
+    [Serializable]
     public class Real : Expr
     {
         public Real(Token c)
         {
             content = c;
+            type = symbols.Type.Float;
+        }
+        public override Expr Check()
+        {
+            return this;
+        }
+        public override Expr ToStringPlus()
+        {
+            return this;
         }
     }
+    [Serializable]
     public class True : Expr
     {
         public True(Token c)
         {
             content = c;
+            type = symbols.Type.Bool;
+        }
+        public override Expr Check()
+        {
+            return this;
+        }
+        public override Expr ToStringPlus()
+        {
+            return this;
         }
     }
+    [Serializable]
     public class False : Expr
     {
         public False(Token c)
         {
             content = c;
+            type = symbols.Type.Bool;
+        }
+        public override Expr Check()
+        {
+            return this;
+        }
+        public override Expr ToStringPlus()
+        {
+            return this;
         }
     }
+    [Serializable]
     public class Str : Expr
     {
         public Str(Token c)
         {
             content = c;
+            type = symbols.Type.String;
+        }
+        public override Expr Check()
+        {
+            return this;
+        }
+        public override Expr ToStringPlus()
+        {
+            return this;
         }
     }
     /*

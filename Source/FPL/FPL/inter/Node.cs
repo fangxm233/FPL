@@ -8,15 +8,32 @@ using System.Collections;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class Node
     {
+        public readonly int line;
         protected Node()
         {
-
+            line = Lexer.line;
         }
         public void Error(string s)
         {
             Console.WriteLine("行 " + Lexer.line + ": " + s);
+            throw new CompileException();
+        }
+        public void Error(Token c,string s)
+        {
+            Console.WriteLine("行 " + c.line + ": " + s);
+            throw new CompileException();
+        }
+        public void Error(Expr c, string s)
+        {
+            Console.WriteLine("行 " + c.line + ": " + s);
+            throw new CompileException();
+        }
+        public void Error(Node c, string s)
+        {
+            Console.WriteLine("行 " + c.line + ": " + s);
             throw new CompileException();
         }
 

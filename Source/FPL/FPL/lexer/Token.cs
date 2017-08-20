@@ -6,12 +6,15 @@ using System.Text;
 
 namespace FPL.lexer
 {
+    [Serializable]
     public class Token
     {
         public readonly int tag;
+        public readonly int line;
         public Token(int i)
         {
             tag = i;
+            line = Lexer.line;
         }
         public override string ToString()
         {
@@ -19,6 +22,7 @@ namespace FPL.lexer
         }
     }
 
+    [Serializable]
     public class Num : Token
     {
         public readonly int value;
@@ -32,6 +36,7 @@ namespace FPL.lexer
         }
     }
 
+    [Serializable]
     public class Real : Token
     {
         public readonly float value;
@@ -45,6 +50,7 @@ namespace FPL.lexer
         }
     }
 
+    [Serializable]
     public class Str : Token
     {
         public readonly string value;

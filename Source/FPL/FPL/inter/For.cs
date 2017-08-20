@@ -7,6 +7,7 @@ using FPL.lexer;
 
 namespace FPL.inter
 {
+    [Serializable]
     public class For : Stmt
     {
         Stmt stmt;
@@ -28,7 +29,7 @@ namespace FPL.inter
             stmt = new Statement(Tag.STATEMENT);
             stmt.Build(lex);
             rel = new Rel();
-            rel.Build(lex);
+            rel = rel.Build(lex);
             lex.Scan();
             assign = new Assign(Tag.ASSIGN);
             assign = assign.Build(lex);
@@ -39,6 +40,19 @@ namespace FPL.inter
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;
+        }
+
+        public override void Check()
+        {
+            stmt.Check();
+            rel.Check();
+            assign.Check();
+            foreach (Stmt item in stmts)
+            {
+                in_loop = true;
+                item.Check();
+            }
+            in_loop = false;
         }
     }
 }

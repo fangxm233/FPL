@@ -53,10 +53,16 @@ namespace FPL
             {
                 Lexer lex = new Lexer(new StreamReader(new FileStream(args, FileMode.Open)));
                 Praser praser = new Praser(lex);
+
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
-                watch.Start();  //开始监视代码运行时间
-                praser.Compile();
+                watch.Start();
+                List<Stmt> result = praser.Compile();
                 watch.Stop();
+
+                FileStream fileStream = new FileStream("Program.fplc", FileMode.Create);
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                binaryFormatter.Serialize(fileStream, result);
+
                 TimeSpan timespan = watch.Elapsed;
                 Console.WriteLine("编译完成");
                 Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);

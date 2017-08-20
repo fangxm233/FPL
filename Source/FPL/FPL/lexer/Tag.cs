@@ -6,6 +6,7 @@ using System.Text;
 
 namespace FPL.lexer
 {
+    [Serializable]
     class Tag
     {
         public const int
@@ -16,6 +17,6 @@ namespace FPL.lexer
             STR = 276, PLUS = 277, MULTIPLY = 278, DIVIDE = 279,
             ASSIGN = 280, SEMICOLON = 281, LPARENTHESIS = 282, RPARENTHESIS = 283, FOR = 284,
             LBRACE = 285, RBRACE = 286, STATEMENT = 287, MORE = 288, LESS = 289,
-            EOF = 65535;
+            CONTINUE = 290, EOF = 65535;
     }
 }
