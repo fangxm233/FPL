@@ -53,13 +53,14 @@ namespace FPL
             try
             {
                 Lexer lex = new Lexer(new StreamReader(new FileStream(args, FileMode.Open)));
-                Praser praser = new Praser(lex);
 
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
                 watch.Start();
+                Praser praser = new Praser(lex);
                 praser.Compile();
                 watch.Stop();
 
+                //二进制存储
                 FileStream fileStream = new FileStream("Program.fplc", FileMode.Create);
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
                 binaryFormatter.Serialize(fileStream, praser);

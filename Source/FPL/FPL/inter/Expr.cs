@@ -11,8 +11,7 @@ namespace FPL.inter
     [Serializable]
     public class Expr : Node
     {
-        //Token op;
-        public static bool turn_to_string;
+        public static bool turn_to_string; //标记所有语句检查完了以后是否要转为string表达式
         public Expr left;
         public Expr right;
         public Token content;
@@ -21,7 +20,7 @@ namespace FPL.inter
         public virtual Expr Build(Lexer lex)
         {
             lex.Scan();
-            switch (Lexer.Peek.tag)
+            switch (Lexer.Peek.tag) //检测所有可以为值的单元
             {
                 case Tag.TRUE:
                     {
@@ -51,7 +50,7 @@ namespace FPL.inter
                         right = new Str(Lexer.Peek);
                         break;
                     }
-                case Tag.LPARENTHESIS:
+                case Tag.LPARENTHESIS: //括号整个可以算个为值的单元
                     {
                         right = new Expr();
                         right = right.BuildStart(lex);
@@ -77,11 +76,11 @@ namespace FPL.inter
                 case Tag.MORE:
                 case Tag.LESS:
                     {
-                        break;
+                        break; //到了各个可能为表达式的结束符号的时候就返回
                     }
                 case Tag.PLUS:
                     {
-                        right = new Plus(right);
+                        right = new Plus(right); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
                         right.Build(lex);
                         break;
                     }
@@ -95,7 +94,7 @@ namespace FPL.inter
                     {
                         right = new Multiply(right);
                         right.Build(lex);
-                        switch (Lexer.Peek.tag)
+                        switch (Lexer.Peek.tag) //把这个/*对象当做下一个次级符号的左值
                         {
                             case Tag.PLUS:
                                 {
@@ -302,7 +301,7 @@ namespace FPL.inter
                     }
             }
             return right;
-        }
+        } //表达式建立的开始调用的，不可重写
 
         public virtual Expr Check()
         {
@@ -359,7 +358,7 @@ namespace FPL.inter
             return this;
         }
 
-        public virtual Expr ToStringPlus()
+        public virtual Expr ToStringPlus() //目的是把所有的普通+换成string+
         {
             left = left.ToStringPlus();
             right = right.ToStringPlus();
@@ -531,7 +530,7 @@ namespace FPL.inter
                     {
                         break;
                     }
-                case Tag.MULTIPLY:
+                case Tag.MULTIPLY: //把所有同级或更高级的顾浩匹配掉
                     {
                         right = new Multiply(right);
                         right.Build(lex);

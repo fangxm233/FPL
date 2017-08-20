@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using FPL.symbols;
+using FPL.inter;
 
 namespace FPL.lexer
 {
@@ -24,6 +25,7 @@ namespace FPL.lexer
         public Lexer(StreamReader stream_reader)
         {
             this.stream_reader = stream_reader;
+            //把各种保留字写在这
             Reserve(new Word("if", Tag.IF));
             Reserve(new Word("else", Tag.ELSE));
             Reserve(new Word("while", Tag.WHILE));
@@ -42,8 +44,8 @@ namespace FPL.lexer
 
         public void Scan()
         {
-            start:
-            for (; ; Readch())
+            start: //用于检测完注释以后回到这个函数开头的
+            for (; ; Readch()) //去掉所有空白
             {
                 if (peek == ' ' || peek == '\t' || peek == '\r')
                 {
@@ -55,7 +57,57 @@ namespace FPL.lexer
                 }
                 else break;
             }
-            switch (peek)
+            if (peek == '/') //开始检测注释
+            {
+                Readch();
+                if (peek == '/')
+                {
+                    for (; ; Readch())
+                    {
+                        if (peek == '\r') //如果是文件未就返回一个文件尾
+                        {
+                            line++;
+                            Readch();
+                            goto start;
+                        }
+                        if(peek == '\uffff')
+                        {
+                            Peek = new Token(peek);
+                            return;
+                        }
+                    }
+                }
+                if (peek == '*')
+                {
+                    Readch();
+                    for (; ; Readch())
+                    {
+                        if (peek == '\r')
+                        {
+                            line++;
+                            Readch();
+                        }
+                        if (peek == '*')
+                        {
+                            Readch();
+                            if (peek == '/')
+                            {
+                                Readch();
+                                goto start;
+                            }
+                        }
+                        if (peek == '\uffff')
+                        {
+                            Peek = new Token(peek);
+                            return;
+                        }
+                    }
+                }
+                Peek = Word.divide;
+                Readch();
+                return;
+            }
+            switch (peek) //检测并返回各个符号以及组合符号
             {
                 case '&':
                     {
@@ -107,9 +159,7 @@ namespace FPL.lexer
                     }
                 case '/':
                     {
-                        Peek = Word.divide;
-                        Readch();
-                        return;
+                        break;//除号已在前面处理过了
                     }
                 case ';':
                     {
@@ -142,42 +192,6 @@ namespace FPL.lexer
                         return;
                     }
             }
-            if (peek == '/')
-            {
-                Readch();
-                if (peek == '/')
-                {
-                    for (; ; Readch())
-                    {
-                        if (peek == '\r')
-                        {
-                            line++;
-                            Readch();
-                            goto start;
-                        }
-                    }
-                }
-                if(peek == '*')
-                {
-                    for (; ; Readch())
-                    {
-                        if (peek == '\n')
-                        {
-                            line++;
-                            Readch();
-                        }
-                        if (peek == '*')
-                        {
-                            Readch();
-                            if (peek == '/')
-                            {
-                                Readch();
-                                goto start;
-                            }
-                        }
-                    }
-                }
-            }
             if (peek == '"')
             {
                 string s = "";
@@ -193,7 +207,7 @@ namespace FPL.lexer
                     }
                     else if (peek == '\n')
                     {
-                        //报错string"缺失
+                        Node.Error("应输入\"\"\"");
                         Str str = new Str(s);
                         Readch();
                         Peek = str;
@@ -202,7 +216,7 @@ namespace FPL.lexer
                     s = s + peek;
                 }
             }
-            if (char.IsDigit(peek))
+            if (char.IsDigit(peek)) //检测数字
             {
                 string n = "";
                 do
@@ -212,9 +226,16 @@ namespace FPL.lexer
                 } while (char.IsDigit(peek));
                 if (peek != '.')
                 {
-                    Peek = new Num(int.Parse(n));
+                    try
+                    {
+                        Peek = new Num(int.Parse(n));
+                    }
+                    catch (Exception)
+                    {
+                        Node.Error("整数超出范围");
+                    }
                     return;
-                }//此处应有报错，整数过长
+                }
                 string f = n;
                 f = f + peek;
                 for (;;)
@@ -223,10 +244,17 @@ namespace FPL.lexer
                     if (!char.IsDigit(peek)) break;
                     f = f + peek;
                 }
-                Peek = new Real(float.Parse(f));//此处应有报错，浮点过长
+                try
+                {
+                    Peek = new Real(float.Parse(f));
+                }
+                catch (Exception)
+                {
+                    Node.Error("浮点数超出范围");
+                }
                 return;
             }
-            if (char.IsLetter(peek))
+            if (char.IsLetter(peek)) //检测标识符
             {
                 StringBuilder b = new StringBuilder();
                 do
@@ -252,11 +280,6 @@ namespace FPL.lexer
 
         void Readch()
         {
-            //if (stream_reader.EndOfStream)
-            //{
-            //    peek = '}';
-            //    return;
-            //}
             peek = (char)stream_reader.Read();
         }
 

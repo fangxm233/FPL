@@ -16,7 +16,7 @@ namespace FPL.inter
         {
             line = Lexer.line;
         }
-        public void Error(string s)
+        public static void Error(string s)
         {
             Console.WriteLine("行 " + Lexer.line + ": " + s);
             throw new CompileException();
