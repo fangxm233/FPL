@@ -43,12 +43,18 @@ namespace FPL.inter
                     }
                 case Tag.REAL:
                     {
-                        left = new Real(Lexer.Peek);
+                        right = new Real(Lexer.Peek);
                         break;
                     }
                 case Tag.STR:
                     {
                         right = new Str(Lexer.Peek);
+                        break;
+                    }
+                case Tag.LPARENTHESIS:
+                    {
+                        right = new Expr();
+                        right = right.BuildStart(lex);
                         break;
                     }
                 default:
@@ -171,6 +177,12 @@ namespace FPL.inter
                 case Tag.STR:
                     {
                         left = new Str(Lexer.Peek);
+                        break;
+                    }
+                case Tag.LPARENTHESIS:
+                    {
+                        left = new Expr();
+                        left = left.BuildStart(lex);
                         break;
                     }
                 default:
@@ -475,7 +487,13 @@ namespace FPL.inter
                     }
                 case Tag.REAL:
                     {
-                        left = new Real(Lexer.Peek);
+                        right = new Real(Lexer.Peek);
+                        break;
+                    }
+                case Tag.LPARENTHESIS:
+                    {
+                        right = new Expr();
+                        right = right.BuildStart(lex);
                         break;
                     }
                 default:
@@ -540,7 +558,13 @@ namespace FPL.inter
                     }
                 case Tag.REAL:
                     {
-                        left = new Real(Lexer.Peek);
+                        right = new Real(Lexer.Peek);
+                        break;
+                    }
+                case Tag.LPARENTHESIS:
+                    {
+                        right = new Expr();
+                        right = right.BuildStart(lex);
                         break;
                     }
                 default:
