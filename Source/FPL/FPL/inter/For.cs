@@ -54,5 +54,31 @@ namespace FPL.inter
             }
             in_loop = false;
         }
+
+        public override void Run()
+        {
+            for (stmt.Run(); rel.Run(); assign.Run())
+            {
+                NewScope();
+                in_loop = true;
+                foreach (Stmt item in stmts)
+                {
+                    item.Run();
+                    if (is_continue) break;
+                    if (!in_loop) break;
+                }
+                if (is_continue)
+                {
+                    is_continue = false;
+                    continue;
+                }
+                if (!in_loop)
+                {
+                    in_loop = false;
+                    break;
+                }
+                DestroyScope();
+            }
+        }
     }
 }

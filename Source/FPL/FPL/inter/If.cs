@@ -43,5 +43,16 @@ namespace FPL.inter
                 item.Check();
             }
         }
+
+        public override void Run()
+        {
+            if (rel.Run())
+            {
+                foreach (Stmt item in stmts)
+                {
+                    item.Run();
+                }
+            }
+        }
     }
 }

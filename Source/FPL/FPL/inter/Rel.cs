@@ -69,6 +69,11 @@ namespace FPL.inter
             }
             return;
         }
+
+        public virtual bool Run()
+        {
+            return (bool)left.Run();
+        }
     }
 
     [Serializable]
@@ -119,6 +124,11 @@ namespace FPL.inter
                     }
             }
         }
+
+        public override bool Run()
+        {
+            return left.Run().ToString() == right.Run().ToString();
+        }
     }
     [Serializable]
     public class Ne : Rel
@@ -168,6 +178,11 @@ namespace FPL.inter
                     }
             }
         }
+
+        public override bool Run()
+        {
+            return left.Run().ToString() != right.Run().ToString();
+        }
     }
     [Serializable]
     public class Le : Rel
@@ -208,6 +223,10 @@ namespace FPL.inter
             }
         }
 
+        public override bool Run()
+        {
+            return (float)left.Run() <= (float)right.Run();
+        }
     }
     [Serializable]
     public class Ge : Rel
@@ -247,6 +266,11 @@ namespace FPL.inter
                     }
             }
         }
+
+        public override bool Run()
+        {
+            return (float)left.Run() >= (float)right.Run();
+        }
     }
     [Serializable]
     public class More : Rel
@@ -285,6 +309,11 @@ namespace FPL.inter
                         return;
                     }
             }
+        }
+
+        public override bool Run()
+        {
+            return (float)left.Run() > (float)right.Run();
         }
     }
     [Serializable]
@@ -326,5 +355,9 @@ namespace FPL.inter
             }
         }
 
+        public override bool Run()
+        {
+            return (float)left.Run() < (float)right.Run();
+        }
     }
 }

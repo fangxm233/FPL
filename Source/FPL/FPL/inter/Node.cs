@@ -42,6 +42,11 @@ namespace FPL.inter
             if (Praser.symbols_list[Praser.symbols_list.Count - 1][name] != null) Error("已在此范围定义了名为\"" + name + "\"的变量");
             Praser.symbols_list[Praser.symbols_list.Count - 1].Add(name, type);
         }
+        public void AddVar(string name, object value)
+        {
+            if (Praser.symbols_list[Praser.symbols_list.Count - 1][name] != null) Error("已在此范围定义了名为\"" + name + "\"的变量");
+            Praser.symbols_list[Praser.symbols_list.Count - 1].Add(name, value);
+        }
 
         public object GetName(string name)
         {
@@ -53,6 +58,19 @@ namespace FPL.inter
                 }
             }
             Error("当前上下文中不存在名称\"" + name + "\"");
+            return null;
+        }
+
+        public object GetVar(string name)
+        {
+            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
+            {
+                if (Praser.symbols_list[i][name] != null)
+                {
+                    return Praser.symbols_list[i][name];
+                }
+            }
+            Error("变量\"" + name + "\"未定义");
             return null;
         }
 

@@ -20,6 +20,10 @@ namespace FPL.lexer
         {
             return "" + (char)tag;
         }
+        public virtual object GetValue()
+        {
+            return null;
+        }
     }
 
     [Serializable]
@@ -33,6 +37,10 @@ namespace FPL.lexer
         public override string ToString()
         {
             return "" + value;
+        }
+        public override object GetValue()
+        {
+            return value;
         }
     }
 
@@ -48,6 +56,10 @@ namespace FPL.lexer
         {
             return "" + value;
         }
+        public override object GetValue()
+        {
+            return value;
+        }
     }
 
     [Serializable]
@@ -61,6 +73,10 @@ namespace FPL.lexer
         public override string ToString()
         {
             return "" + value;
+        }
+        public override object GetValue()
+        {
+            return value;
         }
     }
 }

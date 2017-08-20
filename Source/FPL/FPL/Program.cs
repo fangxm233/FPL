@@ -43,8 +43,9 @@ namespace FPL
         static void Main(string[] args)
         {
             Compile("Program.fpl");
+            //Console.ReadKey();
+            Interprete();
             Console.ReadKey();
-            //Interprete();
         }
 
         static void Compile(string args)
@@ -56,12 +57,13 @@ namespace FPL
 
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
                 watch.Start();
-                List<Stmt> result = praser.Compile();
+                praser.Compile();
                 watch.Stop();
 
                 FileStream fileStream = new FileStream("Program.fplc", FileMode.Create);
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
-                binaryFormatter.Serialize(fileStream, result);
+                binaryFormatter.Serialize(fileStream, praser);
+                fileStream.Close();
 
                 TimeSpan timespan = watch.Elapsed;
                 Console.WriteLine("编译完成");
@@ -72,7 +74,19 @@ namespace FPL
 
         static void Interprete()
         {
+            Praser praser;
 
+            FileStream fileStream = new FileStream("Program.fplc", FileMode.Open);
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            praser = (Praser)binaryFormatter.Deserialize(fileStream);
+
+            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+            praser.Interprete();
+            watch.Stop();
+            TimeSpan timespan = watch.Elapsed;
+            Console.WriteLine("执行完成");
+            Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);
         }
     }
 }

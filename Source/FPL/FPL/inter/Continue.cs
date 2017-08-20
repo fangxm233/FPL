@@ -25,5 +25,10 @@ namespace FPL.inter
         {
             if (!in_loop) Error(this, "没有要中断或继续的循环");
         }
+
+        public override void Run()
+        {
+            is_continue = true;
+        }
     }
 }

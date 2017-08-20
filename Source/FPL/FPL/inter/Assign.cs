@@ -11,21 +11,70 @@ namespace FPL.inter
     [Serializable]
     public class Assign : Stmt
     {
-        Expr left;
-        Expr right;
+        public Expr left;
+        public Expr right;
         public Assign(int tag) : base(tag)
         {
 
         }
+        public string name;
 
         public override Stmt Build(Lexer lex)
         {
-            GetName(((Word)Lexer.Peek).lexeme);
+            name = ((Word)Lexer.Peek).lexeme;
+            symbols.Type type = (symbols.Type)GetName(name);
             left = new Var(Lexer.Peek);
             lex.Scan();
             if (Lexer.Peek.tag != Tag.ASSIGN) Error("应输入\"=\"");
             right = new Expr().BuildStart(lex);
+            switch (type.type)
+            {
+                case "int":
+                    {
+                        return new Int(this);
+                    }
+                case "float":
+                    {
+                        return new Float(this);
+                    }
+                case "string":
+                    {
+                        return new String(this);
+                    }
+                case "bool":
+                    {
+                        return new Bool(this);
+                    }
+            }
             return this;
+        }
+
+        public override void Check()
+        {
+            return;
+        }
+
+        public override void Run()
+        {
+            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
+            {
+                if (Praser.symbols_list[i][name] != null)
+                {
+                    Praser.symbols_list[i][name] = right.Run();
+                    return;
+                }
+            }
+        }
+    }
+
+    [Serializable]
+    public class Int : Assign
+    {
+        public Int(Assign a) : base(Tag.NUM)
+        {
+            left = a.left;
+            right = a.right;
+            name = a.name;
         }
 
         public override void Check()
@@ -36,29 +85,86 @@ namespace FPL.inter
                 right = right.ToStringPlus();
                 Expr.turn_to_string = false;
             }
-            switch (left.type.type)
+            if (right.type.type != "int") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"int\"");
+            return;
+        }
+
+        public override void Run()
+        {
+            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
             {
-                case "int":
-                    {
-                        if (right.type.type != "int") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"int\"");
-                        return;
-                    }
-                case "float":
-                    {
-                        if (right.type.type != "float" || right.type.type != "float") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"float\"");
-                        return;
-                    }
-                case "string":
-                    {
-                        if (right.type.type != "string") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"string\"");
-                        return;
-                    }
-                case "bool":
-                    {
-                        if (right.type.type != "bool") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"bool\"");
-                        return;
-                    }
+                if (Praser.symbols_list[i][name] != null)
+                {
+                    Praser.symbols_list[i][name] = (int)(float)right.Run();
+                    return;
+                }
             }
+        }
+    }
+    [Serializable]
+    public class Float : Assign
+    {
+        public Float(Assign a) : base(Tag.NUM)
+        {
+            left = a.left;
+            right = a.right;
+            name = a.name;
+        }
+
+        public override void Check()
+        {
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            if (right.type.type != "float" && right.type.type != "int") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"float\"");
+            return;
+        }
+    }
+    [Serializable]
+    public class String : Assign
+    {
+        public String(Assign a) : base(Tag.NUM)
+        {
+            left = a.left;
+            right = a.right;
+            name = a.name;
+        }
+
+        public override void Check()
+        {
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            if (right.type.type != "string") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"string\"");
+            return;
+        }
+    }
+    [Serializable]
+    public class Bool : Assign
+    {
+        public Bool(Assign a) : base(Tag.NUM)
+        {
+            left = a.left;
+            right = a.right;
+            name = a.name;
+        }
+
+        public override void Check()
+        {
+            right.Check();
+            if (Expr.turn_to_string)
+            {
+                right = right.ToStringPlus();
+                Expr.turn_to_string = false;
+            }
+            if (right.type.type != "bool") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"bool\"");
+            return;
         }
     }
 }

@@ -10,7 +10,10 @@ namespace FPL.inter
     [Serializable]
     public class Stmt : Node
     {
+        //这两个分别用来标记建立和运行时的break和continue
         public static bool in_loop;
+        public static bool is_continue;
+
         public int tag;
         public Stmt(int tag)
         {
@@ -73,7 +76,7 @@ namespace FPL.inter
                     case Tag.ID:
                         {
                             stmts.Add(new Assign(Tag.ASSIGN));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build(lex);
                             break;
                         }
                     default:
@@ -169,6 +172,10 @@ namespace FPL.inter
         {
             return;
         }
-        public virtual void Run() { }
+
+        public virtual void Run()
+        {
+
+        }
     }
 }

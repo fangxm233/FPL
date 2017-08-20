@@ -149,15 +149,13 @@ namespace FPL.inter
             {
                 case Tag.TRUE:
                     {
-                        content = Word.True;
                         lex.Scan();
-                        return this;
+                        return new True(Word.True);
                     }
                 case Tag.FALSE:
                     {
-                        content = Word.False;
                         lex.Scan();
-                        return this;
+                        return new False(Word.False);
                     }
                 case Tag.ID:
                     {
@@ -368,9 +366,9 @@ namespace FPL.inter
             return this;
         }
 
-        public virtual void Run()
+        public virtual object Run()
         {
-
+            return null;
         }
     }
 
@@ -443,6 +441,11 @@ namespace FPL.inter
             s.ToStringPlus();
             return s;
         }
+
+        public override object Run()
+        {
+            return (float)left.Run() + (float)right.Run();
+        }
     }
     [Serializable]
     public class PlusString : Expr
@@ -453,6 +456,11 @@ namespace FPL.inter
             right = e.right;
             type = e.type;
         }
+
+        public override object Run()
+        {
+            return left.Run().ToString() + right.Run().ToString();
+        }
     }
     [Serializable]
     public class Minus : Expr
@@ -460,6 +468,11 @@ namespace FPL.inter
         public Minus(Expr l)
         {
             left = l;
+        }
+
+        public override object Run()
+        {
+            return (float)left.Run() - (float)right.Run();
         }
     }
     [Serializable]
@@ -533,6 +546,11 @@ namespace FPL.inter
             }
             return this;
         }
+
+        public override object Run()
+        {
+            return (float)left.Run() * (float)right.Run();
+        }
     }
     [Serializable]
     public class Divide : Expr
@@ -604,15 +622,22 @@ namespace FPL.inter
             }
             return this;
         }
+
+        public override object Run()
+        {
+            return (float)left.Run() / (float)right.Run();
+        }
     }
 
     [Serializable]
     public class Var : Expr
     {
+        public string name;
         public Var(Token c)
         {
             content = c;
             type = (symbols.Type)GetName(((Word)content).lexeme);
+            name = ((Word)content).lexeme;
         }
         public override Expr Check()
         {
@@ -621,6 +646,12 @@ namespace FPL.inter
         public override Expr ToStringPlus()
         {
             return this;
+        }
+        public override object Run()
+        {
+            if(type.type == "int")
+                return (float)(int)GetVar(name);
+            return GetVar(name);
         }
     }
     [Serializable]
@@ -639,6 +670,10 @@ namespace FPL.inter
         {
             return this;
         }
+        public override object Run()
+        {
+            return (float)(int)content.GetValue();
+        }
     }
     [Serializable]
     public class Real : Expr
@@ -655,6 +690,10 @@ namespace FPL.inter
         public override Expr ToStringPlus()
         {
             return this;
+        }
+        public override object Run()
+        {
+            return content.GetValue();
         }
     }
     [Serializable]
@@ -673,6 +712,10 @@ namespace FPL.inter
         {
             return this;
         }
+        public override object Run()
+        {
+            return true;
+        }
     }
     [Serializable]
     public class False : Expr
@@ -690,6 +733,10 @@ namespace FPL.inter
         {
             return this;
         }
+        public override object Run()
+        {
+            return false;
+        }
     }
     [Serializable]
     public class Str : Expr
@@ -706,6 +753,10 @@ namespace FPL.inter
         public override Expr ToStringPlus()
         {
             return this;
+        }
+        public override object Run()
+        {
+            return content.GetValue();
         }
     }
     /*

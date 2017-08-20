@@ -11,7 +11,7 @@ namespace FPL.inter
     [Serializable]
     class Statement : Stmt
     {
-        Stmt assign;
+        Assign assign;
         public Statement(int tag) : base(tag)
         {
 
@@ -53,7 +53,7 @@ namespace FPL.inter
             if (Lexer.Peek.tag == Tag.ID)
             {
                 assign = new Assign(Tag.ASSIGN);
-                assign.Build(lex);
+                assign = (Assign)assign.Build(lex);
             }
             else
             {
@@ -66,6 +66,12 @@ namespace FPL.inter
         public override void Check()
         {
             assign.Check();
+        }
+
+        public override void Run()
+        {
+            AddVar(assign.name, "define");
+            assign.Run();
         }
     }
 }
