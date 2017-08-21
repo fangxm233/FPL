@@ -24,7 +24,7 @@ namespace FPL.inter
             name = ((Word)Lexer.Peek).lexeme;
             symbols.Type type = (symbols.Type)GetName(name);
             left = new Var(Lexer.Peek);
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.ASSIGN) Error("应输入\"=\"");
             right = new Expr().BuildStart(lex);
             switch (type.type)

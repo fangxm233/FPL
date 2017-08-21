@@ -19,7 +19,7 @@ namespace FPL.inter
 
         public virtual Expr Build(Lexer lex)
         {
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag) //检测所有可以为值的单元
             {
                 case Tag.TRUE:
@@ -62,7 +62,7 @@ namespace FPL.inter
                         break;
                     }
             }
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
@@ -80,54 +80,42 @@ namespace FPL.inter
                     }
                 case Tag.PLUS:
                     {
-                        right = new Plus(right); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
-                        right.Build(lex);
+                        right = new Plus(this).Build(lex); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
                         break;
                     }
                 case Tag.MINUS:
                     {
-                        right = new Minus(right);
-                        right.Build(lex);
+                        right = new Minus(this).Build(lex);
                         break;
                     }
                 case Tag.MULTIPLY:
                     {
-                        right = new Multiply(right);
-                        right.Build(lex);
+                        right = new Multiply(right).Build(lex);
                         switch (Lexer.Peek.tag) //把这个/*对象当做下一个次级符号的左值
                         {
                             case Tag.PLUS:
                                 {
-                                    right = new Plus(right);
-                                    right.Build(lex);
-                                    break;
+                                    return new Plus(this).Build(lex); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
                                 }
                             case Tag.MINUS:
                                 {
-                                    right = new Minus(right);
-                                    right.Build(lex);
-                                    break;
+                                    return new Minus(this).Build(lex);
                                 }
                         }
                         break;
                     }
                 case Tag.DIVIDE:
                     {
-                        right = new Divide(right);
-                        right.Build(lex);
+                        right = new Divide(right).Build(lex);
                         switch (Lexer.Peek.tag)
                         {
                             case Tag.PLUS:
                                 {
-                                    right = new Plus(right);
-                                    right.Build(lex);
-                                    break;
+                                    return new Plus(this).Build(lex); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
                                 }
                             case Tag.MINUS:
                                 {
-                                    right = new Minus(right);
-                                    right.Build(lex);
-                                    break;
+                                    return new Minus(this).Build(lex);
                                 }
                         }
                         break;
@@ -141,19 +129,19 @@ namespace FPL.inter
             return this;
         }
 
-        public Expr BuildStart(Lexer lex)
+        public Expr BuildStart(Lexer lex) //表达式建立的开始调用的，不可重写
         {
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.TRUE:
                     {
-                        lex.Scan();
+                        lex.Next();
                         return new True(Word.True);
                     }
                 case Tag.FALSE:
                     {
-                        lex.Scan();
+                        lex.Next();
                         return new False(Word.False);
                     }
                 case Tag.ID:
@@ -188,7 +176,7 @@ namespace FPL.inter
                         break;
                     }
             }
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
@@ -202,94 +190,46 @@ namespace FPL.inter
                 case Tag.MORE:
                 case Tag.LESS:
                     {
-                        return left;
+                        return left; //到了各个可能为表达式的结束符号的时候就返回
                     }
                 case Tag.PLUS:
                     {
-                        right = new Plus(left);
-                        right.Build(lex);
-                        break;
+                        return new Plus(left).Build(lex); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
                     }
                 case Tag.MINUS:
                     {
-                        right = new Minus(left);
-                        right.Build(lex);
-                        break;
+                        return new Minus(left).Build(lex);
                     }
                 case Tag.MULTIPLY:
                     {
-                        right = new Multiply(left);
+                        left = new Multiply(left);
                         right.Build(lex);
-                        switch (Lexer.Peek.tag)
+                        switch (Lexer.Peek.tag) //把这个/*对象当做下一个次级符号的左值
                         {
-                            case Tag.SEMICOLON:
-                            case Tag.RPARENTHESIS:
-                            case Tag.AND:
-                            case Tag.OR:
-                            case Tag.EQ:
-                            case Tag.NE:
-                            case Tag.LE:
-                            case Tag.GE:
-                            case Tag.MORE:
-                            case Tag.LESS:
-                                {
-                                    break;
-                                }
                             case Tag.PLUS:
                                 {
-                                    right = new Plus(right);
-                                    right.Build(lex);
-                                    break;
+                                    return new Plus(left).Build(lex); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
                                 }
                             case Tag.MINUS:
                                 {
-                                    right = new Minus(right);
-                                    right.Build(lex);
-                                    break;
-                                }
-                            default:
-                                {
-                                    Error("表达式无效");
-                                    break;
+                                    return new Minus(left).Build(lex);
                                 }
                         }
                         break;
                     }
                 case Tag.DIVIDE:
                     {
-                        right = new Divide(left);
+                        left = new Divide(left);
                         right.Build(lex);
                         switch (Lexer.Peek.tag)
                         {
-                            case Tag.SEMICOLON:
-                            case Tag.RPARENTHESIS:
-                            case Tag.AND:
-                            case Tag.OR:
-                            case Tag.EQ:
-                            case Tag.NE:
-                            case Tag.LE:
-                            case Tag.GE:
-                            case Tag.MORE:
-                            case Tag.LESS:
-                                {
-                                    break;
-                                }
                             case Tag.PLUS:
                                 {
-                                    right = new Plus(right);
-                                    right.Build(lex);
-                                    break;
+                                    return new Plus(left).Build(lex); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
                                 }
                             case Tag.MINUS:
                                 {
-                                    right = new Minus(right);
-                                    right.Build(lex);
-                                    break;
-                                }
-                            default:
-                                {
-                                    Error("表达式无效");
-                                    break;
+                                    return new Minus(left).Build(lex);
                                 }
                         }
                         break;
@@ -300,8 +240,8 @@ namespace FPL.inter
                         break;
                     }
             }
-            return right;
-        } //表达式建立的开始调用的，不可重写
+            return this;
+        }
 
         public virtual Expr Check()
         {
@@ -484,7 +424,7 @@ namespace FPL.inter
 
         public override Expr Build(Lexer lex)
         {
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.ID:
@@ -514,7 +454,7 @@ namespace FPL.inter
                         break;
                     }
             }
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
@@ -530,17 +470,13 @@ namespace FPL.inter
                     {
                         break;
                     }
-                case Tag.MULTIPLY: //把所有同级或更高级的顾浩匹配掉
+                case Tag.MULTIPLY: //把所有同级或更高级的符号匹配掉
                     {
-                        right = new Multiply(right);
-                        right.Build(lex);
-                        break;
+                        return new Multiply(this).Build(lex);
                     }
                 case Tag.DIVIDE:
                     {
-                        right = new Divide(right);
-                        right.Build(lex);
-                        break;
+                        return new Divide(this).Build(lex);
                     }
             }
             return this;
@@ -560,7 +496,7 @@ namespace FPL.inter
         }
         public override Expr Build(Lexer lex)
         {
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.ID:
@@ -590,7 +526,7 @@ namespace FPL.inter
                         break;
                     }
             }
-            lex.Scan();
+            lex.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
@@ -606,17 +542,13 @@ namespace FPL.inter
                     {
                         break;
                     }
-                case Tag.MULTIPLY:
+                case Tag.MULTIPLY: //把所有同级或更高级的符号匹配掉
                     {
-                        right = new Multiply(right);
-                        right.Build(lex);
-                        break;
+                        return new Multiply(this).Build(lex);
                     }
                 case Tag.DIVIDE:
                     {
-                        right = new Divide(right);
-                        right.Build(lex);
-                        break;
+                        return new Divide(this).Build(lex);
                     }
             }
             return this;

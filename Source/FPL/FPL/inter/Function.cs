@@ -4,32 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
-using FPL.symbols;
 
 namespace FPL.inter
 {
     [Serializable]
-    public class If : Stmt
+    public class Function : Stmt
     {
-        Rel rel;
-        List<Stmt> stmts;
-
-        public If(int tag) : base(tag)
+        List<Stmt> stmts = new List<Stmt>();
+        public string name;
+        public Function(int tag) : base(tag)
         {
-            
+            name = ((Word)Lexer.Peek).lexeme;
         }
 
         public override Stmt Build(Lexer lex)
         {
+            AddFunction(name, this);
             NewScope();
             lex.Next();
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
-            rel = new Rel();
-            rel = rel.Build(lex);
+            lex.Next();
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
             lex.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = base.Builds(lex);
+            stmts = Builds(lex);
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;
@@ -37,7 +35,6 @@ namespace FPL.inter
 
         public override void Check()
         {
-            rel.Check();
             foreach (Stmt item in stmts)
             {
                 item.Check();
@@ -46,12 +43,9 @@ namespace FPL.inter
 
         public override void Run()
         {
-            if (rel.Run())
+            foreach (Stmt item in stmts)
             {
-                foreach (Stmt item in stmts)
-                {
-                    item.Run();
-                }
+                item.Run();
             }
         }
     }

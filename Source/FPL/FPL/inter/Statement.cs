@@ -22,25 +22,25 @@ namespace FPL.inter
             {
                 case "int":
                     {
-                        lex.Scan();
+                        lex.Next();
                         AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Int);
                         break;
                     }
                 case "float":
                     {
-                        lex.Scan();
+                        lex.Next();
                         AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Float);
                         break;
                     }
                 case "bool":
                     {
-                        lex.Scan();
+                        lex.Next();
                         AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Bool);
                         break;
                     }
                 case "string":
                     {
-                        lex.Scan();
+                        lex.Next();
                         AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.String);
                         break;
                     }

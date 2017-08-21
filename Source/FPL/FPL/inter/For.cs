@@ -23,20 +23,20 @@ namespace FPL.inter
         public override Stmt Build(Lexer lex)
         {
             NewScope();
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
-            lex.Scan();
+            lex.Next();
             stmt = new Statement(Tag.STATEMENT);
             stmt.Build(lex);
             rel = new Rel();
             rel = rel.Build(lex);
-            lex.Scan();
+            lex.Next();
             assign = new Assign(Tag.ASSIGN);
             assign = assign.Build(lex);
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = base.Builds(lex);
+            stmts = Builds(lex);
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;
@@ -57,6 +57,7 @@ namespace FPL.inter
 
         public override void Run()
         {
+            NewScope();
             for (stmt.Run(); rel.Run(); assign.Run())
             {
                 NewScope();
@@ -79,6 +80,7 @@ namespace FPL.inter
                 }
                 DestroyScope();
             }
+            DestroyScope();
         }
     }
 }

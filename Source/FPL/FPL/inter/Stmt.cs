@@ -24,7 +24,7 @@ namespace FPL.inter
             List<Stmt> stmts = new List<Stmt>();
             while (true)
             {
-                lex.Scan();
+                lex.Next();
                 switch (Lexer.Peek.tag)
                 {
                     case Tag.RBRACE:
@@ -75,13 +75,27 @@ namespace FPL.inter
                         }
                     case Tag.ID:
                         {
-                            stmts.Add(new Assign(Tag.ASSIGN));
-                            stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build(lex);
+                            Token temp = Lexer.Peek;
+                            lex.Next();
+                            if(Lexer.Peek.tag == Tag.LPARENTHESIS)
+                            {
+                                lex.Back();
+                                stmts.Add(new FunctionCall(Tag.FUNCTIONCALL));
+                                stmts[stmts.Count - 1].Build(lex);
+                                break;
+                            }
+                            if (Lexer.Peek.tag == Tag.ASSIGN)
+                            {
+                                lex.Back();
+                                stmts.Add(new Assign(Tag.ASSIGN));
+                                stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build(lex);
+                                break;
+                            }
+                            Error("语法错误");
                             break;
                         }
                     default:
                         {
-                            Console.WriteLine(Lexer.Peek.tag);
                             Error("语句错误或大括号不匹配");
                             return stmts;
                         }
@@ -94,7 +108,7 @@ namespace FPL.inter
             List<Stmt> stmts = new List<Stmt>();
             while (true)
             {
-                lex.Scan();
+                lex.Next();
                 switch (Lexer.Peek.tag)
                 {
                     case Tag.EOF:
@@ -106,57 +120,15 @@ namespace FPL.inter
                             Error("意外的字符\"}\"");
                             break;
                         }
-                    case Tag.BASIC:
-                        {
-                            stmts.Add(new Statement(Tag.BASIC));
-                            stmts[stmts.Count - 1].Build(lex);
-                            break;
-                        }
-                    case Tag.IF:
-                        {
-                            stmts.Add(new If(Tag.IF));
-                            stmts[stmts.Count - 1].Build(lex);
-                            break;
-                        }
-                    case Tag.FOR:
-                        {
-                            stmts.Add(new For(Tag.FOR));
-                            stmts[stmts.Count - 1].Build(lex);
-                            break;
-                        }
-                    case Tag.DO:
-                        {
-                            stmts.Add(new Do(Tag.DO));
-                            stmts[stmts.Count - 1].Build(lex);
-                            break;
-                        }
-                    case Tag.WHILE:
-                        {
-                            stmts.Add(new While(Tag.WHILE));
-                            stmts[stmts.Count - 1].Build(lex);
-                            break;
-                        }
-                    case Tag.BREAK:
-                        {
-                            stmts.Add(new Break(Tag.BREAK));
-                            stmts[stmts.Count - 1].Build(lex);
-                            break;
-                        }
-                    case Tag.CONTINUE:
-                        {
-                            stmts.Add(new Continue(Tag.CONTINUE));
-                            stmts[stmts.Count - 1].Build(lex);
-                            break;
-                        }
                     case Tag.ID:
                         {
-                            stmts.Add(new Assign(Tag.ASSIGN));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts.Add(new Function(Tag.FUNCTION));
+                            stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build(lex);
                             break;
                         }
                     default:
                         {
-                            Error("语句错误或大括号不匹配");
+                            Error("语句错误");
                             return stmts;
                         }
                 }

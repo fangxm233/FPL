@@ -21,13 +21,13 @@ namespace FPL.inter
         public override Stmt Build(Lexer lex)
         {
             NewScope();
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
             rel = new Rel();
             //rel = 
             rel = rel.Build(lex);
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
             stmts = Builds(lex);
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");

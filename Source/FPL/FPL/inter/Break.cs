@@ -17,7 +17,7 @@ namespace FPL.inter
 
         public override Stmt Build(Lexer lex)
         {
-            lex.Scan();
+            lex.Next();
             return this;
         }
 

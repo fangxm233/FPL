@@ -9,14 +9,15 @@ namespace FPL.lexer
     [Serializable]
     class Tag
     {
-        //申明和赋值语句的tag
+        //目前最大tag：293
+        //语句的tag
         public const int
-            ASSIGN = 280, STATEMENT = 287;
+            ASSIGN = 280, STATEMENT = 287, FUNCTION = 291, FUNCTIONCALL = 293;
 
         //标识符的tag
         public const int
-            DO    = 259, ELSE     = 260, BREAK = 258, FALSE = 262, TRUE = 274,
-            WHILE = 275, CONTINUE = 290, IF    = 265, FOR   = 284;
+            DO    = 259, ELSE     = 260, BREAK = 258, FALSE = 262, TRUE   = 274,
+            WHILE = 275, CONTINUE = 290, IF    = 265, FOR   = 284, RETURN = 292;
 
         //表达式的tag
         public const int

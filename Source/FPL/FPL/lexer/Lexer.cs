@@ -17,6 +17,10 @@ namespace FPL.lexer
         char peek = ' ';
         Hashtable words = new Hashtable();
         StreamReader stream_reader;
+
+        public List<Token> peeks = new List<Token>();
+        public int count;
+
         void Reserve(Word w)
         {
             words.Add(w.lexeme, w);
@@ -40,9 +44,14 @@ namespace FPL.lexer
             Reserve(symbols.Type.Bool);
             Reserve(symbols.Type.Float);
             Reserve(symbols.Type.String);
+            while (!stream_reader.EndOfStream)
+            {
+                Scan();
+            }
+            peeks.Add(new Token(Tag.EOF));
         }
 
-        public void Scan()
+        void Scan()
         {
             start: //用于检测完注释以后回到这个函数开头的
             for (; ; Readch()) //去掉所有空白
@@ -72,7 +81,7 @@ namespace FPL.lexer
                         }
                         if(peek == '\uffff')
                         {
-                            Peek = new Token(peek);
+                            peeks.Add(new Token(peek));
                             return;
                         }
                     }
@@ -98,12 +107,12 @@ namespace FPL.lexer
                         }
                         if (peek == '\uffff')
                         {
-                            Peek = new Token(peek);
+                            peeks.Add(new Token(peek));
                             return;
                         }
                     }
                 }
-                Peek = Word.divide;
+                peeks.Add(Word.divide);
                 Readch();
                 return;
             }
@@ -111,49 +120,49 @@ namespace FPL.lexer
             {
                 case '&':
                     {
-                        if (Readch('&')) Peek = Word.and; else Peek = new Token('&');
+                        if (Readch('&')) peeks.Add(Word.and); else peeks.Add(new Token('&'));
                         return;
                     }
                 case '|':
                     {
-                        if (Readch('|')) Peek = Word.or; else Peek = new Token('|');
+                        if (Readch('|')) peeks.Add(Word.or); else peeks.Add(new Token('|'));
                         return;
                     }
                 case '=':
                     {
-                        if (Readch('=')) Peek = Word.eq; else Peek = Word.assign;
+                        if (Readch('=')) peeks.Add(Word.eq); else peeks.Add(Word.assign);
                         return;
                     }
                 case '!':
                     {
-                        if (Readch('=')) Peek =  Word.ne; else Peek =  new Token('!');
+                        if (Readch('=')) peeks.Add(Word.ne); else peeks.Add(new Token('!'));
                         return;
                     }
                 case '<':
                     {
-                        if (Readch('=')) Peek = Word.le; else Peek = Word.less;
+                        if (Readch('=')) peeks.Add(Word.le); else peeks.Add(Word.less);
                         return;
                     }
                 case '>':
                     {
-                        if (Readch('=')) Peek = Word.ge; else Peek = Word.more;
+                        if (Readch('=')) peeks.Add(Word.ge); else peeks.Add(Word.more);
                         return;
                     }
                 case '+':
                     {
-                        Peek = Word.plus;
+                        peeks.Add(Word.plus);
                         Readch();
                         return;
                     }
                 case '-':
                     {
-                        Peek = Word.minus;
+                        peeks.Add(Word.minus);
                         Readch();
                         return;
                     }
                 case '*':
                     {
-                        Peek = Word.multiply;
+                        peeks.Add(Word.multiply);
                         Readch();
                         return;
                     }
@@ -163,31 +172,31 @@ namespace FPL.lexer
                     }
                 case ';':
                     {
-                        Peek = Word.semicolon;
+                        peeks.Add(Word.semicolon);
                         Readch();
                         return;
                     }
                 case '(':
                     {
-                        Peek = Word.Lparenthesis;
+                        peeks.Add(Word.Lparenthesis);
                         Readch();
                         return;
                     }
                 case ')':
                     {
-                        Peek = Word.Rparenthesis;
+                        peeks.Add(Word.Rparenthesis);
                         Readch();
                         return;
                     }
                 case '{':
                     {
-                        Peek = Word.LBrace;
+                        peeks.Add(Word.LBrace);
                         Readch();
                         return;
                     }
                 case '}':
                     {
-                        Peek = Word.RBrace;
+                        peeks.Add(Word.RBrace);
                         Readch();
                         return;
                     }
@@ -202,7 +211,7 @@ namespace FPL.lexer
                     {
                         Str str = new Str(s);
                         Readch();
-                        Peek = str;
+                        peeks.Add(str);
                         return;
                     }
                     else if (peek == '\n')
@@ -210,7 +219,7 @@ namespace FPL.lexer
                         Node.Error("应输入\"\"\"");
                         Str str = new Str(s);
                         Readch();
-                        Peek = str;
+                        peeks.Add(str);
                         return;
                     }
                     s = s + peek;
@@ -228,7 +237,7 @@ namespace FPL.lexer
                 {
                     try
                     {
-                        Peek = new Num(int.Parse(n));
+                        peeks.Add(new Num(int.Parse(n)));
                     }
                     catch (Exception)
                     {
@@ -246,7 +255,7 @@ namespace FPL.lexer
                 }
                 try
                 {
-                    Peek = new Real(float.Parse(f));
+                    peeks.Add(new Real(float.Parse(f)));
                 }
                 catch (Exception)
                 {
@@ -265,17 +274,27 @@ namespace FPL.lexer
                 string s = b.ToString();
                 Word w = (Word)words[s];
                 if (w != null) {
-                    Peek = w;
+                    peeks.Add(w);
                     return;
                 }
                 w = new Word(s, Tag.ID);
                 words.Add(s, w);
-                Peek = w;
+                peeks.Add(w);
                 return;
             }
             Token tok = new Token(peek);
             peek = ' ';
-            Peek = tok;
+            peeks.Add(tok);
+        }
+
+        public void Next()
+        {
+            Peek = peeks[count++];
+        }
+        public void Back()
+        {
+            count -= 2;
+            Next();
         }
 
         void Readch()

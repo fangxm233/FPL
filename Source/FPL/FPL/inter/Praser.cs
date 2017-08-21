@@ -14,10 +14,12 @@ namespace FPL.inter
     {
         [NonSerialized]
         Lexer lex;
+        [NonSerialized]
         public static List<Hashtable> symbols_list = new List<Hashtable>()
         {
             new Hashtable()
         };
+        public static Hashtable functions = new Hashtable();
         List<Stmt> stmts;
 
         public Praser(Lexer lex)
@@ -38,20 +40,18 @@ namespace FPL.inter
         }
         public void Interprete()
         {
-            symbols_list = new List<Hashtable>()
-            {
-                new Hashtable()
-            };
-            foreach (Stmt item in stmts)
-            {
-                item.Run();
-            }
+            if (functions["Main"] == null) Error("未找到主函数");
+            ((Function)functions["Main"]).Run();
+        }
+
+        public static void Error(string s)
+        {
+            Console.WriteLine(s);
+            throw new RunTimeException();
         }
     }
 
     [Serializable]
-    public class CompileException : Exception
-    {
-         
-    }
+    public class CompileException : Exception { }
+    public class RunTimeException : Exception { }
 }

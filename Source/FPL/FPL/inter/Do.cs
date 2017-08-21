@@ -21,18 +21,18 @@ namespace FPL.inter
         public override Stmt Build(Lexer lex)
         {
             NewScope();
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
             stmts = base.Builds(lex);
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.WHILE) Error("应输入\"while\"");
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
             rel = new Rel();
             rel = rel.Build(lex);
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
-            lex.Scan();
+            lex.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             DestroyScope();
             return this;

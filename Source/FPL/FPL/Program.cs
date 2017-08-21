@@ -42,22 +42,22 @@ namespace FPL
         */
         static void Main(string[] args)
         {
-            Compile("Program.fpl");
-            //Console.ReadKey();
-            Interprete();
+            if (Compile("Program.fpl"))
+                Interprete();
             Console.ReadKey();
         }
 
-        static void Compile(string args)
+        static bool Compile(string args)
         {
             try
             {
-                Lexer lex = new Lexer(new StreamReader(new FileStream(args, FileMode.Open)));
-
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
                 watch.Start();
+
+                Lexer lex = new Lexer(new StreamReader(new FileStream(args, FileMode.Open)));
                 Praser praser = new Praser(lex);
                 praser.Compile();
+
                 watch.Stop();
 
                 //二进制存储
@@ -69,25 +69,30 @@ namespace FPL
                 TimeSpan timespan = watch.Elapsed;
                 Console.WriteLine("编译完成");
                 Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);
+                return true;
             }
-            catch (CompileException) { }
+            catch (CompileException) { return false; }
         }
 
         static void Interprete()
         {
-            Praser praser;
+            try
+            {
+                Praser praser;
 
-            FileStream fileStream = new FileStream("Program.fplc", FileMode.Open);
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            praser = (Praser)binaryFormatter.Deserialize(fileStream);
+                FileStream fileStream = new FileStream("Program.fplc", FileMode.Open);
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                praser = (Praser)binaryFormatter.Deserialize(fileStream);
 
-            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
-            watch.Start();
-            praser.Interprete();
-            watch.Stop();
-            TimeSpan timespan = watch.Elapsed;
-            Console.WriteLine("执行完成");
-            Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);
+                System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+                watch.Start();
+                praser.Interprete();
+                watch.Stop();
+                TimeSpan timespan = watch.Elapsed;
+                Console.WriteLine("执行完成");
+                Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);
+            }
+            catch (RunTimeException) { }
         }
     }
 }

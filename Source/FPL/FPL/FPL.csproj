@@ -48,6 +48,8 @@
     <Compile Include="inter\Do.cs" />
     <Compile Include="inter\Expr.cs" />
     <Compile Include="inter\For.cs" />
+    <Compile Include="inter\Function.cs" />
+    <Compile Include="inter\FunctionCall.cs" />
     <Compile Include="inter\If.cs" />
     <Compile Include="inter\Node.cs" />
     <Compile Include="inter\Praser.cs" />
