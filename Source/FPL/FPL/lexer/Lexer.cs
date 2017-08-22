@@ -61,7 +61,6 @@ namespace FPL.lexer
 
         void Scan()
         {
-            start: //用于检测完注释以后回到这个函数开头的
             for (; ; Readch()) //去掉所有空白
             {
                 if (peek == ' ' || peek == '\t' || peek == '\r')
@@ -86,7 +85,7 @@ namespace FPL.lexer
                         {
                             line++;
                             Readch();
-                            goto start;
+                            return;
                         }
                         if(peek == '\uffff')
                         {
@@ -111,7 +110,7 @@ namespace FPL.lexer
                             if (peek == '/')
                             {
                                 Readch();
-                                goto start;
+                                return;
                             }
                         }
                         if (peek == '\uffff')
