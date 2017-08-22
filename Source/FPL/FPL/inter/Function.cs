@@ -43,10 +43,12 @@ namespace FPL.inter
 
         public override void Run()
         {
+            NewScope();
             foreach (Stmt item in stmts)
             {
                 item.Run();
             }
+            DestroyScope();
         }
     }
 }

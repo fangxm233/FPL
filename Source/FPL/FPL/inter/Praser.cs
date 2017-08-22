@@ -15,10 +15,7 @@ namespace FPL.inter
         [NonSerialized]
         Lexer lex;
         [NonSerialized]
-        public static List<Hashtable> symbols_list = new List<Hashtable>()
-        {
-            new Hashtable()
-        };
+        public static List<Hashtable> symbols_list = new List<Hashtable>();
         public static Hashtable functions = new Hashtable();
         List<Stmt> stmts;
 
@@ -53,5 +50,6 @@ namespace FPL.inter
 
     [Serializable]
     public class CompileException : Exception { }
+    [Serializable]
     public class RunTimeException : Exception { }
 }
