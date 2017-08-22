@@ -9,7 +9,7 @@ namespace FPL.lexer
     [Serializable]
     public class Token
     {
-        public readonly int tag;
+        public int tag;
         public readonly int line;
         public Token(int i)
         {

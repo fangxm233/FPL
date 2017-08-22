@@ -9,15 +9,16 @@ namespace FPL.lexer
     [Serializable]
     class Tag
     {
-        //目前最大tag：293
+        //目前最大tag：295
         //语句的tag
         public const int
-            ASSIGN = 280, STATEMENT = 287, FUNCTION = 291, FUNCTIONCALL = 293;
+            ASSIGN = 280, STATEMENT = 287, FUNCTION = 291, FUNCTIONCALL = 293, QUOTE = 295;
 
         //标识符的tag
         public const int
             DO    = 259, ELSE     = 260, BREAK = 258, FALSE = 262, TRUE   = 274,
-            WHILE = 275, CONTINUE = 290, IF    = 265, FOR   = 284, RETURN = 292;
+            WHILE = 275, CONTINUE = 290, IF    = 265, FOR   = 284, RETURN = 292,
+            USING = 294;
 
         //表达式的tag
         public const int
@@ -35,7 +36,7 @@ namespace FPL.lexer
 
         //其他
         public const int 
-            INDEX = 266, TEMP = 273, EOF = 65535;
+            INDEX = 266, TEMP = 273, EOF = 65535, EOL = 65534;
 
     }
 }

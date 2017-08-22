@@ -1,4 +1,7 @@
-﻿Main()
+﻿using Console;
+
+Main()
 {
-	int a = 100;	if(a==100)	{		if(a==100)		{			if(a==100)			{				if(a==100)				{					if(a==100)					{						if(a==100)						{							if(a==100)							{								if(a==100)								{									if(a==100)									{										if(a==100)										{											if(a==100)											{												if(a==100)												{													if(a==100)													{														int b = (((5 + 9))) - 4 / 3 + 10;													}													if(a!=100)													{														int c = (((5 + 9))) - 4 / (3 + 10);													}												}											}										}									}								}							}						}					}				}			}		}	}
+	int s = 555;
+	cout<<"fangxm is very 6666 "+s;
 }

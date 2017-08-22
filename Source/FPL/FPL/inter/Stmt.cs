@@ -87,11 +87,15 @@ namespace FPL.inter
                             if (Lexer.Peek.tag == Tag.ASSIGN)
                             {
                                 lex.Back();
-                                stmts.Add(new Assign(Tag.ASSIGN));
-                                stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build(lex);
+                                stmts.Add(new Assign(Tag.ASSIGN).Build(lex));
                                 break;
                             }
                             Error("语法错误");
+                            break;
+                        }
+                    case Tag.QUOTE:
+                        {
+                            stmts.Add(new Quote(Tag.QUOTE).Build(lex));
                             break;
                         }
                     default:
@@ -124,6 +128,11 @@ namespace FPL.inter
                         {
                             stmts.Add(new Function(Tag.FUNCTION));
                             stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build(lex);
+                            break;
+                        }
+                    case Tag.USING:
+                        {
+                            new Using(Tag.USING).Build(lex);
                             break;
                         }
                     default:

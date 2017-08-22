@@ -53,9 +53,11 @@
     <Compile Include="inter\If.cs" />
     <Compile Include="inter\Node.cs" />
     <Compile Include="inter\Praser.cs" />
+    <Compile Include="inter\Quote.cs" />
     <Compile Include="inter\Rel.cs" />
     <Compile Include="inter\Statement.cs" />
     <Compile Include="inter\Stmt.cs" />
+    <Compile Include="inter\Using.cs" />
     <Compile Include="inter\While.cs" />
     <Compile Include="lexer\Lexer.cs" />
     <Compile Include="lexer\Tag.cs" />

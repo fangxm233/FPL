@@ -16,6 +16,7 @@ namespace FPL.lexer
         public static int line = 1;
         char peek = ' ';
         Hashtable words = new Hashtable();
+        Hashtable quote = new Hashtable();
         StreamReader stream_reader;
 
         public List<Token> peeks = new List<Token>();
@@ -24,6 +25,11 @@ namespace FPL.lexer
         void Reserve(Word w)
         {
             words.Add(w.lexeme, w);
+        }
+
+        public void AddQuote(string s)
+        {
+            quote.Add(s, Tag.QUOTE);
         }
 
         public Lexer(StreamReader stream_reader)
@@ -37,6 +43,7 @@ namespace FPL.lexer
             Reserve(new Word("break", Tag.BREAK));
             Reserve(new Word("continue", Tag.CONTINUE));
             Reserve(new Word("for", Tag.FOR));
+            Reserve(new Word("using", Tag.USING));
             Reserve(Word.True);
             Reserve(Word.False);
             Reserve(symbols.Type.Int);
@@ -49,6 +56,7 @@ namespace FPL.lexer
                 Scan();
             }
             peeks.Add(new Token(Tag.EOF));
+            line = 1;
         }
 
         void Scan()
@@ -63,6 +71,7 @@ namespace FPL.lexer
                 else if (peek == '\n')
                 {
                     line++;
+                    peeks.Add(new Token(Tag.EOL));
                 }
                 else break;
             }
@@ -290,6 +299,18 @@ namespace FPL.lexer
         public void Next()
         {
             Peek = peeks[count++];
+            if(Peek.tag == Tag.EOL)
+            {
+                line++;
+                Next();
+            }
+            if (Peek.tag == Tag.ID)
+            {
+                if (quote[((Word)Peek).lexeme] != null)
+                {
+                    Peek.tag = Tag.QUOTE;
+                }
+            }
         }
         public void Back()
         {
