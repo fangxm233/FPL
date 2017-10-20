@@ -14,27 +14,30 @@ namespace FPL.lexer
     {
         public static Token Peek;
         public static int line = 1;
-        char peek = ' ';
-        Hashtable words = new Hashtable();
-        Hashtable quote = new Hashtable();
-        StreamReader stream_reader;
+        static char peek = ' ';
+        //Hashtable words = new Hashtable();
+        static Dictionary<string, Word> words = new Dictionary<string, Word>();
 
-        public List<Token> peeks = new List<Token>();
-        public int count;
+        //Hashtable quote = new Hashtable();
+        static Dictionary<string, int> quote = new Dictionary<string, int>();
+        static StreamReader stream_reader;
 
-        void Reserve(Word w)
+        public static List<Token> peeks = new List<Token>();
+        public static int count;
+
+        static void Reserve(Word w)
         {
             words.Add(w.lexeme, w);
         }
 
-        public void AddQuote(string s)
+        public static void AddQuote(string s)
         {
             quote.Add(s, Tag.QUOTE);
         }
 
-        public Lexer(StreamReader stream_reader)
+        public static void Analysis(StreamReader stream_reader)
         {
-            this.stream_reader = stream_reader;
+            Lexer.stream_reader = stream_reader;
             //把各种保留字写在这
             Reserve(new Word("if", Tag.IF));
             Reserve(new Word("else", Tag.ELSE));
@@ -59,7 +62,7 @@ namespace FPL.lexer
             line = 1;
         }
 
-        void Scan()
+        static void Scan()
         {
             for (; ; Readch()) //去掉所有空白
             {
@@ -280,7 +283,9 @@ namespace FPL.lexer
                     Readch();
                 } while (char.IsLetterOrDigit(peek));
                 string s = b.ToString();
-                Word w = (Word)words[s];
+                Word w = null;
+                if (words.ContainsKey(s))
+                w = words[s];
                 if (w != null) {
                     peeks.Add(w);
                     return;
@@ -295,7 +300,7 @@ namespace FPL.lexer
             peeks.Add(tok);
         }
 
-        public void Next()
+        public static void Next()
         {
             Peek = peeks[count++];
             if(Peek.tag == Tag.EOL)
@@ -305,24 +310,24 @@ namespace FPL.lexer
             }
             if (Peek.tag == Tag.ID)
             {
-                if (quote[((Word)Peek).lexeme] != null)
+                if (quote.ContainsKey(((Word)Peek).lexeme))
                 {
                     Peek.tag = Tag.QUOTE;
                 }
             }
         }
-        public void Back()
+        public static void Back()
         {
             count -= 2;
             Next();
         }
 
-        void Readch()
+        static void Readch()
         {
             peek = (char)stream_reader.Read();
         }
 
-        bool Readch(char c)
+        static bool Readch(char c)
         {
             Readch();
             if (peek != c) return false;

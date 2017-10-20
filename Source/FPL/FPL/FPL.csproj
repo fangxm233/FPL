@@ -52,7 +52,7 @@
     <Compile Include="inter\FunctionCall.cs" />
     <Compile Include="inter\If.cs" />
     <Compile Include="inter\Node.cs" />
-    <Compile Include="inter\Praser.cs" />
+    <Compile Include="inter\Parser.cs" />
     <Compile Include="inter\Quote.cs" />
     <Compile Include="inter\Rel.cs" />
     <Compile Include="inter\Statement.cs" />

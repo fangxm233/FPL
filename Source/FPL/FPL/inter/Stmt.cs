@@ -19,12 +19,12 @@ namespace FPL.inter
         {
             this.tag = tag;
         }
-        public List<Stmt> Builds(Lexer lex)//这是建立一个语句块
+        public List<Stmt> Builds()//这是建立一个语句块
         {
             List<Stmt> stmts = new List<Stmt>();
             while (true)
             {
-                lex.Next();
+                Lexer.Next();
                 switch (Lexer.Peek.tag)
                 {
                     case Tag.RBRACE:
@@ -34,60 +34,60 @@ namespace FPL.inter
                     case Tag.BASIC:
                         {
                             stmts.Add(new Statement(Tag.BASIC));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.IF:
                         {
                             stmts.Add(new If(Tag.IF));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.FOR:
                         {
                             stmts.Add(new For(Tag.FOR));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.DO:
                         {
                             stmts.Add(new Do(Tag.DO));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.WHILE:
                         {
                             stmts.Add(new While(Tag.WHILE));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.BREAK:
                         {
                             stmts.Add(new Break(Tag.BREAK));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.CONTINUE:
                         {
                             stmts.Add(new Continue(Tag.CONTINUE));
-                            stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.ID:
                         {
                             Token temp = Lexer.Peek;
-                            lex.Next();
+                            Lexer.Next();
                             if(Lexer.Peek.tag == Tag.LPARENTHESIS)
                             {
-                                lex.Back();
+                                Lexer.Back();
                                 stmts.Add(new FunctionCall(Tag.FUNCTIONCALL));
-                                stmts[stmts.Count - 1].Build(lex);
+                                stmts[stmts.Count - 1].Build();
                                 break;
                             }
                             if (Lexer.Peek.tag == Tag.ASSIGN)
                             {
-                                lex.Back();
-                                stmts.Add(new Assign(Tag.ASSIGN).Build(lex));
+                                Lexer.Back();
+                                stmts.Add(new Assign(Tag.ASSIGN).Build());
                                 break;
                             }
                             Error("语法错误");
@@ -95,7 +95,7 @@ namespace FPL.inter
                         }
                     case Tag.QUOTE:
                         {
-                            stmts.Add(new Quote(Tag.QUOTE).Build(lex));
+                            stmts.Add(new Quote(Tag.QUOTE).Build());
                             break;
                         }
                     default:
@@ -107,12 +107,12 @@ namespace FPL.inter
             }
         }
 
-        public List<Stmt> Buildsstart(Lexer lex)
+        public List<Stmt> Buildsstart()
         {
             List<Stmt> stmts = new List<Stmt>();
             while (true)
             {
-                lex.Next();
+                Lexer.Next();
                 switch (Lexer.Peek.tag)
                 {
                     case Tag.EOF:
@@ -127,12 +127,12 @@ namespace FPL.inter
                     case Tag.ID:
                         {
                             stmts.Add(new Function(Tag.FUNCTION));
-                            stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build(lex);
+                            stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build();
                             break;
                         }
                     case Tag.USING:
                         {
-                            new Using(Tag.USING).Build(lex);
+                            new Using(Tag.USING).Build();
                             break;
                         }
                     default:
@@ -144,7 +144,7 @@ namespace FPL.inter
             }
         }
 
-        public virtual Stmt Build(Lexer lex)//这是建立某一个语句
+        public virtual Stmt Build()//这是建立某一个语句
         {
             return this;
         }

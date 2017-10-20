@@ -19,17 +19,17 @@ namespace FPL.inter
             
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
             NewScope();
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
             rel = new Rel();
-            rel = rel.Build(lex);
+            rel = rel.Build();
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = base.Builds(lex);
+            stmts = Builds();
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;

@@ -16,13 +16,13 @@ namespace FPL.inter
             name = ((Word)Lexer.Peek).lexeme;
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }

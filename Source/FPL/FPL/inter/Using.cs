@@ -15,15 +15,15 @@ namespace FPL.inter
 
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
-            lex.Next();
+            Lexer.Next();
             switch (((Word)Lexer.Peek).lexeme)
             {
                 case "Console":
                     {
-                        lex.AddQuote("cout");
-                        lex.AddQuote("cin");
+                        Lexer.AddQuote("cout");
+                        Lexer.AddQuote("cin");
                         break;
                     }
                 default:
@@ -32,7 +32,7 @@ namespace FPL.inter
                         break;
                     }
             }
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }

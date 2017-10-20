@@ -54,8 +54,8 @@ namespace FPL
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
                 watch.Start();
 
-                Lexer lex = new Lexer(new StreamReader(new FileStream(args, FileMode.Open)));
-                Praser praser = new Praser(lex);
+                Lexer.Analysis(new StreamReader(new FileStream(args, FileMode.Open)));
+                Parser praser = new Parser();
                 praser.Compile();
 
                 watch.Stop();
@@ -78,11 +78,11 @@ namespace FPL
         {
             try
             {
-                Praser praser;
+                Parser praser;
 
                 FileStream fileStream = new FileStream("Program.fplc", FileMode.Open);
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
-                praser = (Praser)binaryFormatter.Deserialize(fileStream);
+                praser = (Parser)binaryFormatter.Deserialize(fileStream);
 
                 System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
                 watch.Start();

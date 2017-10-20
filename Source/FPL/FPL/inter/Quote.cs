@@ -15,17 +15,17 @@ namespace FPL.inter
 
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
             switch (((Word)Lexer.Peek).lexeme)
             {
                 case "cout":
                     {
-                        return new Cout(Tag.QUOTE).Build(lex);
+                        return new Cout(Tag.QUOTE).Build();
                     }
                 case "cin":
                     {
-                        return new Cin(Tag.QUOTE).Build(lex);
+                        return new Cin(Tag.QUOTE).Build();
                     }
             }
             return this;
@@ -41,13 +41,13 @@ namespace FPL.inter
 
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.LESS) Error("应输入\"<\"");
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.LESS) Error("应输入\"<\"");
-            expr = new Expr().BuildStart(lex);
+            expr = new Expr().BuildStart();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
@@ -76,15 +76,15 @@ namespace FPL.inter
 
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.MORE) Error("应输入\">\"");
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.MORE) Error("应输入\">\"");
-            lex.Next();
+            Lexer.Next();
             expr = new Var(Lexer.Peek);
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
@@ -98,11 +98,11 @@ namespace FPL.inter
                 {
                     case "int":
                         {
-                            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
+                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
                             {
-                                if (Praser.symbols_list[i][expr.name] != null)
+                                if (Parser.symbols_list[i][expr.name] != null)
                                 {
-                                    Praser.symbols_list[i][expr.name] = int.Parse(s);
+                                    Parser.symbols_list[i][expr.name] = int.Parse(s);
                                     return;
                                 }
                             }
@@ -110,11 +110,11 @@ namespace FPL.inter
                         }
                     case "float":
                         {
-                            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
+                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
                             {
-                                if (Praser.symbols_list[i][expr.name] != null)
+                                if (Parser.symbols_list[i][expr.name] != null)
                                 {
-                                    Praser.symbols_list[i][expr.name] = float.Parse(s);
+                                    Parser.symbols_list[i][expr.name] = float.Parse(s);
                                     return;
                                 }
                             }
@@ -122,11 +122,11 @@ namespace FPL.inter
                         }
                     case "string":
                         {
-                            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
+                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
                             {
-                                if (Praser.symbols_list[i][expr.name] != null)
+                                if (Parser.symbols_list[i][expr.name] != null)
                                 {
-                                    Praser.symbols_list[i][expr.name] = s;
+                                    Parser.symbols_list[i][expr.name] = s;
                                     return;
                                 }
                             }
@@ -134,11 +134,11 @@ namespace FPL.inter
                         }
                     case "bool":
                         {
-                            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
+                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
                             {
-                                if (Praser.symbols_list[i][expr.name] != null)
+                                if (Parser.symbols_list[i][expr.name] != null)
                                 {
-                                    Praser.symbols_list[i][expr.name] = bool.Parse(s);
+                                    Parser.symbols_list[i][expr.name] = bool.Parse(s);
                                     return;
                                 }
                             }
@@ -148,7 +148,7 @@ namespace FPL.inter
             }
             catch (Exception)
             {
-                Praser.Error("无法将输入转换为类型\"" + expr.type.type + "\"");
+                Parser.Error("无法将输入转换为类型\"" + expr.type.type + "\"");
             }
         }
     }

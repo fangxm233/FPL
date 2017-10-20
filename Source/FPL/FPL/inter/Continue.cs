@@ -15,9 +15,9 @@ namespace FPL.inter
 
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
-            lex.Next();
+            Lexer.Next();
             return this;
         }
 

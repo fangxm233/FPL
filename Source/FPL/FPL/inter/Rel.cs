@@ -15,45 +15,45 @@ namespace FPL.inter
         public Expr right;
         //public Token content;
 
-        public virtual Rel Build(Lexer lex)
+        public virtual Rel Build()
         {
-            left = new Expr().BuildStart(lex);
+            left = new Expr().BuildStart();
             switch (Lexer.Peek.tag)
             {
                 case Tag.EQ:
                     {
                         Eq a = new Eq(left);
-                        a.Build(lex);
+                        a.Build();
                         return a;
                     }
                 case Tag.NE:
                     {
                         Ne a = new Ne(left);
-                        a.Build(lex);
+                        a.Build();
                         return a;
                     }
                 case Tag.LE:
                     {
                         Le a = new Le(left);
-                        a.Build(lex);
+                        a.Build();
                         return a;
                     }
                 case Tag.GE:
                     {
                         Ge a = new Ge(left);
-                        a.Build(lex);
+                        a.Build();
                         return a;
                     }
                 case Tag.MORE:
                     {
                         More a = new More(left);
-                        a.Build(lex);
+                        a.Build();
                         return a;
                     }
                 case Tag.LESS:
                     {
                         Less a = new Less(left);
-                        a.Build(lex);
+                        a.Build();
                         return a;
                     }
             }
@@ -84,9 +84,9 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build(Lexer lex)
+        public override Rel Build()
         {
-            right = new Expr().BuildStart(lex);
+            right = new Expr().BuildStart();
             return this;
         }
 
@@ -138,9 +138,9 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build(Lexer lex)
+        public override Rel Build()
         {
-            right = new Expr().BuildStart(lex);
+            right = new Expr().BuildStart();
             return this;
         }
 
@@ -192,9 +192,9 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build(Lexer lex)
+        public override Rel Build()
         {
-            right = new Expr().BuildStart(lex);
+            right = new Expr().BuildStart();
             return this;
         }
 
@@ -236,9 +236,9 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build(Lexer lex)
+        public override Rel Build()
         {
-            right = new Expr().BuildStart(lex);
+            right = new Expr().BuildStart();
             return this;
         }
 
@@ -280,9 +280,9 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build(Lexer lex)
+        public override Rel Build()
         {
-            right = new Expr().BuildStart(lex);
+            right = new Expr().BuildStart();
             return this;
         }
 
@@ -324,9 +324,9 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build(Lexer lex)
+        public override Rel Build()
         {
-            right = new Expr().BuildStart(lex);
+            right = new Expr().BuildStart();
             return this;
         }
 

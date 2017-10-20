@@ -16,32 +16,32 @@ namespace FPL.inter
         {
 
         }
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
             switch (((symbols.Type)Lexer.Peek).lexeme)
             {
                 case "int":
                     {
-                        lex.Next();
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Int);
+                        Lexer.Next();
+                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Int));
                         break;
                     }
                 case "float":
                     {
-                        lex.Next();
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Float);
+                        Lexer.Next();
+                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Float));
                         break;
                     }
                 case "bool":
                     {
-                        lex.Next();
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Bool);
+                        Lexer.Next();
+                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Bool));
                         break;
                     }
                 case "string":
                     {
-                        lex.Next();
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.String);
+                        Lexer.Next();
+                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.String));
                         break;
                     }
                 default:
@@ -50,15 +50,11 @@ namespace FPL.inter
                         break;
                     }
             }
-            if (Lexer.Peek.tag == Tag.ID)
-            {
-                assign = new Assign(Tag.ASSIGN);
-                assign = (Assign)assign.Build(lex);
-            }
-            else
+            if (Lexer.Peek.tag != Tag.ID)
             {
                 Error("应输入标识符");
             }
+            assign = (Assign)assign.Build();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
@@ -70,7 +66,7 @@ namespace FPL.inter
 
         public override void Run()
         {
-            AddVar(assign.name, "define");
+            //AddVar(assign.name, "define");
             assign.Run();
         }
     }

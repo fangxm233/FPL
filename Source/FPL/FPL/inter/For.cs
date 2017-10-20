@@ -20,23 +20,23 @@ namespace FPL.inter
 
         }
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
             NewScope();
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
-            lex.Next();
+            Lexer.Next();
             stmt = new Statement(Tag.STATEMENT);
-            stmt.Build(lex);
+            stmt.Build();
             rel = new Rel();
-            rel = rel.Build(lex);
-            lex.Next();
+            rel = rel.Build();
+            Lexer.Next();
             assign = new Assign(Tag.ASSIGN);
-            assign = assign.Build(lex);
+            assign = assign.Build();
             if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = Builds(lex);
+            stmts = Builds();
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;

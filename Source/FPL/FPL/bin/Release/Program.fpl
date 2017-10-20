@@ -1,0 +1,678 @@
+﻿using Console;
+
+Main()
+{
+	int i = 0;
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+		for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+	for(int a = 0;a<10000;a = a + 1)
+	{
+		i=i+1;
+	}
+}

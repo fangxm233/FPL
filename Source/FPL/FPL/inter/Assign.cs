@@ -11,22 +11,27 @@ namespace FPL.inter
     [Serializable]
     public class Assign : Stmt
     {
-        public Expr left;
+        public Var left;
         public Expr right;
+        int id;
+        public Assign(int tag, int id) : base(tag)
+        {
+            this.id = id;
+        }
         public Assign(int tag) : base(tag)
         {
 
         }
         public string name;
 
-        public override Stmt Build(Lexer lex)
+        public override Stmt Build()
         {
             name = ((Word)Lexer.Peek).lexeme;
             symbols.Type type = (symbols.Type)GetName(name);
             left = new Var(Lexer.Peek);
-            lex.Next();
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.ASSIGN) Error("应输入\"=\"");
-            right = new Expr().BuildStart(lex);
+            right = new Expr().BuildStart();
             switch (type.type)
             {
                 case "int":
@@ -45,6 +50,11 @@ namespace FPL.inter
                     {
                         return new Bool(this);
                     }
+                default:
+                    {
+                        Error("未知的类型\"" + type.type + "\"");
+                        break;
+                    }
             }
             return this;
         }
@@ -56,21 +66,14 @@ namespace FPL.inter
 
         public override void Run()
         {
-            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
-            {
-                if (Praser.symbols_list[i][name] != null)
-                {
-                    Praser.symbols_list[i][name] = right.Run();
-                    return;
-                }
-            }
+            Parser.var_content[left.id] = right.Run();
         }
     }
 
     [Serializable]
     public class Int : Assign
     {
-        public Int(Assign a) : base(Tag.NUM)
+        public Int(Assign a) : base(a.tag, Tag.NUM)
         {
             left = a.left;
             right = a.right;
@@ -91,20 +94,13 @@ namespace FPL.inter
 
         public override void Run()
         {
-            for (int i = Praser.symbols_list.Count - 1; i > -1; i--)
-            {
-                if (Praser.symbols_list[i][name] != null)
-                {
-                    Praser.symbols_list[i][name] = (int)(float)right.Run();
-                    return;
-                }
-            }
+            Parser.var_content[left.id] = (int)(float)right.Run();
         }
     }
     [Serializable]
     public class Float : Assign
     {
-        public Float(Assign a) : base(Tag.NUM)
+        public Float(Assign a) : base(a.tag, Tag.NUM)
         {
             left = a.left;
             right = a.right;
@@ -126,7 +122,7 @@ namespace FPL.inter
     [Serializable]
     public class String : Assign
     {
-        public String(Assign a) : base(Tag.NUM)
+        public String(Assign a) : base(a.tag, Tag.NUM)
         {
             left = a.left;
             right = a.right;
@@ -148,7 +144,7 @@ namespace FPL.inter
     [Serializable]
     public class Bool : Assign
     {
-        public Bool(Assign a) : base(Tag.NUM)
+        public Bool(Assign a) : base(a.tag, Tag.NUM)
         {
             left = a.left;
             right = a.right;
