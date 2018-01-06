@@ -8,16 +8,17 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class Break : Stmt
+    public class Break : Sentence
     {
         public Break(int tag) : base(tag)
         {
             
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             Lexer.Next();
+            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
 
@@ -28,7 +29,7 @@ namespace FPL.inter
 
         public override void Run()
         {
-            in_loop = false;
+            is_break = true;
         }
     }
 }

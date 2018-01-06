@@ -8,17 +8,17 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class Do : Stmt
+    public class Do : Sentence
     {
         Rel rel;
-        List<Stmt> stmts;
+        List<Sentence> stmts;
 
         public Do(int tag) : base(tag)
         {
 
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             NewScope();
             Lexer.Next();
@@ -28,10 +28,10 @@ namespace FPL.inter
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.WHILE) Error("应输入\"while\"");
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
+            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             rel = new Rel();
             rel = rel.Build();
-            if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
+            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             DestroyScope();
@@ -41,7 +41,7 @@ namespace FPL.inter
         public override void Check()
         {
             rel.Check();
-            foreach (Stmt item in stmts)
+            foreach (Sentence item in stmts)
             {
                 in_loop = true;
                 item.Check();
@@ -55,7 +55,7 @@ namespace FPL.inter
             {
                 NewScope();
                 in_loop = true;
-                foreach (Stmt item in stmts)
+                foreach (Sentence item in stmts)
                 {
                     item.Run();
                     if (is_continue) break;

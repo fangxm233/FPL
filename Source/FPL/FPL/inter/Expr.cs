@@ -11,7 +11,7 @@ namespace FPL.inter
     [Serializable]
     public class Expr : Node
     {
-        public static bool turn_to_string; //标记所有语句检查完了以后是否要转为string表达式
+        //public static bool turn_to_string; //标记所有语句检查完了以后是否要转为string表达式
         public Expr left;
         public Expr right;
         public Token content;
@@ -32,7 +32,18 @@ namespace FPL.inter
                     }
                 case Tag.ID:
                     {
-                        right = new Var(Lexer.Peek);
+                        Lexer.Next();
+                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        {
+                            Lexer.Back();
+                            right = new FunctionCall_e(Tag.FUNCTIONCALL).Build();
+                            break;
+                        }
+                        else
+                        {
+                            Lexer.Back();
+                            right = new Var(Lexer.Peek);
+                        }
                         break;
                     }
                 case Tag.NUM:
@@ -50,7 +61,7 @@ namespace FPL.inter
                         right = new Str(Lexer.Peek);
                         break;
                     }
-                case Tag.LPARENTHESIS: //括号整个可以算个为值的单元
+                case Tag.LBRACKETS: //括号整个可以算个为值的单元
                     {
                         right = new Expr();
                         right = right.BuildStart();
@@ -66,7 +77,7 @@ namespace FPL.inter
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
-                case Tag.RPARENTHESIS:
+                case Tag.RBRACKETS:
                 case Tag.AND:
                 case Tag.OR:
                 case Tag.EQ:
@@ -80,13 +91,15 @@ namespace FPL.inter
                     }
                 case Tag.PLUS:
                     {
-                        right = new Plus(this).Build(); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
-                        break;
+                        //right = new Plus(this).Build(); 
+                        return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
+                        //break;
                     }
                 case Tag.MINUS:
                     {
-                        right = new Minus(this).Build();
-                        break;
+                        //right = new Minus(this).Build();
+                        return new Minus(this).Build();
+                        //break;
                     }
                 case Tag.MULTIPLY:
                     {
@@ -95,7 +108,7 @@ namespace FPL.inter
                         {
                             case Tag.PLUS:
                                 {
-                                    return new Plus(this).Build(); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
+                                    return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
                                 }
                             case Tag.MINUS:
                                 {
@@ -111,7 +124,7 @@ namespace FPL.inter
                         {
                             case Tag.PLUS:
                                 {
-                                    return new Plus(this).Build(); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
+                                    return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
                                 }
                             case Tag.MINUS:
                                 {
@@ -146,7 +159,18 @@ namespace FPL.inter
                     }
                 case Tag.ID:
                     {
-                        left = new Var(Lexer.Peek);
+                        Lexer.Next();
+                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        {
+                            Lexer.Back();
+                            left = new FunctionCall_e(Tag.FUNCTIONCALL).Build();
+                            break;
+                        }
+                        else
+                        {
+                            Lexer.Back();
+                            left = new Var(Lexer.Peek);
+                        }
                         break;
                     }
                 case Tag.NUM:
@@ -164,11 +188,15 @@ namespace FPL.inter
                         left = new Str(Lexer.Peek);
                         break;
                     }
-                case Tag.LPARENTHESIS:
+                case Tag.LBRACKETS:
                     {
                         left = new Expr();
                         left = left.BuildStart();
                         break;
+                    }
+                case Tag.SEMICOLON:
+                    {
+                        return null;
                     }
                 default:
                     {
@@ -180,7 +208,7 @@ namespace FPL.inter
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
-                case Tag.RPARENTHESIS:
+                case Tag.RBRACKETS:
                 case Tag.AND:
                 case Tag.OR:
                 case Tag.EQ:
@@ -194,7 +222,7 @@ namespace FPL.inter
                     }
                 case Tag.PLUS:
                     {
-                        return new Plus(left).Build(); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
+                        return new Plus(left).Build(); //把现在的左值传进去当做他的左值,然后把这个对象当作返回值
                     }
                 case Tag.MINUS:
                     {
@@ -202,13 +230,12 @@ namespace FPL.inter
                     }
                 case Tag.MULTIPLY:
                     {
-                        left = new Multiply(left);
-                        right.Build();
+                        left = new Multiply(left).Build();
                         switch (Lexer.Peek.tag) //把这个/*对象当做下一个次级符号的左值
                         {
                             case Tag.PLUS:
                                 {
-                                    return new Plus(left).Build(); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
+                                    return new Plus(left).Build(); //把现在的左值传进去当做他的左值,然后把这个对象当作返回值
                                 }
                             case Tag.MINUS:
                                 {
@@ -219,13 +246,12 @@ namespace FPL.inter
                     }
                 case Tag.DIVIDE:
                     {
-                        left = new Divide(left);
-                        right.Build();
+                        left = new Divide(left).Build();
                         switch (Lexer.Peek.tag)
                         {
                             case Tag.PLUS:
                                 {
-                                    return new Plus(left).Build(); //把现在的右值传进去当做他的左值,然后把这个对象当作右值
+                                    return new Plus(left).Build(); //把现在的左值传进去当做他的左值,然后把这个对象当作返回值
                                 }
                             case Tag.MINUS:
                                 {
@@ -243,10 +269,11 @@ namespace FPL.inter
             return this;
         }
 
-        public virtual Expr Check()
+        //分析是否需要转成string表达式，让functionCall确定返回值类型
+        public virtual bool Check()
         {
-            left = left.Check();
-            right = right.Check();
+            if (left.Check()) return true;
+            if (right.Check()) return true;
             switch (left.type.type)
             {
                 case "int":
@@ -256,7 +283,6 @@ namespace FPL.inter
                 case "string":
                     {
                         type = symbols.Type.String;
-                        turn_to_string = true;
                         break;
                     }
                 case "float":
@@ -280,7 +306,6 @@ namespace FPL.inter
                 case "string":
                     {
                         type = symbols.Type.String;
-                        turn_to_string = true;
                         break;
                     }
                 case "float":
@@ -295,10 +320,10 @@ namespace FPL.inter
                         break;
                     }
             }
-            return this;
+            return false;
         }
 
-        public virtual Expr ToStringPlus() //目的是把所有的普通+换成string+
+        public virtual Expr ToStringPlus() //目的是把所有的普通+换成string+, 如果有 - * / 的话就报错
         {
             left = left.ToStringPlus();
             right = right.ToStringPlus();
@@ -319,10 +344,10 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Expr Check()
+        public override bool Check()
         {
-            left = left.Check();
-            right = right.Check();
+            if (left.Check()) return true;
+            if (right.Check()) return true;
             switch (left.type.type)
             {
                 case "int":
@@ -332,7 +357,6 @@ namespace FPL.inter
                 case "string":
                     {
                         type = symbols.Type.String;
-                        turn_to_string = true;
                         break;
                     }
                 case "float":
@@ -347,7 +371,7 @@ namespace FPL.inter
                         break;
                     }
             }
-            switch (left.type.type)
+            switch (right.type.type)
             {
                 case "int":
                     {
@@ -356,7 +380,6 @@ namespace FPL.inter
                 case "string":
                     {
                         type = symbols.Type.String;
-                        turn_to_string = true;
                         break;
                     }
                 case "float":
@@ -371,7 +394,7 @@ namespace FPL.inter
                         break;
                     }
             }
-            return this;
+            return false;
         }
 
         public override Expr ToStringPlus()
@@ -409,6 +432,12 @@ namespace FPL.inter
             left = l;
         }
 
+        public override Expr ToStringPlus()
+        {
+            Error(this, "运算符\"-\"无法用于String类型的表达式");
+            return base.ToStringPlus();
+        }
+
         public override object Run()
         {
             return (float)left.Run() - (float)right.Run();
@@ -442,7 +471,7 @@ namespace FPL.inter
                         right = new Real(Lexer.Peek);
                         break;
                     }
-                case Tag.LPARENTHESIS:
+                case Tag.LBRACKETS:
                     {
                         right = new Expr();
                         right = right.BuildStart();
@@ -458,7 +487,7 @@ namespace FPL.inter
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
-                case Tag.RPARENTHESIS:
+                case Tag.RBRACKETS:
                 case Tag.AND:
                 case Tag.OR:
                 case Tag.EQ:
@@ -480,6 +509,12 @@ namespace FPL.inter
                     }
             }
             return this;
+        }
+
+        public override Expr ToStringPlus()
+        {
+            Error(this, "运算符\"*\"无法用于String类型的表达式");
+            return base.ToStringPlus();
         }
 
         public override object Run()
@@ -514,7 +549,7 @@ namespace FPL.inter
                         right = new Real(Lexer.Peek);
                         break;
                     }
-                case Tag.LPARENTHESIS:
+                case Tag.LBRACKETS:
                     {
                         right = new Expr();
                         right = right.BuildStart();
@@ -530,7 +565,7 @@ namespace FPL.inter
             switch (Lexer.Peek.tag)
             {
                 case Tag.SEMICOLON:
-                case Tag.RPARENTHESIS:
+                case Tag.RBRACKETS:
                 case Tag.AND:
                 case Tag.OR:
                 case Tag.EQ:
@@ -554,9 +589,34 @@ namespace FPL.inter
             return this;
         }
 
+        public override Expr ToStringPlus()
+        {
+            Error(this, "运算符\"/\"无法用于String类型的表达式");
+            return base.ToStringPlus();
+        }
+
         public override object Run()
         {
             return (float)left.Run() / (float)right.Run();
+        }
+    }
+    [Serializable]
+    public class Brackets : Expr
+    {
+        public override Expr Build()
+        {
+            left = BuildStart();
+            return left;
+        }
+
+        public override bool Check()
+        {
+            if (left.Check())
+            {
+                left = left.ToStringPlus();
+                return true;
+            }
+            return false;
         }
     }
 
@@ -572,9 +632,9 @@ namespace FPL.inter
             type = (symbols.Type)GetName(name);
             id = GetID(name);
         }
-        public override Expr Check()
+        public override bool Check()
         {
-            return this;
+            return false;
         }
         public override Expr ToStringPlus()
         {
@@ -595,9 +655,9 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.Int;
         }
-        public override Expr Check()
+        public override bool Check()
         {
-            return this;
+            return false;
         }
         public override Expr ToStringPlus()
         {
@@ -616,9 +676,9 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.Float;
         }
-        public override Expr Check()
+        public override bool Check()
         {
-            return this;
+            return false;
         }
         public override Expr ToStringPlus()
         {
@@ -637,9 +697,9 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.Bool;
         }
-        public override Expr Check()
+        public override bool Check()
         {
-            return this;
+            return true;
         }
         public override Expr ToStringPlus()
         {
@@ -658,9 +718,9 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.Bool;
         }
-        public override Expr Check()
+        public override bool Check()
         {
-            return this;
+            return true;
         }
         public override Expr ToStringPlus()
         {
@@ -679,9 +739,9 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.String;
         }
-        public override Expr Check()
+        public override bool Check()
         {
-            return this;
+            return true;
         }
         public override Expr ToStringPlus()
         {

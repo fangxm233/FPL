@@ -9,7 +9,7 @@ using FPL.symbols;
 namespace FPL.inter
 {
     [Serializable]
-    public class Assign : Stmt
+    public class Assign : Sentence
     {
         public Var left;
         public Expr right;
@@ -24,7 +24,7 @@ namespace FPL.inter
         }
         public string name;
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             name = ((Word)Lexer.Peek).lexeme;
             symbols.Type type = (symbols.Type)GetName(name);
@@ -82,12 +82,7 @@ namespace FPL.inter
 
         public override void Check()
         {
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (right.Check()) right = right.ToStringPlus();
             if (right.type.type != "int") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"int\"");
             return;
         }
@@ -109,12 +104,7 @@ namespace FPL.inter
 
         public override void Check()
         {
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (right.Check()) right = right.ToStringPlus();
             if (right.type.type != "float" && right.type.type != "int") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"float\"");
             return;
         }
@@ -131,12 +121,7 @@ namespace FPL.inter
 
         public override void Check()
         {
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (right.Check()) right = right.ToStringPlus();
             if (right.type.type != "string") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"string\"");
             return;
         }
@@ -153,12 +138,7 @@ namespace FPL.inter
 
         public override void Check()
         {
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (right.Check()) right = right.ToStringPlus();
             if (right.type.type != "bool") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"bool\"");
             return;
         }

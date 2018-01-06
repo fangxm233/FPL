@@ -14,7 +14,7 @@ namespace FPL.inter
     {
         [NonSerialized]
         public static List<Hashtable> symbols_list = new List<Hashtable>();
-        
+
         public static int var_count;
         [NonSerialized]
         public static List<Hashtable> var_id = new List<Hashtable>();
@@ -25,19 +25,23 @@ namespace FPL.inter
         [NonSerialized]
         public static bool is_runtime;
 
-        List<Stmt> stmts;
+        //List<Sentence> stmts;
 
         public void Compile()
         {
-            stmts = new Stmt(1).Buildsstart();
+            /*stmts = */new Sentence(1).Buildsstart();
             Check();
         }
         public void Check()
         {
-            foreach (Stmt item in stmts)
+            foreach (var item in functions)
             {
-                item.Check();
+                item.Value.Check();
             }
+            //foreach (Sentence item in stmts)
+            //{
+            //    item.Check();
+            //}
         }
         public void Interprete()
         {

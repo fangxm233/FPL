@@ -8,24 +8,24 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class Quote : Stmt
+    public class Quote : Sentence
     {
         public Quote(int tag) : base(tag)
         {
 
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             switch (((Word)Lexer.Peek).lexeme)
             {
-                case "cout":
+                case "Println":
                     {
-                        return new Cout(Tag.QUOTE).Build();
+                        return new Println(Tag.QUOTE).Build();
                     }
-                case "cin":
+                case "Readln":
                     {
-                        return new Cin(Tag.QUOTE).Build();
+                        return new Readln(Tag.QUOTE).Build();
                     }
             }
             return this;
@@ -33,33 +33,29 @@ namespace FPL.inter
     }
 
     [Serializable]
-    public class Cout : Quote
+    public class Println : Quote
     {
         Expr expr;
-        public Cout(int tag) : base(tag)
+        public Println(int tag) : base(tag)
         {
 
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LESS) Error("应输入\"<\"");
-            Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LESS) Error("应输入\"<\"");
+            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             expr = new Expr().BuildStart();
+            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
 
         public override void Check()
         {
-            expr.Check();
-            if (Expr.turn_to_string)
-            {
-                expr = expr.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            //Console.WriteLine(expr.Check());
+            if (expr.Check()) expr = expr.ToStringPlus();
         }
 
         public override void Run()
@@ -68,22 +64,22 @@ namespace FPL.inter
         }
     }
     [Serializable]
-    public class Cin : Quote
+    public class Readln : Quote
     {
         Var expr;
-        public Cin(int tag) : base(tag)
+        public Readln(int tag) : base(tag)
         {
 
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.MORE) Error("应输入\">\"");
-            Lexer.Next();
-            if (Lexer.Peek.tag != Tag.MORE) Error("应输入\">\"");
+            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             Lexer.Next();
             expr = new Var(Lexer.Peek);
+            Lexer.Next();
+            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
@@ -98,50 +94,22 @@ namespace FPL.inter
                 {
                     case "int":
                         {
-                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
-                            {
-                                if (Parser.symbols_list[i][expr.name] != null)
-                                {
-                                    Parser.symbols_list[i][expr.name] = int.Parse(s);
-                                    return;
-                                }
-                            }
+                            Parser.var_content[expr.id] = int.Parse(s);
                             break;
                         }
                     case "float":
                         {
-                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
-                            {
-                                if (Parser.symbols_list[i][expr.name] != null)
-                                {
-                                    Parser.symbols_list[i][expr.name] = float.Parse(s);
-                                    return;
-                                }
-                            }
+                            Parser.var_content[expr.id] = float.Parse(s);
                             break;
                         }
                     case "string":
                         {
-                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
-                            {
-                                if (Parser.symbols_list[i][expr.name] != null)
-                                {
-                                    Parser.symbols_list[i][expr.name] = s;
-                                    return;
-                                }
-                            }
+                            Parser.var_content[expr.id] = s;
                             break;
                         }
                     case "bool":
                         {
-                            for (int i = Parser.symbols_list.Count - 1; i > -1; i--)
-                            {
-                                if (Parser.symbols_list[i][expr.name] != null)
-                                {
-                                    Parser.symbols_list[i][expr.name] = bool.Parse(s);
-                                    return;
-                                }
-                            }
+                            Parser.var_content[expr.id] = bool.Parse(s);
                             break;
                         }
                 }

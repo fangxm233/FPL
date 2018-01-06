@@ -22,20 +22,21 @@ namespace FPL.symbols
             Float  = new Type("float",  Tag.BASIC, 8),
             Char   = new Type("char",   Tag.BASIC, 1),
             Bool   = new Type("bool",   Tag.BASIC, 1),
-            String = new Type("string", Tag.BASIC, 1);
+            String = new Type("string", Tag.BASIC, 1),
+            Void   = new Type("void",   Tag.BASIC, 0);
 
-        public static bool Numeric(Type p)
-        {
-            if (p == Char || p == Int || p == Float) return true;
-            return false;
-        }
+        //public static bool Numeric(Type p)
+        //{
+        //    if (p == Char || p == Int || p == Float) return true;
+        //    return false;
+        //}
 
-        public static Type Max(Type p1, Type p2)
-        {
-            if (!Numeric(p1) || !Numeric(p2)) return null;
-            else if (p1 == Float || p2 == Float) return Float;
-            else if (p1 == Int || p2 == Int) return Int;
-            else return Char;
-        }
+        //public static Type Max(Type p1, Type p2)
+        //{
+        //    if (!Numeric(p1) || !Numeric(p2)) return null;
+        //    else if (p1 == Float || p2 == Float) return Float;
+        //    else if (p1 == Int || p2 == Int) return Int;
+        //    else return Char;
+        //}
     }
 }

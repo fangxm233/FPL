@@ -23,7 +23,7 @@ namespace FPL.lexer
         static StreamReader stream_reader;
 
         public static List<Token> peeks = new List<Token>();
-        public static int count;
+        public static int index;
 
         static void Reserve(Word w)
         {
@@ -47,6 +47,7 @@ namespace FPL.lexer
             Reserve(new Word("continue", Tag.CONTINUE));
             Reserve(new Word("for", Tag.FOR));
             Reserve(new Word("using", Tag.USING));
+            Reserve(new Word("return", Tag.RETURN));
             Reserve(Word.True);
             Reserve(Word.False);
             Reserve(symbols.Type.Int);
@@ -54,6 +55,7 @@ namespace FPL.lexer
             Reserve(symbols.Type.Bool);
             Reserve(symbols.Type.Float);
             Reserve(symbols.Type.String);
+            Reserve(symbols.Type.Void);
             while (!stream_reader.EndOfStream)
             {
                 Scan();
@@ -124,7 +126,6 @@ namespace FPL.lexer
                     }
                 }
                 peeks.Add(Word.divide);
-                Readch();
                 return;
             }
             switch (peek) //检测并返回各个符号以及组合符号
@@ -302,7 +303,7 @@ namespace FPL.lexer
 
         public static void Next()
         {
-            Peek = peeks[count++];
+            Peek = peeks[index++];
             if(Peek.tag == Tag.EOL)
             {
                 line++;
@@ -318,7 +319,7 @@ namespace FPL.lexer
         }
         public static void Back()
         {
-            count -= 2;
+            index -= 2;
             Next();
         }
 

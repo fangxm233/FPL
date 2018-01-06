@@ -8,16 +8,17 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    class Continue : Stmt
+    class Continue : Sentence
     {
         public Continue(int tag) : base(tag)
         {
 
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             Lexer.Next();
+            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
 

@@ -8,25 +8,25 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class While : Stmt
+    public class While : Sentence
     {
         Rel rel;
-        List<Stmt> stmts;
+        List<Sentence> stmts;
 
         public While(int tag) : base(tag)
         {
             
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
+            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             rel = new Rel();
             //rel = 
             rel = rel.Build();
-            if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
+            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
             stmts = Builds();
@@ -38,7 +38,7 @@ namespace FPL.inter
         public override void Check()
         {
             rel.Check();
-            foreach (Stmt item in stmts)
+            foreach (Sentence item in stmts)
             {
                 in_loop = true;
                 item.Check();
@@ -52,24 +52,25 @@ namespace FPL.inter
             {
                 NewScope();
                 in_loop = true;
-                foreach (Stmt item in stmts)
+                foreach (Sentence item in stmts)
                 {
                     item.Run();
                     if (is_continue) break;
-                    if (!in_loop) break;
+                    if (is_break) break;
                 }
                 if (is_continue)
                 {
                     is_continue = false;
                     continue;
                 }
-                if (!in_loop)
+                if (is_break)
                 {
-                    in_loop = false;
+                    is_break = false;
                     break;
                 }
                 DestroyScope();
             }
+            in_loop = false;
         }
     }
 }

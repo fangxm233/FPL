@@ -8,23 +8,23 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class For : Stmt
+    public class For : Sentence
     {
-        Stmt stmt;
+        Sentence stmt;
         Rel rel;
-        Stmt assign;
-        List<Stmt> stmts;
+        Sentence assign;
+        List<Sentence> stmts;
 
         public For(int tag) : base(tag)
         {
 
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
+            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             Lexer.Next();
             stmt = new Statement(Tag.STATEMENT);
             stmt.Build();
@@ -33,7 +33,7 @@ namespace FPL.inter
             Lexer.Next();
             assign = new Assign(Tag.ASSIGN);
             assign = assign.Build();
-            if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
+            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
             stmts = Builds();
@@ -47,7 +47,7 @@ namespace FPL.inter
             stmt.Check();
             rel.Check();
             assign.Check();
-            foreach (Stmt item in stmts)
+            foreach (Sentence item in stmts)
             {
                 in_loop = true;
                 item.Check();
@@ -62,24 +62,25 @@ namespace FPL.inter
             {
                 NewScope();
                 in_loop = true;
-                foreach (Stmt item in stmts)
+                foreach (Sentence item in stmts)
                 {
                     item.Run();
                     if (is_continue) break;
-                    if (!in_loop) break;
+                    if (is_break) break;
                 }
                 if (is_continue)
                 {
                     is_continue = false;
                     continue;
                 }
-                if (!in_loop)
+                if (is_break)
                 {
-                    in_loop = false;
+                    is_break = false;
                     break;
                 }
                 DestroyScope();
             }
+            in_loop = false;
             DestroyScope();
         }
     }

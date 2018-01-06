@@ -92,18 +92,8 @@ namespace FPL.inter
 
         public override void Check()
         {
-            left.Check();
-            if (Expr.turn_to_string)
-            {
-                left = left.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (left.Check()) left = left.ToStringPlus();
+            if (right.Check()) right = right.ToStringPlus();
             switch (left.type.type)
             {
                 case "string":
@@ -146,18 +136,8 @@ namespace FPL.inter
 
         public override void Check()
         {
-            left.Check();
-            if (Expr.turn_to_string)
-            {
-                left = left.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (left.Check()) left = left.ToStringPlus();
+            if (right.Check()) right = right.ToStringPlus();
             switch (left.type.type)
             {
                 case "string":
@@ -200,18 +180,8 @@ namespace FPL.inter
 
         public override void Check()
         {
-            left.Check();
-            if (Expr.turn_to_string)
-            {
-                left = left.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (left.Check()) left = left.ToStringPlus();
+            if (right.Check()) right = right.ToStringPlus();
             switch (left.type.type)
             {
                 case "int":
@@ -244,18 +214,8 @@ namespace FPL.inter
 
         public override void Check()
         {
-            left.Check();
-            if (Expr.turn_to_string)
-            {
-                left = left.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (left.Check()) left = left.ToStringPlus();
+            if (right.Check()) right = right.ToStringPlus();
             switch (left.type.type)
             {
                 case "int":
@@ -288,18 +248,8 @@ namespace FPL.inter
 
         public override void Check()
         {
-            left.Check();
-            if (Expr.turn_to_string)
-            {
-                left = left.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (left.Check()) left = left.ToStringPlus();
+            if (right.Check()) right = right.ToStringPlus();
             switch (left.type.type)
             {
                 case "int":
@@ -332,18 +282,8 @@ namespace FPL.inter
 
         public override void Check()
         {
-            left.Check();
-            if (Expr.turn_to_string)
-            {
-                left = left.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
-            right.Check();
-            if (Expr.turn_to_string)
-            {
-                right = right.ToStringPlus();
-                Expr.turn_to_string = false;
-            }
+            if (left.Check()) left = left.ToStringPlus();
+            if (right.Check()) right = right.ToStringPlus();
             switch (left.type.type)
             {
                 case "int":

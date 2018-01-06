@@ -8,23 +8,30 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class Function : Stmt
+    public class Function : Sentence
     {
-        List<Stmt> stmts = new List<Stmt>();
+        List<Sentence> stmts = new List<Sentence>();
         public string name;
+        public symbols.Type return_type;
+        
         public Function(int tag) : base(tag)
         {
-            name = ((Word)Lexer.Peek).lexeme;
+            return_type = (symbols.Type)Lexer.Peek;
+            Lexer.Next();
+            if (Lexer.Peek.tag == Tag.ID)
+                name = ((Word)Lexer.Peek).lexeme;
+            else Error("\"" + ((Word)Lexer.Peek).lexeme + "\"无效");
+            building_function = name;
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             AddFunction(name, this);
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LPARENTHESIS) Error("应输入\"(\"");
+            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.RPARENTHESIS) Error("应输入\")\"");
+            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
             stmts = Builds();
@@ -35,7 +42,7 @@ namespace FPL.inter
 
         public override void Check()
         {
-            foreach (Stmt item in stmts)
+            foreach (Sentence item in stmts)
             {
                 item.Check();
             }
@@ -43,10 +50,16 @@ namespace FPL.inter
 
         public override void Run()
         {
+            function_return = null;
             NewScope();
-            foreach (Stmt item in stmts)
+            foreach (Sentence item in stmts)
             {
                 item.Run();
+                if (is_return)
+                {
+                    is_return = false;
+                    break;
+                }
             }
             DestroyScope();
         }

@@ -9,14 +9,14 @@ using FPL.symbols;
 namespace FPL.inter
 {
     [Serializable]
-    class Statement : Stmt
+    class Statement : Sentence
     {
         Assign assign;
         public Statement(int tag) : base(tag)
         {
 
         }
-        public override Stmt Build()
+        public override Sentence Build()
         {
             switch (((symbols.Type)Lexer.Peek).lexeme)
             {

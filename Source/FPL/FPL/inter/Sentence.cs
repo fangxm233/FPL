@@ -8,20 +8,26 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class Stmt : Node
+    public class Sentence : Node
     {
-        //这两个分别用来标记建立和运行时的break和continue
+        //运行时标记
         public static bool in_loop;
+        public static bool is_break;
         public static bool is_continue;
+        public static bool is_return;
+
+        public static object function_return;
+
+        public static string building_function;
 
         public int tag;
-        public Stmt(int tag)
+        public Sentence(int tag)
         {
             this.tag = tag;
         }
-        public List<Stmt> Builds()//这是建立一个语句块
+        public List<Sentence> Builds()//这是建立一个语句块
         {
-            List<Stmt> stmts = new List<Stmt>();
+            List<Sentence> sentences = new List<Sentence>();
             while (true)
             {
                 Lexer.Next();
@@ -29,65 +35,61 @@ namespace FPL.inter
                 {
                     case Tag.RBRACE:
                         {
-                            return stmts;
+                            return sentences;
                         }
                     case Tag.BASIC:
                         {
-                            stmts.Add(new Statement(Tag.BASIC));
-                            stmts[stmts.Count - 1].Build();
+                            sentences.Add(new Statement(Tag.BASIC).Build());
                             break;
                         }
                     case Tag.IF:
                         {
-                            stmts.Add(new If(Tag.IF));
-                            stmts[stmts.Count - 1].Build();
+                            sentences.Add(new If(Tag.IF).Build());
                             break;
                         }
                     case Tag.FOR:
                         {
-                            stmts.Add(new For(Tag.FOR));
-                            stmts[stmts.Count - 1].Build();
+                            sentences.Add(new For(Tag.FOR).Build());
                             break;
                         }
                     case Tag.DO:
                         {
-                            stmts.Add(new Do(Tag.DO));
-                            stmts[stmts.Count - 1].Build();
+                            sentences.Add(new Do(Tag.DO).Build());
                             break;
                         }
                     case Tag.WHILE:
                         {
-                            stmts.Add(new While(Tag.WHILE));
-                            stmts[stmts.Count - 1].Build();
+                            sentences.Add(new While(Tag.WHILE).Build());
                             break;
                         }
                     case Tag.BREAK:
                         {
-                            stmts.Add(new Break(Tag.BREAK));
-                            stmts[stmts.Count - 1].Build();
+                            sentences.Add(new Break(Tag.BREAK).Build());
                             break;
                         }
                     case Tag.CONTINUE:
                         {
-                            stmts.Add(new Continue(Tag.CONTINUE));
-                            stmts[stmts.Count - 1].Build();
+                            sentences.Add(new Continue(Tag.CONTINUE).Build());
+                            break;
+                        }
+                    case Tag.RETURN:
+                        {
+                            sentences.Add(new Return(Tag.RETURN).Build());
                             break;
                         }
                     case Tag.ID:
                         {
-                            Token temp = Lexer.Peek;
                             Lexer.Next();
-                            if(Lexer.Peek.tag == Tag.LPARENTHESIS)
+                            if(Lexer.Peek.tag == Tag.LBRACKETS)
                             {
                                 Lexer.Back();
-                                stmts.Add(new FunctionCall(Tag.FUNCTIONCALL));
-                                stmts[stmts.Count - 1].Build();
+                                sentences.Add(new FunctionCall_s(Tag.FUNCTIONCALL).Build());
                                 break;
                             }
                             if (Lexer.Peek.tag == Tag.ASSIGN)
                             {
                                 Lexer.Back();
-                                stmts.Add(new Assign(Tag.ASSIGN).Build());
+                                sentences.Add(new Assign(Tag.ASSIGN).Build());
                                 break;
                             }
                             Error("语法错误");
@@ -95,21 +97,21 @@ namespace FPL.inter
                         }
                     case Tag.QUOTE:
                         {
-                            stmts.Add(new Quote(Tag.QUOTE).Build());
+                            sentences.Add(new Quote(Tag.QUOTE).Build());
                             break;
                         }
                     default:
                         {
                             Error("语句错误或大括号不匹配");
-                            return stmts;
+                            return sentences;
                         }
                 }
             }
         }
 
-        public List<Stmt> Buildsstart()
+        public List<Sentence> Buildsstart()
         {
-            List<Stmt> stmts = new List<Stmt>();
+            List<Sentence> sentences = new List<Sentence>();
             while (true)
             {
                 Lexer.Next();
@@ -117,17 +119,16 @@ namespace FPL.inter
                 {
                     case Tag.EOF:
                         {
-                            return stmts;
+                            return sentences;
                         }
                     case Tag.RBRACE:
                         {
                             Error("意外的字符\"}\"");
                             break;
                         }
-                    case Tag.ID:
+                    case Tag.BASIC:
                         {
-                            stmts.Add(new Function(Tag.FUNCTION));
-                            stmts[stmts.Count - 1] = stmts[stmts.Count - 1].Build();
+                            sentences.Add(new Function(Tag.FUNCTION).Build());
                             break;
                         }
                     case Tag.USING:
@@ -135,16 +136,21 @@ namespace FPL.inter
                             new Using(Tag.USING).Build();
                             break;
                         }
+                    case Tag.QUOTE:
+                        {
+                            Error("引用中已存在函数" + "\"" + ((Word)Lexer.Peek).lexeme + "\"");
+                            break;
+                        }
                     default:
                         {
                             Error("语句错误");
-                            return stmts;
+                            return sentences;
                         }
                 }
             }
         }
 
-        public virtual Stmt Build()//这是建立某一个语句
+        public virtual Sentence Build()//这是建立某一个语句
         {
             return this;
         }

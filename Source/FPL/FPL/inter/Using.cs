@@ -8,22 +8,27 @@ using FPL.lexer;
 namespace FPL.inter
 {
     [Serializable]
-    public class Using : Stmt
+    public class Using : Sentence
     {
         public Using(int tag) : base(tag)
         {
 
         }
 
-        public override Stmt Build()
+        public override Sentence Build()
         {
             Lexer.Next();
             switch (((Word)Lexer.Peek).lexeme)
             {
                 case "Console":
                     {
-                        Lexer.AddQuote("cout");
-                        Lexer.AddQuote("cin");
+                        Lexer.AddQuote("Println");
+                        Lexer.AddQuote("Readln");
+                        break;
+                    }
+                case "IO":
+                    {
+
                         break;
                     }
                 default:

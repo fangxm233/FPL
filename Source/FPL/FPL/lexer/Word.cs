@@ -26,8 +26,8 @@ namespace FPL.lexer
             divide   = new Word("divide",   Tag.DIVIDE),
 
             semicolon    = new Word("semicolon",    Tag.SEMICOLON),
-            Lparenthesis = new Word("Lparenthesis", Tag.LPARENTHESIS),
-            Rparenthesis = new Word("Rparenthesis", Tag.RPARENTHESIS),
+            Lparenthesis = new Word("Lparenthesis", Tag.LBRACKETS),
+            Rparenthesis = new Word("Rparenthesis", Tag.RBRACKETS),
             LBrace       = new Word("LBrace",       Tag.LBRACE),
             RBrace       = new Word("RBrace",       Tag.RBRACE),
 

@@ -69,6 +69,7 @@ namespace FPL
                 TimeSpan timespan = watch.Elapsed;
                 Console.WriteLine("编译完成");
                 Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);
+                Console.WriteLine("");
                 return true;
             }
             catch (CompileException) { return false; }
@@ -76,23 +77,31 @@ namespace FPL
 
         static void Interprete()
         {
-            try
-            {
-                Parser praser;
+            Parser parser;
 
-                FileStream fileStream = new FileStream("Program.fplc", FileMode.Open);
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
-                praser = (Parser)binaryFormatter.Deserialize(fileStream);
+            FileStream fileStream = new FileStream("Program.fplc", FileMode.Open);
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            parser = (Parser)binaryFormatter.Deserialize(fileStream);
 
-                System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
-                watch.Start();
-                praser.Interprete();
-                watch.Stop();
-                TimeSpan timespan = watch.Elapsed;
-                Console.WriteLine("执行完成");
-                Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);
-            }
-            catch (RunTimeException) { }
+            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+            //try
+            //{
+                try
+                {
+                    parser.Interprete();
+                }
+                catch (RunTimeException){}
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e.Message);
+            //}
+            watch.Stop();
+            TimeSpan timespan = watch.Elapsed;
+            Console.WriteLine("");
+            Console.WriteLine("执行完成");
+            Console.WriteLine("执行时间：{0}(毫秒)", timespan.TotalMilliseconds);
         }
     }
 }
