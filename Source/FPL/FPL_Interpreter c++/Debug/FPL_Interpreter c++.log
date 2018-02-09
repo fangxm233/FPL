@@ -1,2 +1,7 @@
-﻿  Runner.cpp
+﻿  stdafx.cpp
+  Runner.cpp
+  OutPut.cpp
+  Lexer.cpp
+  FPL_Interpreter.cpp
+  正在生成代码...
   FPL_Interpreter c++.vcxproj -> G:\GIT\FPL\Source\FPL\Debug\FPL_Interpreter c++.exe

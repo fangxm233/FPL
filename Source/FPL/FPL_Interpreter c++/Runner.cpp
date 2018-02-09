@@ -3,8 +3,8 @@
 #include "OutPut.h"
 #include "Lexer.h"
 //#include "InstructionType.h"
-InstructionsType* Runner::code_ptr;
-InstructionsType* Runner::code_ptr_start;
+InstructionType* Runner::code_ptr;
+InstructionType* Runner::code_ptr_start;
 int* Runner::varStack_ptr;
 int* Runner::tmpStack_ptr;
 int* Runner::parameter_ptr;
@@ -13,7 +13,7 @@ int* Runner::methods_ptr_start;
 //int Runner::backup_code_ptr = 0;
 //int Runner::backup_varStack_ptr = -1;
 //int Runner::backup_tmpStack_ptr = -1;
-vector<InstructionsType> Runner::Instructions = Lexer::instructions_v;
+vector<InstructionType> Runner::Instructions = Lexer::instructions_v;
 vector<int> Runner::parameters = Lexer::parameters_v;
 //vector<int> Runner::methods_p = Lexer::methods_p_v;
 vector<int> Runner::methods = Lexer::methods_v;
@@ -43,8 +43,8 @@ void Runner::RunStart()
 	{
 		RunInstructions();
 		return;
-		//vector<InstructionsType>::iterator i = Instructions.begin();
-		//InstructionsType * aaa = i._Ptr;
+		//vector<InstructionType>::iterator i = Instructions.begin();
+		//InstructionType * aaa = i._Ptr;
 		//cout << *aaa << endl;
 		//aaa++;
 		//cout << *aaa << endl;
@@ -105,88 +105,88 @@ start:;
 	//if ((call_stack.size() - varStack_ptr) <= 10)Expansion_var();
 	switch (*code_ptr)
 	{
-	case InstructionsType::loadi:
+	case InstructionType::loadi:
 		*++varStack_ptr = 0;
 		break;
-	case InstructionsType::unloadi:
+	case InstructionType::unloadi:
 		varStack_ptr--;
 		break;
-	case InstructionsType::pushvar:
+	case InstructionType::pushvar:
 		*++tmpStack_ptr = *(varStack_ptr - *parameter_ptr);
 		break;
-	case InstructionsType::pushadr:
+	case InstructionType::pushadr:
 		break;
-	case InstructionsType::pushval:
+	case InstructionType::pushval:
 		*++tmpStack_ptr = *parameter_ptr;
 		break;
-	case InstructionsType::poparg:
+	case InstructionType::poparg:
 		*++varStack_ptr = *tmpStack_ptr--;
 		break;
-	case InstructionsType::popvar:
+	case InstructionType::popvar:
 		*(varStack_ptr - *parameter_ptr) = *tmpStack_ptr--;
 		break;
-	case InstructionsType::popadr:
+	case InstructionType::popadr:
 		break;
-	case InstructionsType::pop:
+	case InstructionType::pop:
 		tmpStack_ptr--;
 		break;
-	case InstructionsType::add:
+	case InstructionType::add:
 		tmpStack_ptr--;
 		*tmpStack_ptr = *tmpStack_ptr + *(tmpStack_ptr + 1);
 		break;
-	case InstructionsType::addv:
+	case InstructionType::addv:
 		*(varStack_ptr - *parameter_ptr) += *tmpStack_ptr--;
 		break;
-	case InstructionsType::add1:
+	case InstructionType::add1:
 		(*tmpStack_ptr)++;
 		break;
-	case InstructionsType::addv1:
+	case InstructionType::addv1:
 		(*(varStack_ptr - *parameter_ptr))++;
 		break;
-	case InstructionsType::sub:
+	case InstructionType::sub:
 		tmpStack_ptr--;
 		*tmpStack_ptr = *tmpStack_ptr - *(tmpStack_ptr + 1);
 		break;
-	case InstructionsType::subv:
+	case InstructionType::subv:
 		*(varStack_ptr - *parameter_ptr) -= *tmpStack_ptr--;
 		break;
-	case InstructionsType::sub1:
+	case InstructionType::sub1:
 		(*tmpStack_ptr)--;
 		break;
-	case InstructionsType::subv1:
+	case InstructionType::subv1:
 		(*(varStack_ptr - *parameter_ptr))--;
 		break;
-	case InstructionsType::div_:
+	case InstructionType::div_:
 		tmpStack_ptr--;
 		*tmpStack_ptr = *tmpStack_ptr / *(tmpStack_ptr + 1);
 		break;
-	case InstructionsType::divv:
+	case InstructionType::divv:
 		*(varStack_ptr - *parameter_ptr) /= *tmpStack_ptr--;
 		break;
-	case InstructionsType::mul:
+	case InstructionType::mul:
 		tmpStack_ptr--;
 		*tmpStack_ptr = *tmpStack_ptr * *(tmpStack_ptr + 1);
 		break;
-	case InstructionsType::mulv:
+	case InstructionType::mulv:
 		*(varStack_ptr - *parameter_ptr) *= *tmpStack_ptr--;
 		break;
-	case InstructionsType::jmp:
+	case InstructionType::jmp:
 		code_ptr = code_ptr_start + *parameter_ptr - 1;
 		parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
 		goto start;
-	case InstructionsType::call:
+	case InstructionType::call:
 		//cout << "call" << endl;
 		*++tmpStack_ptr = (int)(code_ptr + 1);
 		*++tmpStack_ptr = (int)(parameter_ptr + 1);
 		code_ptr = code_ptr_start + *(methods_ptr_start + *parameter_ptr) - 1;
 		parameter_ptr = parameter_ptr_start + *(methods_ptr_start + *parameter_ptr) - 1;
 		goto start;
-	case InstructionsType::ret:
+	case InstructionType::ret:
 		parameter_ptr = (int*) *--tmpStack_ptr;
-		code_ptr = (InstructionsType*) *--tmpStack_ptr;
+		code_ptr = (InstructionType*) *--tmpStack_ptr;
 		*tmpStack_ptr = *(tmpStack_ptr + 2);
 		goto start;
-	case InstructionsType::eqt:
+	case InstructionType::eqt:
 		if (*(tmpStack_ptr - 1) == *(tmpStack_ptr))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
@@ -196,7 +196,7 @@ start:;
 		}
 		tmpStack_ptr -= 2;
 		break;
-	case InstructionsType::eqf:
+	case InstructionType::eqf:
 		if (*(tmpStack_ptr - 1) != *(tmpStack_ptr))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
@@ -206,7 +206,7 @@ start:;
 		}
 		tmpStack_ptr -= 2;
 		break;
-	case InstructionsType::let:
+	case InstructionType::let:
 		if (*(tmpStack_ptr - 1) < *(tmpStack_ptr))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
@@ -216,7 +216,7 @@ start:;
 		}
 		tmpStack_ptr -= 2;
 		break;
-	case InstructionsType::lef:
+	case InstructionType::lef:
 		if (*(tmpStack_ptr - 1) >= *(tmpStack_ptr))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
@@ -226,7 +226,7 @@ start:;
 		}
 		tmpStack_ptr -= 2;
 		break;
-	case InstructionsType::mot:
+	case InstructionType::mot:
 		if (*(tmpStack_ptr - 1) > *(tmpStack_ptr))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
@@ -236,7 +236,7 @@ start:;
 		}
 		tmpStack_ptr -= 2;
 		break;
-	case InstructionsType::mof:
+	case InstructionType::mof:
 		if (*(tmpStack_ptr - 1) <= *(tmpStack_ptr))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
@@ -246,7 +246,7 @@ start:;
 		}
 		tmpStack_ptr -= 2;
 		break;
-	case InstructionsType::endP:
+	case InstructionType::endP:
 		return;
 	default:
 		OutPut::RunTimeError("Î´ÖªÖ¸Áî");

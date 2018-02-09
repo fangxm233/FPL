@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "Lexer.h"
 
-vector<InstructionsType> Lexer::instructions_v;
+vector<InstructionType> Lexer::instructions_v;
 vector<int> Lexer::parameters_v;
 //vector<int> Lexer::methods_p_v;
 //vector<int> Lexer::methods_i_v;
 vector<int> Lexer::methods_v;
-list<InstructionsType> Lexer::instructions;
+list<InstructionType> Lexer::instructions;
 list<int> Lexer::parameters;
 list<int> Lexer::methods;
 int Lexer::peek;
@@ -15,7 +15,7 @@ int Lexer::line;
 
 void Lexer::Analysis(const char * filename)
 {
-	instructions = list<InstructionsType>();
+	instructions = list<InstructionType>();
 	parameters = list<int>();
 	methods = list<int>();
 	infile = ifstream("G://GIT/FPL/Source/FPL/Debug/Program.fplc");
@@ -29,8 +29,8 @@ void Lexer::Analysis(const char * filename)
 	{
 		Scan();
 	}
-	list<InstructionsType>::iterator itor_ins = instructions.begin();
-	instructions_v = vector<InstructionsType>(instructions.size());
+	list<InstructionType>::iterator itor_ins = instructions.begin();
+	instructions_v = vector<InstructionType>(instructions.size());
 	for (int i = 0; itor_ins != instructions.end(); i++)
 	{
 		instructions_v[i] = *itor_ins++;
@@ -58,8 +58,8 @@ void Lexer::Analysis(const char * filename)
 void Lexer::Scan()
 {
 	Readch();
-	instructions.push_back((InstructionsType)peek);
-	if (instructions.back() == InstructionsType::func) 
+	instructions.push_back((InstructionType)peek);
+	if (instructions.back() == InstructionType::func) 
 	{
 		instructions.pop_back();
 		Readch();
@@ -67,28 +67,28 @@ void Lexer::Scan()
 		return;
 	}
 	Readch();
-	parameters.push_back((InstructionsType)peek);
+	parameters.push_back((InstructionType)peek);
 	//switch (instructions.back())
 	//{
-	//case InstructionsType::jmp:
+	//case InstructionType::jmp:
 	//	parameters.back() = parameters.back() - line - 1;
 	//	break;
-	//case InstructionsType::eqt:
+	//case InstructionType::eqt:
 	//	parameters.back() = parameters.back() - line - 1;
 	//	break;
-	//case InstructionsType::eqf:
+	//case InstructionType::eqf:
 	//	parameters.back() = parameters.back() - line - 1;
 	//	break;
-	//case InstructionsType::let:
+	//case InstructionType::let:
 	//	parameters.back() = parameters.back() - line - 1;
 	//	break;
-	//case InstructionsType::lef:
+	//case InstructionType::lef:
 	//	parameters.back() = parameters.back() - line - 1;
 	//	break;
-	//case InstructionsType::mot:
+	//case InstructionType::mot:
 	//	parameters.back() = parameters.back() - line - 1;
 	//	break;
-	//case InstructionsType::mof:
+	//case InstructionType::mof:
 	//	parameters.back() = parameters.back() - line - 1;
 	//	break;
 	//default:
