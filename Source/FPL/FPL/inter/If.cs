@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
 using FPL.symbols;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
@@ -12,7 +12,8 @@ namespace FPL.inter
     public class If : Sentence
     {
         Rel rel;
-        List<Sentence> stmts;
+        List<Sentence> sentences;
+        CodingUnit to_end;
 
         public If(int tag) : base(tag)
         {
@@ -29,7 +30,7 @@ namespace FPL.inter
             if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = Builds();
+            sentences = Builds();
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;
@@ -38,20 +39,30 @@ namespace FPL.inter
         public override void Check()
         {
             rel.Check();
-            foreach (Sentence item in stmts)
+            foreach (Sentence item in sentences)
             {
                 item.Check();
             }
         }
 
-        public override void Run()
+        public override void Code()
         {
-            if (rel.Run())
+            rel.Code();
+            CodingUnit u = Encoder.code[Encoder.code.Count - 1];
+            u.parameter = Encoder.line + 2;
+            to_end = Encoder.Write(InstructionsType.jmp);
+            foreach (var item in sentences)
             {
-                foreach (Sentence item in stmts)
-                {
-                    item.Run();
-                }
+                item.Code();
+            }
+            to_end.parameter = Encoder.line + 1;
+        }
+
+        public override void CodeSecond()
+        {
+            foreach (var item in sentences)
+            {
+                item.CodeSecond();
             }
         }
     }

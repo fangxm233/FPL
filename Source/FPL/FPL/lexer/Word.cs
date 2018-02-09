@@ -30,6 +30,7 @@ namespace FPL.lexer
             Rparenthesis = new Word("Rparenthesis", Tag.RBRACKETS),
             LBrace       = new Word("LBrace",       Tag.LBRACE),
             RBrace       = new Word("RBrace",       Tag.RBRACE),
+            comma        = new Word("comma",        Tag.COMMA), 
 
             True   = new Word("true",   Tag.TRUE),
             False  = new Word("false",  Tag.FALSE),

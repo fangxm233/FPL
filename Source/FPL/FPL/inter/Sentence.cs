@@ -11,14 +11,14 @@ namespace FPL.inter
     public class Sentence : Node
     {
         //运行时标记
-        public static bool in_loop;
-        public static bool is_break;
-        public static bool is_continue;
-        public static bool is_return;
+        //public static bool in_loop;
+        //public static bool is_break;
+        //public static bool is_continue;
+        //public static bool is_return;
 
-        public static object function_return;
+        //public static object function_return;
 
-        public static string building_function;
+        //public static string building_function;
 
         public int tag;
         public Sentence(int tag)
@@ -160,9 +160,14 @@ namespace FPL.inter
             return;
         }
 
-        public virtual void Run()
+        public virtual void Code()
         {
+            return; 
+        }
 
+        public virtual void CodeSecond()
+        {
+            return;
         }
     }
 }

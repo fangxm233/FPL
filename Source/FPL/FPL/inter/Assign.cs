@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
 using FPL.symbols;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
@@ -13,11 +13,7 @@ namespace FPL.inter
     {
         public Var left;
         public Expr right;
-        int id;
-        public Assign(int tag, int id) : base(tag)
-        {
-            this.id = id;
-        }
+        public int id;
         public Assign(int tag) : base(tag)
         {
 
@@ -30,6 +26,13 @@ namespace FPL.inter
             symbols.Type type = (symbols.Type)GetName(name);
             left = new Var(Lexer.Peek);
             Lexer.Next();
+            switch (Lexer.Peek.tag)
+            {
+                case Tag.SEMICOLON:
+                case Tag.RBRACKETS:
+                case Tag.COMMA:
+                    return this;
+            }
             if (Lexer.Peek.tag != Tag.ASSIGN) Error("应输入\"=\"");
             right = new Expr().BuildStart();
             switch (type.type)
@@ -64,16 +67,20 @@ namespace FPL.inter
             return;
         }
 
-        public override void Run()
+        public override void Code()
         {
-            Parser.var_content[left.id] = right.Run();
+            if (right != null)
+                right.Code();
+            else
+                Encoder.Write(InstructionsType.pushval);
+            Encoder.Write(InstructionsType.popvar, left.id);
         }
     }
 
     [Serializable]
     public class Int : Assign
     {
-        public Int(Assign a) : base(a.tag, Tag.NUM)
+        public Int(Assign a) : base(Tag.NUM)
         {
             left = a.left;
             right = a.right;
@@ -86,16 +93,11 @@ namespace FPL.inter
             if (right.type.type != "int") Error(this, "无法将类型\"" + right.type.type + "\"转换为类型\"int\"");
             return;
         }
-
-        public override void Run()
-        {
-            Parser.var_content[left.id] = (int)(float)right.Run();
-        }
     }
     [Serializable]
     public class Float : Assign
     {
-        public Float(Assign a) : base(a.tag, Tag.NUM)
+        public Float(Assign a) : base(Tag.NUM)
         {
             left = a.left;
             right = a.right;
@@ -112,7 +114,7 @@ namespace FPL.inter
     [Serializable]
     public class String : Assign
     {
-        public String(Assign a) : base(a.tag, Tag.NUM)
+        public String(Assign a) : base(Tag.NUM)
         {
             left = a.left;
             right = a.right;
@@ -129,7 +131,7 @@ namespace FPL.inter
     [Serializable]
     public class Bool : Assign
     {
-        public Bool(Assign a) : base(a.tag, Tag.NUM)
+        public Bool(Assign a) : base(Tag.NUM)
         {
             left = a.left;
             right = a.right;

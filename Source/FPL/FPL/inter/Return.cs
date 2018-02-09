@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
@@ -11,10 +11,16 @@ namespace FPL.inter
     {
         public Expr expr;
         string function_name;
+        Function function;
 
         public Return(int tag) : base(tag)
         {
-            function_name = building_function;
+            function_name = Parser.analyzing_function.name;
+        }
+
+        public Return(int tag, string name) : base(tag)
+        {
+            function_name = name;
         }
 
         public override Sentence Build()
@@ -26,14 +32,28 @@ namespace FPL.inter
 
         public override void Check()
         {
+            function = GetFunction(function_name);
             if (expr == null) return;
             if (expr.Check()) expr = expr.ToStringPlus();
             if (expr.type != GetFunction(function_name).return_type) Error(this, "无法将\"" + expr.type.lexeme + "\"类型作为返回值");
         }
 
-        public override void Run()
+        public override void Code()
         {
-            if(expr!= null) function_return = expr.Run();
+            if(function_name == "Main")
+            {
+                Encoder.Write(InstructionsType.endP);
+                return;
+            }
+            if (GetFunction(function_name).return_type == symbols.Type.Void)
+                Encoder.Write(InstructionsType.pushval);
+            else
+                expr.Code();
+            for (int i = 0; i < function.stmts.Count; i++)
+            {
+                Encoder.Write(InstructionsType.unloadi);
+            }
+            Encoder.Write(InstructionsType.ret);
         }
     }
 }

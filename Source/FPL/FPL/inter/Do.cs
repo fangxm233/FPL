@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
@@ -11,7 +11,10 @@ namespace FPL.inter
     public class Do : Sentence
     {
         Rel rel;
-        List<Sentence> stmts;
+        public List<Sentence> sentences;
+        public int end_line;
+        int head_line;
+        public int rel_line;
 
         public Do(int tag) : base(tag)
         {
@@ -23,7 +26,7 @@ namespace FPL.inter
             NewScope();
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = base.Builds();
+            sentences = base.Builds();
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.WHILE) Error("应输入\"while\"");
@@ -41,38 +44,27 @@ namespace FPL.inter
         public override void Check()
         {
             rel.Check();
-            foreach (Sentence item in stmts)
+            foreach (Sentence item in sentences)
             {
-                in_loop = true;
+                Parser.analyzing_loop = this;
                 item.Check();
             }
-            in_loop = false;
+            Parser.analyzing_loop = null;
         }
 
-        public override void Run()
+        public override void Code()
         {
-            do
+            head_line = Encoder.line + 1;
+            foreach (var item in sentences)
             {
-                NewScope();
-                in_loop = true;
-                foreach (Sentence item in stmts)
-                {
-                    item.Run();
-                    if (is_continue) break;
-                    if (!in_loop) break;
-                }
-                if (is_continue)
-                {
-                    is_continue = false;
-                    continue;
-                }
-                if (!in_loop)
-                {
-                    in_loop = false;
-                    break;
-                }
-                DestroyScope();
-            } while (rel.Run());
+                item.Code();
+            }
+            if (Encoder.line == head_line) return;
+            rel_line = Encoder.line + 1;
+            rel.Code();
+            CodingUnit u = Encoder.code[Encoder.code.Count - 1];
+            u.parameter = head_line;
+            end_line = u.lineNum;
         }
     }
 }

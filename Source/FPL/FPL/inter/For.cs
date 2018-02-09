@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
     [Serializable]
     public class For : Sentence
     {
-        Sentence stmt;
+        Statement statement;
         Rel rel;
         Sentence assign;
-        List<Sentence> stmts;
+        public List<Sentence> sentences;
+        public int end_line;
+        public CodingUnit to_rel;
 
         public For(int tag) : base(tag)
         {
@@ -26,8 +28,8 @@ namespace FPL.inter
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             Lexer.Next();
-            stmt = new Statement(Tag.STATEMENT);
-            stmt.Build();
+            statement = new Statement(Tag.STATEMENT);
+            statement.Build();
             rel = new Rel();
             rel = rel.Build();
             Lexer.Next();
@@ -36,7 +38,7 @@ namespace FPL.inter
             if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            stmts = Builds();
+            sentences = Builds();
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             return this;
@@ -44,44 +46,44 @@ namespace FPL.inter
 
         public override void Check()
         {
-            stmt.Check();
-            rel.Check();
-            assign.Check();
-            foreach (Sentence item in stmts)
+            statement.Check();
+            if (rel != null)
+                rel.Check();
+            if (assign != null)
+                assign.Check();
+            foreach (Sentence item in sentences)
             {
-                in_loop = true;
+                Parser.analyzing_loop = this;
                 item.Check();
             }
-            in_loop = false;
+            Parser.analyzing_loop = null;
         }
 
-        public override void Run()
+        public override void Code()
         {
-            NewScope();
-            for (stmt.Run(); rel.Run(); assign.Run())
+            to_rel = Encoder.Write(InstructionsType.jmp);
+            foreach (var item in sentences)
             {
-                NewScope();
-                in_loop = true;
-                foreach (Sentence item in stmts)
-                {
-                    item.Run();
-                    if (is_continue) break;
-                    if (is_break) break;
-                }
-                if (is_continue)
-                {
-                    is_continue = false;
-                    continue;
-                }
-                if (is_break)
-                {
-                    is_break = false;
-                    break;
-                }
-                DestroyScope();
+                item.Code();
             }
-            in_loop = false;
-            DestroyScope();
+            if (assign != null)
+                assign.Code();
+            to_rel.parameter = Encoder.line + 1;
+            if (rel != null)
+                rel.Code();
+            else
+                Encoder.Write(InstructionsType.jmp);
+            CodingUnit u = Encoder.code[Encoder.code.Count - 1];
+            u.parameter = to_rel.lineNum + 1;
+            end_line = u.lineNum;
+        }
+
+        public override void CodeSecond()
+        {
+            foreach (var item in sentences)
+            {
+                item.CodeSecond();
+            }
         }
     }
 }

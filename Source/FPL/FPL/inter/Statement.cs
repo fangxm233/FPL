@@ -9,9 +9,9 @@ using FPL.symbols;
 namespace FPL.inter
 {
     [Serializable]
-    class Statement : Sentence
+    public class Statement : Sentence
     {
-        Assign assign;
+        public Assign assign;
         public Statement(int tag) : base(tag)
         {
 
@@ -23,27 +23,34 @@ namespace FPL.inter
                 case "int":
                     {
                         Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Int));
+                        assign = new Assign(Tag.ASSIGN);
+                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Int);
                         break;
                     }
                 case "float":
                     {
                         Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Float));
+                        assign = new Assign(Tag.ASSIGN);
+                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Float);
                         break;
                     }
                 case "bool":
                     {
                         Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Bool));
+                        assign = new Assign(Tag.ASSIGN);
+                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Bool);
                         break;
                     }
                 case "string":
                     {
                         Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN, AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.String));
+                        assign = new Assign(Tag.ASSIGN);
+                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.String);
                         break;
                     }
+                case ",":
+                    Error("应输入类型名");
+                    break;
                 default:
                     {
                         Error("上下文中不存在名称" + ((symbols.Type)Lexer.Peek).lexeme);
@@ -55,6 +62,9 @@ namespace FPL.inter
                 Error("应输入标识符");
             }
             assign = (Assign)assign.Build();
+            Parser.analyzing_function.stmts.Add(assign.name);
+            if (Lexer.Peek.tag == Tag.COMMA) return this;
+            if (Lexer.Peek.tag == Tag.RBRACKETS) return this;
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
@@ -64,10 +74,9 @@ namespace FPL.inter
             assign.Check();
         }
 
-        public override void Run()
+        public override void Code()
         {
-            //AddVar(assign.name, "define");
-            assign.Run();
+            assign.Code();
         }
     }
 }

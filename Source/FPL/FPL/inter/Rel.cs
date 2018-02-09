@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
 using FPL.symbols;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
@@ -57,7 +57,7 @@ namespace FPL.inter
                         return a;
                     }
             }
-            return this;
+            return null;
         }
 
         public virtual void Check()
@@ -70,9 +70,9 @@ namespace FPL.inter
             return;
         }
 
-        public virtual bool Run()
+        public virtual void Code()
         {
-            return (bool)left.Run();
+            return;
         }
     }
 
@@ -115,9 +115,11 @@ namespace FPL.inter
             }
         }
 
-        public override bool Run()
+        public override void Code()
         {
-            return left.Run().ToString() == right.Run().ToString();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.eqt);
         }
     }
     [Serializable]
@@ -159,9 +161,11 @@ namespace FPL.inter
             }
         }
 
-        public override bool Run()
+        public override void Code()
         {
-            return left.Run().ToString() != right.Run().ToString();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.eqf);
         }
     }
     [Serializable]
@@ -193,9 +197,11 @@ namespace FPL.inter
             }
         }
 
-        public override bool Run()
+        public override void Code()
         {
-            return (float)left.Run() <= (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.mof);
         }
     }
     [Serializable]
@@ -227,9 +233,11 @@ namespace FPL.inter
             }
         }
 
-        public override bool Run()
+        public override void Code()
         {
-            return (float)left.Run() >= (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.lef);
         }
     }
     [Serializable]
@@ -261,9 +269,11 @@ namespace FPL.inter
             }
         }
 
-        public override bool Run()
+        public override void Code()
         {
-            return (float)left.Run() > (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.mot);
         }
     }
     [Serializable]
@@ -295,9 +305,11 @@ namespace FPL.inter
             }
         }
 
-        public override bool Run()
+        public override void Code()
         {
-            return (float)left.Run() < (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.let);
         }
     }
 }

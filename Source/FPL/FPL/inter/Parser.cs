@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
 using FPL.symbols;
 using System.Collections;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
@@ -15,51 +15,70 @@ namespace FPL.inter
         [NonSerialized]
         public static List<Hashtable> symbols_list = new List<Hashtable>();
 
-        public static int var_count;
         [NonSerialized]
         public static List<Hashtable> var_id = new List<Hashtable>();
-        [NonSerialized]
-        public static object[] var_content;
 
         public static Dictionary<string, Function> functions = new Dictionary<string, Function>();
-        [NonSerialized]
-        public static bool is_runtime;
-
-        //List<Sentence> stmts;
+        public static Function analyzing_function;
+        public static Sentence analyzing_loop;
+        //[NonSerialized]
+        //public static bool is_runtime;
 
         public void Compile()
         {
-            /*stmts = */new Sentence(1).Buildsstart();
+            new Sentence(1).Buildsstart();
             Check();
         }
+
         public void Check()
         {
             foreach (var item in functions)
             {
                 item.Value.Check();
             }
-            //foreach (Sentence item in stmts)
-            //{
-            //    item.Check();
-            //}
-        }
-        public void Interprete()
-        {
-            if (!functions.ContainsKey("Main")) Error("未找到主函数");
-            is_runtime = true;
-            var_content = new object[var_count];
-            functions["Main"].Run();
         }
 
-        public static void Error(string s)
+        public void Code()
         {
-            Console.WriteLine(s);
-            throw new RunTimeException();
+            List<CodingUnit> functions_unit = new List<CodingUnit>();
+            int i = 0;
+            foreach (var item in functions)
+            {
+                item.Value.id = i;
+                i++;
+                functions_unit.Add(Encoder.Write(InstructionsType.func));
+            }
+            if(!functions.ContainsKey("Main")) Sentence.Error("未找到主函数");
+            functions["Main"].Code();
+            foreach (var item in functions)
+            {
+                if (item.Key != "Main")
+                    item.Value.Code();
+            }
+            foreach (var item in functions)
+            {
+                item.Value.CodeSecond();
+            }
+            i = 0;
+            foreach (var item in functions)
+            {
+                CodingUnit u = functions_unit[i];
+                u.parameter = item.Value.head_line;
+                i++;
+            }
+        }
+
+        public void CodeSecond()
+        {
+            foreach (var item in functions)
+            {
+                item.Value.CodeSecond();
+            }
         }
     }
 
     [Serializable]
     public class CompileException : Exception { }
     [Serializable]
-    public class RunTimeException : Exception { }
+    public class CodeException : Exception { }
 }

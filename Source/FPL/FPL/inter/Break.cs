@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using FPL.Encoding;
 using FPL.lexer;
 
 namespace FPL.inter
@@ -10,6 +10,9 @@ namespace FPL.inter
     [Serializable]
     public class Break : Sentence
     {
+        Sentence loop;
+        CodingUnit unit;
+
         public Break(int tag) : base(tag)
         {
             
@@ -24,12 +27,29 @@ namespace FPL.inter
 
         public override void Check()
         {
-            if (!in_loop) Error(this, "没有要中断或继续的循环");
+            if (Parser.analyzing_loop == null) Error(this, "没有要中断或继续的循环");
+            loop = Parser.analyzing_loop;
         }
 
-        public override void Run()
+        public override void Code()
         {
-            is_break = true;
+            unit = Encoder.Write(InstructionsType.jmp);
+        }
+
+        public override void CodeSecond()
+        {
+            switch (loop.tag)
+            {
+                case Tag.WHILE:
+                    unit.parameter = ((While)loop).end_line + 1;
+                    break;
+                case Tag.FOR:
+                    unit.parameter = ((For)loop).end_line + 1;
+                    break;
+                case Tag.DO:
+                    unit.parameter = ((Do)loop).end_line + 1;
+                    break;
+            }
         }
     }
 }

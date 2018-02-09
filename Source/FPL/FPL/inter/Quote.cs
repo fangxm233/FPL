@@ -57,11 +57,6 @@ namespace FPL.inter
             //Console.WriteLine(expr.Check());
             if (expr.Check()) expr = expr.ToStringPlus();
         }
-
-        public override void Run()
-        {
-            Console.WriteLine(expr.Run());
-        }
     }
     [Serializable]
     public class Readln : Quote
@@ -83,41 +78,6 @@ namespace FPL.inter
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
-        }
-
-        public override void Run()
-        {
-            string s = Console.ReadLine();
-            try
-            {
-                switch (expr.type.type)
-                {
-                    case "int":
-                        {
-                            Parser.var_content[expr.id] = int.Parse(s);
-                            break;
-                        }
-                    case "float":
-                        {
-                            Parser.var_content[expr.id] = float.Parse(s);
-                            break;
-                        }
-                    case "string":
-                        {
-                            Parser.var_content[expr.id] = s;
-                            break;
-                        }
-                    case "bool":
-                        {
-                            Parser.var_content[expr.id] = bool.Parse(s);
-                            break;
-                        }
-                }
-            }
-            catch (Exception)
-            {
-                Parser.Error("无法将输入转换为类型\"" + expr.type.type + "\"");
-            }
         }
     }
 }

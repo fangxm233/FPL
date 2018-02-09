@@ -1,0 +1,8 @@
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\bin\Release\Program.fplc
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\bin\Release\FPL_Interpreter.exe.config
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\bin\Release\FPL_Interpreter.exe
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\bin\Release\FPL_Interpreter.pdb
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\obj\Release\FPL_Interpreter.csproj.CoreCompileInputs.cache
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\obj\Release\FPL_Interpreter.exe
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\obj\Release\FPL_Interpreter.pdb
+G:\GIT\FPL\Source\FPL\FPL_Interpreter\obj\Release\FPL_Interpreter.csprojResolveAssemblyReference.cache

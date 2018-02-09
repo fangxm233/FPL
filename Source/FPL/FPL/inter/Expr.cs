@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
 using FPL.symbols;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
@@ -195,6 +195,16 @@ namespace FPL.inter
                         break;
                     }
                 case Tag.SEMICOLON:
+                case Tag.RBRACKETS:
+                case Tag.AND:
+                case Tag.OR:
+                case Tag.EQ:
+                case Tag.NE:
+                case Tag.LE:
+                case Tag.GE:
+                case Tag.MORE:
+                case Tag.LESS:
+                case Tag.COMMA:
                     {
                         return null;
                     }
@@ -217,6 +227,7 @@ namespace FPL.inter
                 case Tag.GE:
                 case Tag.MORE:
                 case Tag.LESS:
+                case Tag.COMMA:
                     {
                         return left; //到了各个可能为表达式的结束符号的时候就返回
                     }
@@ -330,9 +341,15 @@ namespace FPL.inter
             return this;
         }
 
-        public virtual object Run()
+        public virtual void Code()
         {
-            return null;
+            return;
+        }
+
+        public virtual void CodeSecond()
+        {
+            left.CodeSecond();
+            right.CodeSecond();
         }
     }
 
@@ -404,9 +421,11 @@ namespace FPL.inter
             return s;
         }
 
-        public override object Run()
+        public override void Code()
         {
-            return (float)left.Run() + (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.add);
         }
     }
     [Serializable]
@@ -417,11 +436,6 @@ namespace FPL.inter
             left = e.left;
             right = e.right;
             type = e.type;
-        }
-
-        public override object Run()
-        {
-            return left.Run().ToString() + right.Run().ToString();
         }
     }
     [Serializable]
@@ -438,9 +452,11 @@ namespace FPL.inter
             return base.ToStringPlus();
         }
 
-        public override object Run()
+        public override void Code()
         {
-            return (float)left.Run() - (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.sub);
         }
     }
     [Serializable]
@@ -517,9 +533,11 @@ namespace FPL.inter
             return base.ToStringPlus();
         }
 
-        public override object Run()
+        public override void Code()
         {
-            return (float)left.Run() * (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.mul);
         }
     }
     [Serializable]
@@ -595,9 +613,11 @@ namespace FPL.inter
             return base.ToStringPlus();
         }
 
-        public override object Run()
+        public override void Code()
         {
-            return (float)left.Run() / (float)right.Run();
+            left.Code();
+            right.Code();
+            Encoder.Write(InstructionsType.div);
         }
     }
     [Serializable]
@@ -630,7 +650,7 @@ namespace FPL.inter
             content = c;
             name = ((Word)content).lexeme;
             type = (symbols.Type)GetName(name);
-            id = GetID(name);
+            Parser.analyzing_function.vars.Add(this);
         }
         public override bool Check()
         {
@@ -640,11 +660,13 @@ namespace FPL.inter
         {
             return this;
         }
-        public override object Run()
+        public override void Code()
         {
-            if(type.type == "int")
-                return (float)(int)GetVar(id);
-            return GetVar(id);
+            Encoder.Write(InstructionsType.pushvar, id);
+        }
+        public override void CodeSecond()
+        {
+            return;
         }
     }
     [Serializable]
@@ -663,9 +685,13 @@ namespace FPL.inter
         {
             return this;
         }
-        public override object Run()
+        public override void Code()
         {
-            return (float)(int)content.GetValue();
+            Encoder.Write(InstructionsType.pushval, (int)content.GetValue());
+        }
+        public override void CodeSecond()
+        {
+            return;
         }
     }
     [Serializable]
@@ -684,9 +710,9 @@ namespace FPL.inter
         {
             return this;
         }
-        public override object Run()
+        public override void CodeSecond()
         {
-            return content.GetValue();
+            return;
         }
     }
     [Serializable]
@@ -705,9 +731,9 @@ namespace FPL.inter
         {
             return this;
         }
-        public override object Run()
+        public override void CodeSecond()
         {
-            return true;
+            return;
         }
     }
     [Serializable]
@@ -726,9 +752,9 @@ namespace FPL.inter
         {
             return this;
         }
-        public override object Run()
+        public override void CodeSecond()
         {
-            return false;
+            return;
         }
     }
     [Serializable]
@@ -747,9 +773,9 @@ namespace FPL.inter
         {
             return this;
         }
-        public override object Run()
+        public override void CodeSecond()
         {
-            return content.GetValue();
+            return;
         }
     }
     /*

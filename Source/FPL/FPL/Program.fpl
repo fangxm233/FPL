@@ -1,22 +1,23 @@
-﻿using Console;
-
-void Main()
+﻿void Main()
 {
-	//int a = 0;
-	Print();
+	int a;
+	for(int i = 0;i<=10000000;i=i+1)
+	{
+		pp();
+		a = a+1;
+	}
+	//p(0);
 	return;
-	//Readln(a);
 }
 
-void Print()
+void p(int i)
 {
-	Println(pp());
-	//Print();
-}
-
-string p()
-{
-	return "fffffff";
+	if(i == 10000000)
+	{
+		return;
+	}
+	i=i+1;
+	p(i);
 }
 
 int pp()

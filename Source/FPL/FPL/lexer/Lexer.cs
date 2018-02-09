@@ -60,6 +60,7 @@ namespace FPL.lexer
             {
                 Scan();
             }
+            Scan();
             peeks.Add(new Token(Tag.EOF));
             line = 1;
         }
@@ -209,6 +210,12 @@ namespace FPL.lexer
                 case '}':
                     {
                         peeks.Add(Word.RBrace);
+                        Readch();
+                        return;
+                    }
+                case ',':
+                    {
+                        peeks.Add(Word.comma);
                         Readch();
                         return;
                     }

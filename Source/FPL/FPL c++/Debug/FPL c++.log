@@ -1,3 +1,10 @@
-﻿  FPLc.cpp
+﻿  stdafx.cpp
+g:\git\fpl\source\fpl\fpl c++\stdafx.cpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+g:\git\fpl\source\fpl\fpl c++\stdafx.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+g:\git\fpl\source\fpl\fpl c++\targetver.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  Token.cpp
+  Tag.cpp
+  Lexer.cpp
+  FPLc.cpp
+  正在生成代码...
   FPL c++.vcxproj -> G:\GIT\FPL\Source\FPL\Debug\FPL c++.exe
-  FPL c++.vcxproj -> G:\GIT\FPL\Source\FPL\Debug\FPL c++.pdb (Partial PDB)
