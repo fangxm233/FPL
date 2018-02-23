@@ -1,68 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FPL.lexer;
 using FPL.symbols;
+using FPL.Encoding;
 
 namespace FPL.inter
 {
-    [Serializable]
     public class Statement : Sentence
     {
         public Assign assign;
-        public Statement(int tag) : base(tag)
-        {
+        public string name;
+        string type_name;
+        public int ID;
+        public Class @class;
+        public VarType varType;
 
+        public Statement(VarType varType, int tag) : base(tag)
+        {
+            this.varType = varType;
         }
         public override Sentence Build()
         {
-            switch (((symbols.Type)Lexer.Peek).lexeme)
-            {
-                case "int":
-                    {
-                        Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN);
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Int);
-                        break;
-                    }
-                case "float":
-                    {
-                        Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN);
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Float);
-                        break;
-                    }
-                case "bool":
-                    {
-                        Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN);
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Bool);
-                        break;
-                    }
-                case "string":
-                    {
-                        Lexer.Next();
-                        assign = new Assign(Tag.ASSIGN);
-                        AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.String);
-                        break;
-                    }
-                case ",":
-                    Error("应输入类型名");
-                    break;
-                default:
-                    {
-                        Error("上下文中不存在名称" + ((symbols.Type)Lexer.Peek).lexeme);
-                        break;
-                    }
-            }
+            //switch (((Word)Lexer.Peek).lexeme)
+            //{
+            //    case "int":
+            //        {
+            //            assign = new Assign(Tag.ASSIGN);
+            //            Lexer.Next();
+            //            AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Int);
+            //            break;
+            //        }
+            //    case "float":
+            //        {
+            //            assign = new Assign(Tag.ASSIGN);
+            //            Lexer.Next();
+            //            AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Float);
+            //            break;
+            //        }
+            //    case "bool":
+            //        {
+            //            assign = new Assign(Tag.ASSIGN);
+            //            Lexer.Next();
+            //            AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.Bool);
+            //            break;
+            //        }
+            //    case "string":
+            //        {
+            //            assign = new Assign(Tag.ASSIGN);
+            //            Lexer.Next();
+            //            AddVar(((Word)Lexer.Peek).lexeme, symbols.Type.String);
+            //            break;
+            //        }
+            //    case ",":
+            //        Error("应输入类型名");
+            //        break;
+            //    default:
+            //        {
+            //        }
+            //}
+            Lexer.Next();
             if (Lexer.Peek.tag != Tag.ID)
             {
                 Error("应输入标识符");
             }
-            assign = (Assign)assign.Build();
-            Parser.analyzing_function.stmts.Add(assign.name);
+            name = ((Word)Lexer.Peek).lexeme;
+            AddVar(this);
+            Lexer.Back();
+            @class = Parser.analyzing_class;
+            type_name = ((Word)Lexer.Peek).lexeme;
+            assign = (Assign)new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build();
+            if (Parser.analyzing_function != null)
+                Parser.analyzing_function.Statements.Add(this);
+            else
+                @class.Statement.Add(this);
             if (Lexer.Peek.tag == Tag.COMMA) return this;
             if (Lexer.Peek.tag == Tag.RBRACKETS) return this;
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
@@ -71,6 +83,7 @@ namespace FPL.inter
 
         public override void Check()
         {
+            assign.TypeName = type_name;
             assign.Check();
         }
 

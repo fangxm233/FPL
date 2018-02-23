@@ -12,3 +12,11 @@ G:\GIT\FPL\Source\FPL\FPL\bin\Debug\FPL.pdb
 G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.exe
 G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.pdb
 G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.csproj.CoreCompileInputs.cache
+C:\f\FPL\FPL\bin\Debug\Program.fpl
+C:\f\FPL\FPL\bin\Debug\FPL.exe.config
+C:\f\FPL\FPL\bin\Debug\FPL.exe
+C:\f\FPL\FPL\bin\Debug\FPL.pdb
+C:\f\FPL\FPL\obj\Debug\FPL.csprojResolveAssemblyReference.cache
+C:\f\FPL\FPL\obj\Debug\FPL.csproj.CoreCompileInputs.cache
+C:\f\FPL\FPL\obj\Debug\FPL.exe
+C:\f\FPL\FPL\obj\Debug\FPL.pdb

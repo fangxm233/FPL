@@ -1,28 +1,46 @@
 ﻿namespace FPL.inter
 {
-    public enum InstructionsType
+    public enum InstructionType
     {
-        pushvar,
+        pushloc,
+        pusharg,
+        pushfield,
         pushadr,
         pushval,
+        pushEAX,
 
-        poparg,
-        popvar,
         popadr,
+        popEAX,
         pop,
 
+        storeloc,
+        storearg,
+        storefield,
+
         add,
-        addv,
+        addl,
+        adda,
+        addf,
         add1,
-        addv1,
+        addl1,
+        adda1,
+        addf1,
         sub,
-        subv,
+        subl,
+        suba,
+        subf,
         sub1,
-        subv1,
+        subl1,
+        suba1,
+        subf1,
         div,
-        divv,
+        divl,
+        diva,
+        divf,
         mul,
-        mulv,
+        mull,
+        mula,
+        mulf,
 
         jmp,
         call,
@@ -35,11 +53,20 @@
         mot,
         mof,
 
+        newobjc,
+        newobji,
+        newobjf,
+        newobjs,
+        newobjb,
+
         endP,
 
-        loadi,
-        unloadi,
-
-        func
+        nop,
+        endF,
+        func,
+        @class,
+        define,
+        classEnd,
+        funcEnd,
     }
 }

@@ -7,7 +7,6 @@ using FPL.Encoding;
 
 namespace FPL.inter
 {
-    [Serializable]
     public class Do : Sentence
     {
         Rel rel;
@@ -25,15 +24,24 @@ namespace FPL.inter
         {
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            sentences = base.Builds();
-            if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+            if (Lexer.Peek.tag == Tag.LBRACE)
+            {
+                sentences = BuildMethod();
+                if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+            }
+            else
+            {
+                Lexer.Back();
+                sentences = new List<Sentence>
+                {
+                    BuildOne()
+                };
+            }
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.WHILE) Error("应输入\"while\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            rel = new Rel();
-            rel = rel.Build();
+            rel = new Rel().BuildStart();
             if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
@@ -61,7 +69,7 @@ namespace FPL.inter
             }
             if (Encoder.line == head_line) return;
             rel_line = Encoder.line + 1;
-            rel.Code();
+            rel.Code(0);
             CodingUnit u = Encoder.code[Encoder.code.Count - 1];
             u.parameter = head_line;
             end_line = u.lineNum;

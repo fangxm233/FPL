@@ -7,7 +7,7 @@ using FPL.lexer;
 
 namespace FPL.inter
 {
-    [Serializable]
+
     public class Using : Sentence
     {
         public Using(int tag) : base(tag)

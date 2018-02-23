@@ -8,27 +8,30 @@ using FPL.Encoding;
 
 namespace FPL.inter
 {
-    [Serializable]
     public class Expr : Node
     {
-        //public static bool turn_to_string; //标记所有语句检查完了以后是否要转为string表达式
         public Expr left;
         public Expr right;
         public Token content;
         public symbols.Type type = symbols.Type.Int;
+        public Class @class;
+        public string name;
 
         public virtual Expr Build()
         {
+            bool is_first_loop = true;
             Lexer.Next();
             switch (Lexer.Peek.tag) //检测所有可以为值的单元
             {
                 case Tag.TRUE:
                     {
-                        return new True(Word.True);
+                        right = new True_e(Word.True);
+                        break;
                     }
                 case Tag.FALSE:
                     {
-                        return new False(Word.False);
+                        right = new False_e(Word.False);
+                        break;
                     }
                 case Tag.ID:
                     {
@@ -37,13 +40,26 @@ namespace FPL.inter
                         {
                             Lexer.Back();
                             right = new FunctionCall_e(Tag.FUNCTIONCALL).Build();
+                            if (is_first_loop)
+                            {
+                                Parser.analyzing_class.FunctionCalls_e.Add((FunctionCall_e)right);
+                                is_first_loop = !is_first_loop;
+                            }
                             break;
                         }
-                        else
+                        Lexer.Back();
+                        right = new Object_e();
+                        if (is_first_loop)
                         {
-                            Lexer.Back();
-                            right = new Var(Lexer.Peek);
+                            //Parser.analyzing_class.Objects_e.Add((Object_e)right);
+                            ((Object_e)right).statement = GetStatement(right.name);
+                            is_first_loop = !is_first_loop;
                         }
+                        break;
+                    }
+                case Tag.NEW:
+                    {
+                        right = new New_e().Build();
                         break;
                     }
                 case Tag.NUM:
@@ -63,13 +79,12 @@ namespace FPL.inter
                     }
                 case Tag.LBRACKETS: //括号整个可以算个为值的单元
                     {
-                        right = new Expr();
-                        right = right.BuildStart();
+                        right = new Brackets().Build();
                         break;
                     }
                 default:
                     {
-                        Error("表达式无效");
+                        Error(this, "表达式无效");
                         break;
                     }
             }
@@ -86,20 +101,18 @@ namespace FPL.inter
                 case Tag.GE:
                 case Tag.MORE:
                 case Tag.LESS:
+                case Tag.COMMA:
+                case Tag.ASSIGN:
                     {
                         break; //到了各个可能为表达式的结束符号的时候就返回
                     }
                 case Tag.PLUS:
                     {
-                        //right = new Plus(this).Build(); 
                         return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
-                        //break;
                     }
                 case Tag.MINUS:
                     {
-                        //right = new Minus(this).Build();
                         return new Minus(this).Build();
-                        //break;
                     }
                 case Tag.MULTIPLY:
                     {
@@ -133,9 +146,57 @@ namespace FPL.inter
                         }
                         break;
                     }
+                case Tag.DOT:
+                    {
+                        right = new Dot(right).Build();
+                        switch (Lexer.Peek.tag)
+                        {
+                            case Tag.PLUS:
+                                {
+                                    return new Plus(this).Build(); 
+                                }
+                            case Tag.MINUS:
+                                {
+                                    return new Minus(this).Build();
+                                }
+                            case Tag.MULTIPLY:
+                                {
+                                    right = new Multiply(right).Build();
+                                    switch (Lexer.Peek.tag) //把这个/*对象当做下一个次级符号的左值
+                                    {
+                                        case Tag.PLUS:
+                                            {
+                                                return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
+                                            }
+                                        case Tag.MINUS:
+                                            {
+                                                return new Minus(this).Build();
+                                            }
+                                    }
+                                    break;
+                                }
+                            case Tag.DIVIDE:
+                                {
+                                    right = new Divide(right).Build();
+                                    switch (Lexer.Peek.tag)
+                                    {
+                                        case Tag.PLUS:
+                                            {
+                                                return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
+                                            }
+                                        case Tag.MINUS:
+                                            {
+                                                return new Minus(this).Build();
+                                            }
+                                    }
+                                    break;
+                                }
+                        }
+                        break;
+                    }
                 default:
                     {
-                        Error("表达式无效");
+                        Error(this, "表达式无效");
                         break;
                     }
             }
@@ -150,12 +211,12 @@ namespace FPL.inter
                 case Tag.TRUE:
                     {
                         Lexer.Next();
-                        return new True(Word.True);
+                        return new True_e(Word.True);
                     }
                 case Tag.FALSE:
                     {
                         Lexer.Next();
-                        return new False(Word.False);
+                        return new False_e(Word.False);
                     }
                 case Tag.ID:
                     {
@@ -164,13 +225,18 @@ namespace FPL.inter
                         {
                             Lexer.Back();
                             left = new FunctionCall_e(Tag.FUNCTIONCALL).Build();
+                            Parser.analyzing_class.FunctionCalls_e.Add((FunctionCall_e)left);
                             break;
                         }
-                        else
-                        {
-                            Lexer.Back();
-                            left = new Var(Lexer.Peek);
-                        }
+                        Lexer.Back();
+                        left = new Object_e();
+                        //Parser.analyzing_class.Objects_e.Add((Object_e)left);
+                        ((Object_e)left).statement = GetStatement(left.name);
+                        break;
+                    }
+                case Tag.NEW:
+                    {
+                        left = new New_e().Build();
                         break;
                     }
                 case Tag.NUM:
@@ -190,8 +256,7 @@ namespace FPL.inter
                     }
                 case Tag.LBRACKETS:
                     {
-                        left = new Expr();
-                        left = left.BuildStart();
+                        left = new Brackets().Build();
                         break;
                     }
                 case Tag.SEMICOLON:
@@ -210,7 +275,7 @@ namespace FPL.inter
                     }
                 default:
                     {
-                        Error("表达式无效");
+                        Error(this, "表达式无效");
                         break;
                     }
             }
@@ -228,6 +293,7 @@ namespace FPL.inter
                 case Tag.MORE:
                 case Tag.LESS:
                 case Tag.COMMA:
+                case Tag.ASSIGN:
                     {
                         return left; //到了各个可能为表达式的结束符号的时候就返回
                     }
@@ -271,73 +337,66 @@ namespace FPL.inter
                         }
                         break;
                     }
+                case Tag.DOT:
+                    {
+                        left = new Dot(left).Build();
+                        switch (Lexer.Peek.tag)
+                        {
+                            case Tag.PLUS:
+                                {
+                                    return new Plus(this).Build();
+                                }
+                            case Tag.MINUS:
+                                {
+                                    return new Minus(this).Build();
+                                }
+                            case Tag.MULTIPLY:
+                                {
+                                    left = new Multiply(left).Build();
+                                    switch (Lexer.Peek.tag) //把这个/*对象当做下一个次级符号的左值
+                                    {
+                                        case Tag.PLUS:
+                                            {
+                                                return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
+                                            }
+                                        case Tag.MINUS:
+                                            {
+                                                return new Minus(this).Build();
+                                            }
+                                    }
+                                    break;
+                                }
+                            case Tag.DIVIDE:
+                                {
+                                    left = new Divide(left).Build();
+                                    switch (Lexer.Peek.tag)
+                                    {
+                                        case Tag.PLUS:
+                                            {
+                                                return new Plus(this).Build(); //把现在的对象传进去当做他的左值,然后把这个对象当作返回值
+                                            }
+                                        case Tag.MINUS:
+                                            {
+                                                return new Minus(this).Build();
+                                            }
+                                    }
+                                    break;
+                                }
+                        }
+                        break;
+                    }
                 default:
                     {
-                        Error("表达式无效");
+                        Error(this, "表达式无效");
                         break;
                     }
             }
-            return this;
+            return left;
         }
 
         //分析是否需要转成string表达式，让functionCall确定返回值类型
-        public virtual bool Check()
+        public virtual Expr Check()
         {
-            if (left.Check()) return true;
-            if (right.Check()) return true;
-            switch (left.type.type)
-            {
-                case "int":
-                    {
-                        break;
-                    }
-                case "string":
-                    {
-                        type = symbols.Type.String;
-                        break;
-                    }
-                case "float":
-                    {
-                        if (type == symbols.Type.String) break;
-                        type = symbols.Type.Float;
-                        break;
-                    }
-                default:
-                    {
-                        Error(left,"表达式无效");
-                        break;
-                    }
-            }
-            switch (right.type.type)
-            {
-                case "int":
-                    {
-                        break;
-                    }
-                case "string":
-                    {
-                        type = symbols.Type.String;
-                        break;
-                    }
-                case "float":
-                    {
-                        if (type == symbols.Type.String) break;
-                        type = symbols.Type.Float;
-                        break;
-                    }
-                default:
-                    {
-                        Error(right, "表达式无效");
-                        break;
-                    }
-            }
-            return false;
-        }
-
-        public virtual Expr ToStringPlus() //目的是把所有的普通+换成string+, 如果有 - * / 的话就报错
-        {
-            left = left.ToStringPlus();
-            right = right.ToStringPlus();
             return this;
         }
 
@@ -351,9 +410,13 @@ namespace FPL.inter
             left.CodeSecond();
             right.CodeSecond();
         }
+
+        public virtual int GetIndex()
+        {
+            return 1;
+        }
     }
 
-    [Serializable]
     public class Plus : Expr
     {
         public Plus(Expr l)
@@ -361,84 +424,46 @@ namespace FPL.inter
             left = l;
         }
 
-        public override bool Check()
+        public override Expr Check()
         {
-            if (left.Check()) return true;
-            if (right.Check()) return true;
-            switch (left.type.type)
+            left = left.Check();
+            right = right.Check();
+            if(left.type == symbols.Type.String || right.type == symbols.Type.String)
+            {
+                return new PlusString(this);
+            }
+            switch (left.type.type_name)
             {
                 case "int":
-                    {
-                        break;
-                    }
-                case "string":
-                    {
-                        type = symbols.Type.String;
-                        break;
-                    }
                 case "float":
-                    {
-                        if (type == symbols.Type.String) break;
-                        type = symbols.Type.Float;
-                        break;
-                    }
-                default:
-                    {
-                        Error(left, "表达式无效");
-                        break;
-                    }
-            }
-            switch (right.type.type)
-            {
-                case "int":
-                    {
-                        break;
-                    }
+                case "bool":
                 case "string":
-                    {
-                        type = symbols.Type.String;
-                        break;
-                    }
-                case "float":
-                    {
-                        if (type == symbols.Type.String) break;
-                        type = symbols.Type.Float;
-                        break;
-                    }
+                    break;
                 default:
-                    {
-                        Error(right, "表达式无效");
-                        break;
-                    }
+                    Error("表达式暂不支持除\"int\"\"float\"\"bool\"\"string\"以外的类型");
+                    break;
             }
-            return false;
-        }
-
-        public override Expr ToStringPlus()
-        {
-            PlusString s = new PlusString(this);
-            s.ToStringPlus();
-            return s;
+            if (left.type != right.type) Error(this, "运算符\"+\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+            type = left.type;
+            return this;
         }
 
         public override void Code()
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.add);
+            Encoder.Write(InstructionType.add);
         }
     }
-    [Serializable]
     public class PlusString : Expr
     {
         public PlusString(Expr e)
         {
             left = e.left;
             right = e.right;
-            type = e.type;
+            type = symbols.Type.String;
         }
     }
-    [Serializable]
     public class Minus : Expr
     {
         public Minus(Expr l)
@@ -446,20 +471,37 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
-            Error(this, "运算符\"-\"无法用于String类型的表达式");
-            return base.ToStringPlus();
+            left = left.Check();
+            right = right.Check();
+            if (left.type == symbols.Type.String || right.type == symbols.Type.String)
+            {
+                Error(this, "运算符\"-\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+            }
+            switch (left.type.type_name)
+            {
+                case "int":
+                case "float":
+                case "bool":
+                case "string":
+                    break;
+                default:
+                    Error("表达式暂不支持除\"int\"\"float\"\"bool\"\"string\"以外的类型");
+                    break;
+            }
+            if (left.type != right.type) Error(this, "运算符\"-\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+            type = left.type;
+            return this;
         }
 
         public override void Code()
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.sub);
+            Encoder.Write(InstructionType.sub);
         }
     }
-    [Serializable]
     public class Multiply : Expr
     {
         public Multiply(Expr l)
@@ -469,12 +511,32 @@ namespace FPL.inter
 
         public override Expr Build()
         {
+            bool is_first_loop = true;
             Lexer.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.ID:
                     {
-                        right = new Var(Lexer.Peek);
+                        Lexer.Next();
+                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        {
+                            Lexer.Back();
+                            right = new FunctionCall_e(Tag.FUNCTIONCALL).Build();
+                            if (is_first_loop)
+                            {
+                                Parser.analyzing_class.FunctionCalls_e.Add((FunctionCall_e)right);
+                                is_first_loop = !is_first_loop;
+                            }
+                            break;
+                        }
+                        Lexer.Back();
+                        right = new Object_e();
+                        if (is_first_loop)
+                        {
+                            //Parser.analyzing_class.Objects_e.Add((Object_e)right);
+                            ((Object_e)right).statement = GetStatement(right.name);
+                            is_first_loop = !is_first_loop;
+                        }
                         break;
                     }
                 case Tag.NUM:
@@ -495,7 +557,7 @@ namespace FPL.inter
                     }
                 default:
                     {
-                        Error("表达式无效");
+                        Error(this, "表达式无效");
                         break;
                     }
             }
@@ -512,8 +574,10 @@ namespace FPL.inter
                 case Tag.GE:
                 case Tag.MORE:
                 case Tag.LESS:
+                case Tag.COMMA:
+                case Tag.ASSIGN:
                     {
-                        break;
+                        break; //到了各个可能为表达式的结束符号的时候就返回
                     }
                 case Tag.MULTIPLY: //把所有同级或更高级的符号匹配掉
                     {
@@ -523,24 +587,57 @@ namespace FPL.inter
                     {
                         return new Divide(this).Build();
                     }
+                case Tag.DOT:
+                    {
+                        right = new Dot(right).Build();
+                        switch (Lexer.Peek.tag)
+                        {
+                            case Tag.MULTIPLY: //把所有同级或更高级的符号匹配掉
+                                {
+                                    return new Multiply(this).Build();
+                                }
+                            case Tag.DIVIDE:
+                                {
+                                    return new Divide(this).Build();
+                                }
+                        }
+                        break;
+                    }
             }
             return this;
         }
 
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
-            Error(this, "运算符\"*\"无法用于String类型的表达式");
-            return base.ToStringPlus();
+            left = left.Check();
+            right = right.Check();
+            if (left.type == symbols.Type.String || right.type == symbols.Type.String)
+            {
+                Error(this, "运算符\"-\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+            }
+            switch (left.type.type_name)
+            {
+                case "int":
+                case "float":
+                case "bool":
+                case "string":
+                    break;
+                default:
+                    Error("表达式暂不支持除\"int\"\"float\"\"bool\"\"string\"以外的类型");
+                    break;
+            }
+            if (left.type != right.type) Error(this, "运算符\"*\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+            type = left.type;
+            return this;
         }
 
         public override void Code()
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.mul);
+            Encoder.Write(InstructionType.mul);
         }
     }
-    [Serializable]
     public class Divide : Expr
     {
         public Divide(Expr l)
@@ -549,12 +646,32 @@ namespace FPL.inter
         }
         public override Expr Build()
         {
+            bool is_first_loop = true;
             Lexer.Next();
             switch (Lexer.Peek.tag)
             {
                 case Tag.ID:
                     {
-                        right = new Var(Lexer.Peek);
+                        Lexer.Next();
+                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        {
+                            Lexer.Back();
+                            right = new FunctionCall_e(Tag.FUNCTIONCALL).Build();
+                            if (is_first_loop)
+                            {
+                                Parser.analyzing_class.FunctionCalls_e.Add((FunctionCall_e)right);
+                                is_first_loop = !is_first_loop;
+                            }
+                            break;
+                        }
+                        Lexer.Back();
+                        right = new Object_e();
+                        if (is_first_loop)
+                        {
+                            //Parser.analyzing_class.Objects_e.Add((Object_e)right);
+                            ((Object_e)right).statement = GetStatement(right.name);
+                            is_first_loop = !is_first_loop;
+                        }
                         break;
                     }
                 case Tag.NUM:
@@ -575,7 +692,7 @@ namespace FPL.inter
                     }
                 default:
                     {
-                        Error("表达式无效");
+                        Error(this, "表达式无效");
                         break;
                     }
             }
@@ -592,8 +709,10 @@ namespace FPL.inter
                 case Tag.GE:
                 case Tag.MORE:
                 case Tag.LESS:
+                case Tag.COMMA:
+                case Tag.ASSIGN:
                     {
-                        break;
+                        break; //到了各个可能为表达式的结束符号的时候就返回
                     }
                 case Tag.MULTIPLY: //把所有同级或更高级的符号匹配掉
                     {
@@ -603,73 +722,266 @@ namespace FPL.inter
                     {
                         return new Divide(this).Build();
                     }
+                case Tag.DOT:
+                    {
+                        right = new Dot(right).Build();
+                        switch (Lexer.Peek.tag)
+                        {
+                            case Tag.MULTIPLY: //把所有同级或更高级的符号匹配掉
+                                {
+                                    return new Multiply(this).Build();
+                                }
+                            case Tag.DIVIDE:
+                                {
+                                    return new Divide(this).Build();
+                                }
+                        }
+                        break;
+                    }
             }
             return this;
         }
 
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
-            Error(this, "运算符\"/\"无法用于String类型的表达式");
-            return base.ToStringPlus();
+            left = left.Check();
+            right = right.Check();
+            if (left.type == symbols.Type.String || right.type == symbols.Type.String)
+            {
+                Error(this, "运算符\"-\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+            }
+            switch (left.type.type_name)
+            {
+                case "int":
+                case "float":
+                case "bool":
+                case "string":
+                    break;
+                default:
+                    Error("表达式暂不支持除\"int\"\"float\"\"bool\"\"string\"以外的类型");
+                    break;
+            }
+            if (left.type != right.type) Error(this, "运算符\"\\\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+            type = left.type;
+            return this;
         }
 
         public override void Code()
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.div);
+            Encoder.Write(InstructionType.div);
         }
     }
-    [Serializable]
+    public class Dot : Expr
+    {
+        public Dot(Expr left)
+        {
+            this.left = left;
+        }
+
+        public override Expr Build()
+        {
+            Lexer.Next();
+            switch (Lexer.Peek.tag) //检测所有可以为值的单元
+            {
+                case Tag.ID:
+                    {
+                        Lexer.Next();
+                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        {
+                            Lexer.Back();
+                            right = new FunctionCall_e(Tag.FUNCTIONCALL).Build();
+                            break;
+                        }
+                        Lexer.Back();
+                        right = new Object_e();
+                        break;
+                    }
+                default:
+                    {
+                        Error(this, "表达式无效");
+                        break;
+                    }
+            }
+            Lexer.Next();
+            switch (Lexer.Peek.tag)
+            {
+                case Tag.SEMICOLON:
+                case Tag.RBRACKETS:
+                case Tag.AND:
+                case Tag.OR:
+                case Tag.EQ:
+                case Tag.NE:
+                case Tag.LE:
+                case Tag.GE:
+                case Tag.MORE:
+                case Tag.LESS:
+                case Tag.COMMA:
+                case Tag.ASSIGN:
+                    {
+                        break; //到了各个可能为表达式的结束符号的时候就返回
+                    }
+                case Tag.DOT: //把所有同级或更高级的符号匹配掉
+                    {
+                        return new Dot(this).Build();
+                    }
+            }
+            return this;
+        }
+
+        public override Expr Check()//左边的右边
+        {
+            left = left.Check();
+            right.@class = left.@class;
+            right = right.Check();
+            type = right.type;
+            @class = right.@class;
+            return this;
+        }
+
+        public override void Code()
+        {
+            left.Code();
+            right.Code();
+        }
+
+        public override int GetIndex()
+        {
+            int i = left.GetIndex();
+            int a = right.GetIndex();
+            return i > a ? i + 1 : a + 1;
+        }
+    }
+
     public class Brackets : Expr
     {
         public override Expr Build()
         {
-            left = BuildStart();
+            BuildStart();
+            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             return left;
         }
-
-        public override bool Check()
-        {
-            if (left.Check())
-            {
-                left = left.ToStringPlus();
-                return true;
-            }
-            return false;
-        }
     }
-
-    [Serializable]
-    public class Var : Expr
+    public class New_e : Expr
     {
-        public string name;
-        public int id;
-        public Var(Token c)
+        string Type_Name;
+        public List<Expr> parameters = new List<Expr>();
+        Function function;
+
+        public New_e()
         {
-            content = c;
-            name = ((Word)content).lexeme;
-            type = (symbols.Type)GetName(name);
-            Parser.analyzing_function.vars.Add(this);
+            Lexer.Next();
+            Type_Name = ((Word)Lexer.Peek).lexeme;
         }
-        public override bool Check()
+
+        public override Expr Build()
         {
-            return false;
-        }
-        public override Expr ToStringPlus()
-        {
+            @class = GetClass(Type_Name);
+            Lexer.Next();
+            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            while (Lexer.Peek.tag != Tag.RBRACKETS)
+            {
+                parameters.Add(new Expr().BuildStart());
+                if (parameters[parameters.Count - 1] == null)
+                {
+                    if (Lexer.Peek.tag == Tag.COMMA) Error("缺少参数");
+                    if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
+                    parameters.RemoveAt(parameters.Count - 1);
+                    break;
+                }
+            }
             return this;
         }
+
+        public override Expr Check()
+        {
+            if (@class.GetFunction(@class.name).par_statements.Count != parameters.Count)
+            {
+                Error(this, "该类型不存在" + parameters.Count + "个参数的构造函数");
+            }
+            @class = GetClass(Type_Name);
+            function = @class.GetFunction(Type_Name);
+            if (function == null) Error(this, "该类型不存在构造函数");
+            type = symbols.Type.GetType(@class.name);
+            return this;
+        }
+        
         public override void Code()
         {
-            Encoder.Write(InstructionsType.pushvar, id);
-        }
-        public override void CodeSecond()
-        {
-            return;
+            Encoder.Write(InstructionType.newobjc, @class.ID);
+            Encoder.Write(InstructionType.call, @class.GetFunction(".init").ID);
+            if (function.par_statements.Count != 0)
+            {
+                for (int i = parameters.Count - 1; i >= 0; i--)
+                {
+                    parameters[i].Code();
+                }
+            }
+            Encoder.Write(InstructionType.call, @class.GetFunction(@class.name).ID);
         }
     }
-    [Serializable]
+    public class Object_e : Expr
+    {
+        public Statement statement;
+        public bool is_head;
+        public VarType varType;
+        public int ID;
+
+        public Object_e()
+        {
+            name = ((Word)Lexer.Peek).lexeme;
+        }
+        
+        public override Expr Check()
+        {//@class == null意味着是这一串对象中是第一个
+            if (@class == null) { @class = statement.@class; is_head = true; }
+            else statement = @class.GetStatement(name);
+            varType = statement.varType;
+            if (Parser.analyzing_function != null)
+            {
+                type = Parser.analyzing_function.GetTypeByLocalName(name);
+                if (type != null)
+                {
+                    Parser.analyzing_function.objects_e.Add(this);
+                    return this;
+                }
+            }
+            type = @class.GetTypeByLocalName(name);
+            if (type == null) Error(this, "类型\"" + @class.name + "\"中未包含\"" + name + "\"的定义");
+            @class = GetClass(type.type_name);
+            @class.Objects_e.Add(this);
+            return this;
+        }
+
+        public override void Code()
+        {
+            ID = statement.ID;
+            if (is_head)
+            {
+                Encoder.Write(InstructionType.pusharg);//this
+                Encoder.Write(InstructionType.pushfield, ID);
+                return;
+            }
+            switch (varType)
+            {
+                case VarType.arg:
+                    Encoder.Write(InstructionType.pusharg, ID);
+                    break;
+                case VarType.field:
+                    Encoder.Write(InstructionType.pushfield, ID);
+                    break;
+                case VarType.local:
+                    Encoder.Write(InstructionType.pushloc, ID);
+                    break;
+            }
+        }
+
+        public override int GetIndex()
+        {
+            return is_head ? 2 : 1;
+        }
+    }
     public class Num : Expr
     {
         public Num(Token c)
@@ -677,24 +989,15 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.Int;
         }
-        public override bool Check()
-        {
-            return false;
-        }
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
             return this;
         }
         public override void Code()
         {
-            Encoder.Write(InstructionsType.pushval, (int)content.GetValue());
-        }
-        public override void CodeSecond()
-        {
-            return;
+            Encoder.Write(InstructionType.pushval, (int)content.GetValue());
         }
     }
-    [Serializable]
     public class Real : Expr
     {
         public Real(Token c)
@@ -702,62 +1005,35 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.Float;
         }
-        public override bool Check()
-        {
-            return false;
-        }
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
             return this;
         }
-        public override void CodeSecond()
-        {
-            return;
-        }
     }
-    [Serializable]
-    public class True : Expr
+    public class True_e : Expr
     {
-        public True(Token c)
+        public True_e(Token c)
         {
             content = c;
             type = symbols.Type.Bool;
         }
-        public override bool Check()
-        {
-            return true;
-        }
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
             return this;
         }
-        public override void CodeSecond()
-        {
-            return;
-        }
     }
-    [Serializable]
-    public class False : Expr
+    public class False_e : Expr
     {
-        public False(Token c)
+        public False_e(Token c)
         {
             content = c;
             type = symbols.Type.Bool;
         }
-        public override bool Check()
-        {
-            return true;
-        }
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
             return this;
         }
-        public override void CodeSecond()
-        {
-            return;
-        }
     }
-    [Serializable]
     public class Str : Expr
     {
         public Str(Token c)
@@ -765,25 +1041,9 @@ namespace FPL.inter
             content = c;
             type = symbols.Type.String;
         }
-        public override bool Check()
-        {
-            return true;
-        }
-        public override Expr ToStringPlus()
+        public override Expr Check()
         {
             return this;
         }
-        public override void CodeSecond()
-        {
-            return;
-        }
     }
-    /*
-    public class Basic : Expr
-    {
-        public Basic(Token c)
-        {
-            content = c;
-        }
-    }*/
 }

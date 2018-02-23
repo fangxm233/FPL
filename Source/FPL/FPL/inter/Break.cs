@@ -7,7 +7,7 @@ using FPL.lexer;
 
 namespace FPL.inter
 {
-    [Serializable]
+
     public class Break : Sentence
     {
         Sentence loop;
@@ -33,7 +33,7 @@ namespace FPL.inter
 
         public override void Code()
         {
-            unit = Encoder.Write(InstructionsType.jmp);
+            unit = Encoder.Write(InstructionType.jmp);
         }
 
         public override void CodeSecond()

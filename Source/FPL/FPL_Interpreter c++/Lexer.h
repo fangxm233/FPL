@@ -5,20 +5,25 @@
 class Lexer
 {
 public:
-	static void Analysis(const char * filename);
+	static void Analysis(string filename);
 	static vector<InstructionType> instructions_v;
 	static vector<int> parameters_v;
 	static vector<int> methods_v;
-	//static vector<int> methods_p_v;
-	//static vector<int> methods_i_v;
+	static vector<int> classes_v;
+	static int entrance_line;
 private:
 	static int line;
 	static list<InstructionType> instructions;
 	static list<int> parameters;
 	static list<int> methods;
-	static int peek;
+	static list<int> classes;
+	//static int peek_int;
 	static ifstream infile;
 	static void Scan();
-	static void Readch();
+	static void ReadchInt();
+	static void ReadchString();
+	static void TurnToVec();
+	static void AnalysisFilehead();
+	static bool StringIsdigit(string s);
 };
 

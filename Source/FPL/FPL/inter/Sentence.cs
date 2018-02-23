@@ -7,25 +7,15 @@ using FPL.lexer;
 
 namespace FPL.inter
 {
-    [Serializable]
+
     public class Sentence : Node
     {
-        //运行时标记
-        //public static bool in_loop;
-        //public static bool is_break;
-        //public static bool is_continue;
-        //public static bool is_return;
-
-        //public static object function_return;
-
-        //public static string building_function;
-
         public int tag;
         public Sentence(int tag)
         {
             this.tag = tag;
         }
-        public List<Sentence> Builds()//这是建立一个语句块
+        public List<Sentence> BuildMethod()
         {
             List<Sentence> sentences = new List<Sentence>();
             while (true)
@@ -39,7 +29,7 @@ namespace FPL.inter
                         }
                     case Tag.BASIC:
                         {
-                            sentences.Add(new Statement(Tag.BASIC).Build());
+                            sentences.Add(new Statement(VarType.local, Tag.BASIC).Build());
                             break;
                         }
                     case Tag.IF:
@@ -80,19 +70,40 @@ namespace FPL.inter
                     case Tag.ID:
                         {
                             Lexer.Next();
-                            if(Lexer.Peek.tag == Tag.LBRACKETS)
+                            if (Lexer.Peek.tag == Tag.LBRACKETS)
                             {
                                 Lexer.Back();
                                 sentences.Add(new FunctionCall_s(Tag.FUNCTIONCALL).Build());
+                                Parser.analyzing_class.FunctionCalls_s.Add((FunctionCall_s)sentences[sentences.Count - 1]);
                                 break;
                             }
-                            if (Lexer.Peek.tag == Tag.ASSIGN)
+                            if(Lexer.Peek.tag == Tag.ID)
                             {
                                 Lexer.Back();
-                                sentences.Add(new Assign(Tag.ASSIGN).Build());
+                                sentences.Add(new Statement(VarType.local, Tag.STATEMENT).Build());
+                                break;
+                            }
+                            Lexer.Back();
+                            Lexer.AddBackup();
+                            sentences.Add(new Object_s(Tag.OBJECT).Build());
+                            //Parser.analyzing_class.Objects_s.Add((Object_s)sentences[sentences.Count - 1]);
+                            ((Object_s)sentences[sentences.Count - 1]).statement = GetStatement(((Object_s)sentences[sentences.Count - 1]).name);
+                            if (Lexer.Peek.tag == Tag.SEMICOLON) break;
+                            Lexer.Next();
+                            if (Lexer.Peek.tag == Tag.ASSIGN)
+                            {
+                                Lexer.Recovery();
+                                Lexer.Back();
+                                sentences.RemoveAt(sentences.Count - 1);
+                                sentences.Add(new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build());
                                 break;
                             }
                             Error("语法错误");
+                            break;
+                        }
+                    case Tag.NEW:
+                        {
+                            sentences.Add(new New_s(Tag.NEW).Build());
                             break;
                         }
                     case Tag.QUOTE:
@@ -109,7 +120,90 @@ namespace FPL.inter
             }
         }
 
-        public List<Sentence> Buildsstart()
+        public Sentence BuildOne()
+        {
+            Lexer.Next();
+            switch (Lexer.Peek.tag)
+            {
+                case Tag.BASIC:
+                    {
+                        return new Statement(VarType.local, Tag.BASIC).Build();
+                    }
+                case Tag.IF:
+                    {
+                        return new If(Tag.IF).Build();
+                    }
+                case Tag.FOR:
+                    {
+                        return new For(Tag.FOR).Build();
+                    }
+                case Tag.DO:
+                    {
+                        return new Do(Tag.DO).Build();
+                    }
+                case Tag.WHILE:
+                    {
+                        return new While(Tag.WHILE).Build();
+                    }
+                case Tag.BREAK:
+                    {
+                        return new Break(Tag.BREAK).Build();
+                    }
+                case Tag.CONTINUE:
+                    {
+                        return new Continue(Tag.CONTINUE).Build();
+                    }
+                case Tag.RETURN:
+                    {
+                        return new Return(Tag.RETURN).Build();
+                    }
+                case Tag.ID:
+                    {
+                        Lexer.Next();
+                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        {
+                            Lexer.Back();
+                            Sentence sentence = new FunctionCall_s(Tag.FUNCTIONCALL).Build();
+                            Parser.analyzing_class.FunctionCalls_s.Add((FunctionCall_s)sentence);
+                            return sentence;
+                        }
+                        if (Lexer.Peek.tag == Tag.ID)
+                        {
+                            Lexer.Back();
+                            return new Statement(VarType.local, Tag.STATEMENT).Build();
+                        }
+                        else
+                        {
+                            Lexer.Back();
+                            Lexer.AddBackup();
+                            Sentence sentence = new Object_s(Tag.OBJECT).Build();
+                            ((Object_s)sentence).statement = GetStatement(((Object_s)sentence).name);
+                            if (Lexer.Peek.tag == Tag.SEMICOLON) return sentence;
+                            Lexer.Next();
+                            if (Lexer.Peek.tag == Tag.ASSIGN)
+                            {
+                                Lexer.Recovery();
+                                Lexer.Back();
+                                sentence = new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build();
+                                return sentence;
+                            }
+                            Error("语法错误");
+                            return null;
+                        }
+                    }
+                case Tag.NEW:
+                    {
+                        return new New_s(Tag.NEW).Build();
+                    }
+                default:
+                    {
+                        Error("语句错误或大括号不匹配");
+                        return null;
+                    }
+            }
+        }
+
+        public List<Sentence> BuildClass()
         {
             List<Sentence> sentences = new List<Sentence>();
             while (true)
@@ -117,34 +211,92 @@ namespace FPL.inter
                 Lexer.Next();
                 switch (Lexer.Peek.tag)
                 {
-                    case Tag.EOF:
+                    case Tag.BASIC:
                         {
-                            return sentences;
+                            Lexer.Next();
+                            Lexer.Next();
+                            if (Lexer.Peek.tag == Tag.LBRACKETS)
+                            {
+                                Lexer.Back();
+                                Lexer.Back();
+                                sentences.Add(new Function(Tag.FUNCTION).Build());
+                                break;
+                            }
+                            else
+                            {
+                                Lexer.Back();
+                                Lexer.Back();
+                                sentences.Add(new Statement(VarType.field, Tag.BASIC).Build());
+                                //Parser.analyzing_class.Statement.Add((Statement)sentences[sentences.Count - 1]);
+                                break;
+                            }
+                        }
+                    case Tag.ID:
+                        {
+                            Lexer.Next();
+                            if (Lexer.Peek.tag == Tag.LBRACKETS)
+                            {
+                                Lexer.Back();
+                                if (Lexer.Peek.ToString() != Parser.analyzing_class.name) Error("应输入类型");
+                                sentences.Add(new Function(symbols.Type.Void, Tag.CONSTRUCTOR).Build());
+                                break;
+                            }
+                            Lexer.Next();
+                            if(Lexer.Peek.tag == Tag.LBRACKETS)
+                            {
+                                if (Lexer.Peek.tag == Tag.LBRACKETS)
+                                {
+                                    Lexer.Back();
+                                    Lexer.Back();
+                                    sentences.Add(new Function(Tag.FUNCTION).Build());
+                                    break;
+                                }
+                            }
+                            Lexer.Back();
+                            Lexer.Back();
+                            sentences.Add(new Statement(VarType.field, Tag.STATEMENT).Build());
+                            //Parser.analyzing_class.Statement.Add((Statement)sentences[sentences.Count - 1]);
+                            break;
                         }
                     case Tag.RBRACE:
                         {
-                            Error("意外的字符\"}\"");
-                            break;
-                        }
-                    case Tag.BASIC:
-                        {
-                            sentences.Add(new Function(Tag.FUNCTION).Build());
-                            break;
-                        }
-                    case Tag.USING:
-                        {
-                            new Using(Tag.USING).Build();
-                            break;
-                        }
-                    case Tag.QUOTE:
-                        {
-                            Error("引用中已存在函数" + "\"" + ((Word)Lexer.Peek).lexeme + "\"");
-                            break;
+                            return sentences;
                         }
                     default:
                         {
                             Error("语句错误");
                             return sentences;
+                        }
+                }
+            }
+        }
+
+        public List<Sentence> BuildStsrt()
+        {
+            List<Sentence> classes = new List<Sentence>();
+            while (true)
+            {
+                Lexer.Next();
+                switch (Lexer.Peek.tag)
+                {
+                    case Tag.EOF:
+                        {
+                            return classes;
+                        }
+                    case Tag.CLASS:
+                        {
+                            classes.Add(new Class(Tag.CLASS).Build());
+                            break;
+                        }
+                    case Tag.RBRACE:
+                        {
+                            Error("应输入类型或文件尾");
+                            break;
+                        }
+                    default:
+                        {
+                            Error("语句错误");
+                            return classes;
                         }
                 }
             }

@@ -7,7 +7,7 @@ using FPL.Encoding;
 
 namespace FPL.inter
 {
-    [Serializable]
+
     class Continue : Sentence
     {
         Sentence loop;
@@ -33,7 +33,7 @@ namespace FPL.inter
 
         public override void Code()
         {
-            unit = Encoder.Write(InstructionsType.jmp);
+            unit = Encoder.Write(InstructionType.jmp);
         }
 
         public override void CodeSecond()

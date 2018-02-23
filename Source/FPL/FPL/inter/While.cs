@@ -7,7 +7,6 @@ using FPL.Encoding;
 
 namespace FPL.inter
 {
-    [Serializable]
     public class While : Sentence
     {
         Rel rel;
@@ -25,13 +24,22 @@ namespace FPL.inter
             NewScope();
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            rel = new Rel();
-            rel = rel.Build();
+            rel = new Rel().BuildStart();
             if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            sentences = Builds();
-            if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+            if (Lexer.Peek.tag == Tag.LBRACE)
+            {
+                sentences = BuildMethod();
+                if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+            }
+            else
+            {
+                Lexer.Back();
+                sentences = new List<Sentence>
+                {
+                    BuildOne()
+                };
+            }
             DestroyScope();
             return this;
         }
@@ -53,7 +61,7 @@ namespace FPL.inter
 
         public override void Code()
         {
-            to_rel = Encoder.Write(InstructionsType.jmp);
+            to_rel = Encoder.Write(InstructionType.jmp);
             foreach (var item in sentences)
             {
                 item.Code();
@@ -64,7 +72,7 @@ namespace FPL.inter
                 return;
             }
             to_rel.parameter = Encoder.line + 1;
-            rel.Code();
+            rel.Code(0);
             CodingUnit u = Encoder.code[Encoder.code.Count - 1];
             u.parameter = to_rel.lineNum + 1;
             end_line = u.lineNum;

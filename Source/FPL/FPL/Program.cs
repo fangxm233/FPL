@@ -24,25 +24,15 @@ namespace FPL
          * 强类型运算
          * 函数
          */
-        /* 目前有的判断语句标志
-         * 各种变量名
-         * 各种类型名
-         * while
-         * do
-         * for
-         * if 
-         * else
-         * break
-         */
-        /* 编译时变量存储
-         * 一个类，存名字和type
-         * 一个列表存储一个作用域的变量
-         * 再一个列表存作用域们
-         */
 
         static void Main(string[] args)
         {
-            if (Compile("Program.fpl"))
+            if(args.Length == 0)
+            {
+                Console.WriteLine("未指明文件");
+                return;
+            }
+            if (Compile(args))
             {
                 //ProcessStartInfo processin = new ProcessStartInfo()
                 //{
@@ -53,7 +43,8 @@ namespace FPL
                 //};
                 //Process process = Process.Start(processin);
                 //process.OutputDataReceived += OutPut;
-                Process.Start("FPL_Interpreter.exe");
+                Console.WriteLine("启动解释器");
+                Process.Start("FPL_Interpreter c++.exe");
             }
             Console.ReadKey();
         }
@@ -63,14 +54,14 @@ namespace FPL
         //    Console.WriteLine(e.Data);
         //}
 
-        static bool Compile(string args)
+        static bool Compile(string[] args)
         {
             try
             {
-                System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+                Stopwatch watch = new Stopwatch();
                 watch.Start();
 
-                Lexer.Analysis(new StreamReader(new FileStream(args, FileMode.Open)));
+                Lexer.Analysis(args);
                 Parser parser = new Parser();
                 parser.Compile();
                 Encoder.Init("Program.fplc");

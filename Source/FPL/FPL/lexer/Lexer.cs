@@ -14,16 +14,18 @@ namespace FPL.lexer
     {
         public static Token Peek;
         public static int line = 1;
+        public static string now_file_name;
         static char peek = ' ';
-        //Hashtable words = new Hashtable();
         static Dictionary<string, Word> words = new Dictionary<string, Word>();
 
-        //Hashtable quote = new Hashtable();
         static Dictionary<string, int> quote = new Dictionary<string, int>();
         static StreamReader stream_reader;
+        static string[] files;
+        static int now_file_id;
 
-        public static List<Token> peeks = new List<Token>();
-        public static int index;
+        static List<Token> peeks = new List<Token>();
+        static int index;
+        static List<int> backups = new List<int>();
 
         static void Reserve(Word w)
         {
@@ -35,9 +37,9 @@ namespace FPL.lexer
             quote.Add(s, Tag.QUOTE);
         }
 
-        public static void Analysis(StreamReader stream_reader)
+        public static void Analysis(string[] args)
         {
-            Lexer.stream_reader = stream_reader;
+            files = args;
             //把各种保留字写在这
             Reserve(new Word("if", Tag.IF));
             Reserve(new Word("else", Tag.ELSE));
@@ -48,6 +50,8 @@ namespace FPL.lexer
             Reserve(new Word("for", Tag.FOR));
             Reserve(new Word("using", Tag.USING));
             Reserve(new Word("return", Tag.RETURN));
+            Reserve(new Word("class", Tag.CLASS));
+            Reserve(new Word("new", Tag.NEW));
             Reserve(Word.True);
             Reserve(Word.False);
             Reserve(symbols.Type.Int);
@@ -56,24 +60,33 @@ namespace FPL.lexer
             Reserve(symbols.Type.Float);
             Reserve(symbols.Type.String);
             Reserve(symbols.Type.Void);
-            while (!stream_reader.EndOfStream)
+            foreach (var item in files)
             {
-                Scan();
+                stream_reader = new StreamReader(item);
+                now_file_name = item;
+                peek = ' ';
+                while (!stream_reader.EndOfStream)
+                {
+                    Scan();
+                }
+                if (peeks.Last().tag != Tag.EOF)
+                    Scan();
+                line = 1;
+                stream_reader.Close();
             }
-            Scan();
             peeks.Add(new Token(Tag.EOF));
-            line = 1;
+            now_file_name = files[0];
         }
 
         static void Scan()
         {
             for (; ; Readch()) //去掉所有空白
             {
-                if (peek == ' ' || peek == '\t' || peek == '\r')
+                if (peek == ' ' || peek == '\t' || peek == '\n')
                 {
                     continue;
                 }
-                else if (peek == '\n')
+                else if (peek == '\r')
                 {
                     line++;
                     peeks.Add(new Token(Tag.EOL));
@@ -87,13 +100,14 @@ namespace FPL.lexer
                 {
                     for (; ; Readch())
                     {
-                        if (peek == '\r') //如果是文件未就返回一个文件尾
+                        if (peek == '\r')
                         {
                             line++;
+                            peeks.Add(new Token(Tag.EOL));
                             Readch();
                             return;
                         }
-                        if(peek == '\uffff')
+                        if(peek == '\uffff')//如果是文件未就返回一个文件尾
                         {
                             peeks.Add(new Token(peek));
                             return;
@@ -108,6 +122,7 @@ namespace FPL.lexer
                         if (peek == '\r')
                         {
                             line++;
+                            peeks.Add(new Token(Tag.EOL));
                             Readch();
                         }
                         if (peek == '*')
@@ -219,6 +234,12 @@ namespace FPL.lexer
                         Readch();
                         return;
                     }
+                case '.':
+                    {
+                        peeks.Add(Word.dot);
+                        Readch();
+                        return;
+                    }
             }
             if (peek == '"')
             {
@@ -282,14 +303,14 @@ namespace FPL.lexer
                 }
                 return;
             }
-            if (char.IsLetter(peek)) //检测标识符
+            if (char.IsLetter(peek) || peek == '_') //检测标识符
             {
                 StringBuilder b = new StringBuilder();
                 do
                 {
                     b.Append(peek);
                     Readch();
-                } while (char.IsLetterOrDigit(peek));
+                } while (char.IsLetterOrDigit(peek) || peek == '_');
                 string s = b.ToString();
                 Word w = null;
                 if (words.ContainsKey(s))
@@ -308,6 +329,24 @@ namespace FPL.lexer
             peeks.Add(tok);
         }
 
+        public static void AddBackup()
+        {
+            backups.Add(index);
+        }
+
+        public static void ThrowBackup()
+        {
+            backups.RemoveAt(backups.Count - 1);
+        }
+
+        public static void Recovery()
+        {
+            index = backups[backups.Count - 1];
+            index--;
+            Next();
+            ThrowBackup();
+        }
+
         public static void Next()
         {
             Peek = peeks[index++];
@@ -323,11 +362,25 @@ namespace FPL.lexer
                     Peek.tag = Tag.QUOTE;
                 }
             }
+            if(Peek.tag == Tag.EOF)
+            {
+                if (now_file_id == files.Length - 1)
+                    return;
+                else
+                    line = 1;
+                now_file_name = files[++now_file_id];
+                Next();
+            }
         }
         public static void Back()
         {
             index -= 2;
-            Next();
+            Peek = peeks[index++];
+            if (Peek.tag == Tag.EOL)
+            {
+                line--;
+                Back();
+            }
         }
 
         static void Readch()

@@ -12,6 +12,7 @@ namespace FPL.inter
         public Expr expr;
         string function_name;
         Function function;
+        public Class @class;
 
         public Return(int tag) : base(tag)
         {
@@ -25,6 +26,7 @@ namespace FPL.inter
 
         public override Sentence Build()
         {
+            @class = Parser.analyzing_class;
             expr = new Expr().BuildStart();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
@@ -32,28 +34,29 @@ namespace FPL.inter
 
         public override void Check()
         {
-            function = GetFunction(function_name);
+            function = @class.GetFunction(function_name);
             if (expr == null) return;
-            if (expr.Check()) expr = expr.ToStringPlus();
-            if (expr.type != GetFunction(function_name).return_type) Error(this, "无法将\"" + expr.type.lexeme + "\"类型作为返回值");
+            expr = expr.Check();
+            if (expr.type != @class.GetFunction(function_name).return_type) Error(this, "无法将\"" + expr.type.lexeme + "\"类型作为返回值");
         }
 
         public override void Code()
         {
             if(function_name == "Main")
             {
-                Encoder.Write(InstructionsType.endP);
+                Encoder.Write(InstructionType.endP);
                 return;
             }
-            if (GetFunction(function_name).return_type == symbols.Type.Void)
-                Encoder.Write(InstructionsType.pushval);
-            else
-                expr.Code();
-            for (int i = 0; i < function.stmts.Count; i++)
+            if (@class.GetFunction(function_name).return_type != symbols.Type.Void)
             {
-                Encoder.Write(InstructionsType.unloadi);
+                expr.Code();
+                Encoder.Write(InstructionType.popEAX);
             }
-            Encoder.Write(InstructionsType.ret);
+            for (int i = 0; i < function.Statements.Count; i++)
+            {
+                Encoder.Write(InstructionType.pop);
+            }
+            Encoder.Write(InstructionType.ret);
         }
     }
 }

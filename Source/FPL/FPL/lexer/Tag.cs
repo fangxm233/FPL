@@ -6,19 +6,20 @@ using System.Text;
 
 namespace FPL.lexer
 {
-    [Serializable]
+
     class Tag
     {
-        //目前最大tag：297
+        //目前最大tag：303
         //语句的tag
         public const int
-            ASSIGN = 280, STATEMENT = 287, FUNCTION = 291, FUNCTIONCALL = 293, QUOTE = 295;
+            ASSIGN = 280, STATEMENT = 287, FUNCTION = 291, FUNCTIONCALL = 293, QUOTE = 295,
+            OBJECT = 301, CONSTRUCTOR = 302, INIT_FUNCTION = 303;
 
         //标识符的tag
         public const int
             DO    = 259, ELSE     = 260, BREAK = 258, FALSE = 262, TRUE   = 274,
             WHILE = 275, CONTINUE = 290, IF    = 265, FOR   = 284, RETURN = 292,
-            USING = 294, VOID     = 296;
+            USING = 294, VOID     = 296, CLASS = 298, NEW   = 299;
 
         //表达式的tag
         public const int
@@ -33,7 +34,7 @@ namespace FPL.lexer
         //符号的tag
         public const int
             SEMICOLON = 281, LBRACKETS = 282, RBRACKETS = 283, LBRACE = 285, RBRACE = 286,
-            COMMA = 297;
+            COMMA     = 297, DOT       = 300;
 
         //其他
         public const int 

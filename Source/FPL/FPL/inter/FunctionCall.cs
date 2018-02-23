@@ -7,13 +7,16 @@ using FPL.Encoding;
 
 namespace FPL.inter
 {
-    [Serializable]
     public class FunctionCall_s : Sentence
     {
         public string name;
         public symbols.Type return_type;
         public List<Expr> parameters = new List<Expr>();
-        CodingUnit unit;
+        Sentence next;
+        public Class @class;
+        public Function function;
+        public symbols.Type type;
+        public bool is_head = true;
 
         public FunctionCall_s(int tag) : base(tag)
         {
@@ -24,7 +27,7 @@ namespace FPL.inter
         {
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            while (true)
+            while (Lexer.Peek.tag != Tag.RBRACKETS)
             {
                 parameters.Add(new Expr().BuildStart());
                 if (parameters[parameters.Count - 1] == null)
@@ -34,49 +37,92 @@ namespace FPL.inter
                     parameters.RemoveAt(parameters.Count - 1);
                     break;
                 }
-                if (Lexer.Peek.tag == Tag.RBRACKETS) break;
             }
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            if (Lexer.Peek.tag != Tag.DOT)
+            {
+                if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
+                return this;
+            }
+            next = BuildNext();
             return this;
+        }
+
+        public Sentence BuildNext()
+        {
+            Lexer.Next();
+            if (Lexer.Peek.tag != Tag.ID) Error("\"" + Lexer.Peek.ToString() + "\"无效");
+            Lexer.Next();
+            if (Lexer.Peek.tag == Tag.LBRACKETS)
+            {
+                Lexer.Back();
+                return new FunctionCall_s(Tag.FUNCTIONCALL).Build();
+            }
+            Lexer.Back();
+            return new Object_s(Tag.OBJECT).Build();
         }
 
         public override void Check()
         {
-            if (parameters.Count != GetFunction(name).statements.Count) Error("\"" + name + "\"方法没有采用" + parameters.Count + "个参数的重载");
-            return_type = GetFunction(name).return_type;
+            function = @class.GetFunction(name);
+            if (function == null) Error(this, "类型\"" + @class.name + "\"中未包含\"" + name + "\"的定义");
+            if (parameters.Count != function.par_statements.Count) Error("\"" + name + "\"方法没有采用" + parameters.Count + "个参数的重载");
+            return_type = function.return_type;
+            if (next != null)
+            {
+                if (return_type.tag == Tag.VOID) Error(next, "运算符\".\"无法应用于\"void\"类型的操作数");
+                if (next.tag == Tag.FUNCTIONCALL)
+                {
+                    ((FunctionCall_s)next).@class = GetClass(return_type.type_name);
+                    ((FunctionCall_s)next).is_head = false;
+                }
+                if (next.tag == Tag.OBJECT)
+                {
+                    ((Object_s)next).@class = GetClass(return_type.type_name);
+                    ((Object_s)next).is_head = false;
+                }
+                next.Check();
+            }
+            foreach (var item in parameters)
+            {
+                item.Check();
+            }
+            if (next == null) return;
         }
 
         public override void Code()
         {
-            if (GetFunction(name).statements.Count != 0)
+            if (name != "Main")
+                Encoder.Write(InstructionType.pusharg);
+            if (function.par_statements.Count != 0)
             {
-                foreach (var item in parameters)
+                for (int i = parameters.Count - 1; i >= 0; i--)
                 {
-                    item.Code();
-                    Encoder.Write(InstructionsType.poparg);
+                    parameters[i].Code();
                 }
             }
-            unit = Encoder.Write(InstructionsType.call);
-            Encoder.Write(InstructionsType.pop);
-        }
-
-        public override void CodeSecond()
-        {
-            unit.parameter = GetFunction(name).id;//填写所指函数
+            Encoder.Write(InstructionType.call, function.ID);
+            if (function.par_statements.Count != 0)
+            {
+                for (int i = parameters.Count - 1; i >= 0; i--)
+                {
+                    Encoder.Write(InstructionType.pop);
+                }
+            }
         }
     }
 
-    [Serializable]
     public class FunctionCall_e : Expr
     {
-        public string name;
         public symbols.Type return_type;
         public List<Expr> parameters = new List<Expr>();
-        CodingUnit unit;
+        public Function function;
+        public Class local_class;
+        public bool is_head = true;
 
         public FunctionCall_e(int tag)
         {
+            tag = Tag.FUNCTIONCALL;
             name = ((Word)Lexer.Peek).lexeme;
         }
 
@@ -84,7 +130,7 @@ namespace FPL.inter
         {
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            while (true)
+            while (Lexer.Peek.tag != Tag.RBRACKETS)
             {
                 parameters.Add(new Expr().BuildStart());
                 if (parameters[parameters.Count - 1] == null)
@@ -94,39 +140,37 @@ namespace FPL.inter
                     parameters.RemoveAt(parameters.Count - 1);
                     break;
                 }
-                if (Lexer.Peek.tag == Tag.RBRACKETS) break;
             }
             return this;
         }
 
-        public override bool Check()
+        public override Expr Check()
         {
-            if (parameters.Count != GetFunction(name).statements.Count) Error("\"" + name + "\"方法没有采用" + parameters.Count + "个参数的重载");
-            return_type = GetFunction(name).return_type;
-            return return_type == symbols.Type.String ? true : false;
-        }
-
-        public override Expr ToStringPlus()
-        {
+            local_class = @class;
+            function = local_class.GetFunction(name);
+            if (function == null) Error(this, "类型\"" + local_class.name + "\"中未包含\"" + name + "\"的定义");
+            if (parameters.Count != function.par_statements.Count) Error("\"" + name + "\"方法没有采用" + parameters.Count + "个参数的重载");
+            return_type = function.return_type;
+            @class = GetClass(return_type.type_name);
+            type = return_type;
+            foreach (var item in parameters)
+            {
+                item.Check();
+            }
             return this;
         }
 
         public override void Code()
         {
-            if (GetFunction(name).statements.Count != 0)
+            Encoder.Write(InstructionType.pusharg);
+            if (function.par_statements.Count != 0)
             {
-                foreach (var item in parameters)
+                for (int i = parameters.Count - 1; i >= 0; i--)
                 {
-                    item.Code();
-                    Encoder.Write(InstructionsType.poparg);
+                    parameters[i].Code();
                 }
             }
-            unit = Encoder.Write(InstructionsType.call);
-        }
-
-        public override void CodeSecond()
-        {
-            unit.parameter = GetFunction(name).id;//填写所指函数
+            Encoder.Write(InstructionType.call, function.ID);
         }
     }
 }

@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace FPL.lexer
 {
-    [Serializable]
+
     public class Word : Token
     {
         public string lexeme = "";
         public Word(string s, int i) : base(i)
         {
             lexeme = s;
+        }
+        public override string ToString()
+        {
+            return lexeme;
         }
         public static readonly Word
             and  = new Word("&&", Tag.AND),  or   = new Word("||", Tag.OR),
@@ -30,9 +34,10 @@ namespace FPL.lexer
             Rparenthesis = new Word("Rparenthesis", Tag.RBRACKETS),
             LBrace       = new Word("LBrace",       Tag.LBRACE),
             RBrace       = new Word("RBrace",       Tag.RBRACE),
-            comma        = new Word("comma",        Tag.COMMA), 
+            comma        = new Word("comma",        Tag.COMMA),
+            dot          = new Word("dot",          Tag.DOT),
 
-            True   = new Word("true",   Tag.TRUE),
+            True = new Word("true",   Tag.TRUE),
             False  = new Word("false",  Tag.FALSE),
             assign = new Word("assign", Tag.ASSIGN),
             temp   = new Word("temp",   Tag.TEMP);

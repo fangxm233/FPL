@@ -2,249 +2,274 @@
 #include "Runner.h"
 #include "OutPut.h"
 #include "Lexer.h"
-//#include "InstructionType.h"
+
 InstructionType* Runner::code_ptr;
 InstructionType* Runner::code_ptr_start;
-int* Runner::varStack_ptr;
-int* Runner::tmpStack_ptr;
+int* Runner::stack_ptr;
 int* Runner::parameter_ptr;
 int* Runner::parameter_ptr_start;
 int* Runner::methods_ptr_start;
-//int Runner::backup_code_ptr = 0;
-//int Runner::backup_varStack_ptr = -1;
-//int Runner::backup_tmpStack_ptr = -1;
-vector<InstructionType> Runner::Instructions = Lexer::instructions_v;
-vector<int> Runner::parameters = Lexer::parameters_v;
-//vector<int> Runner::methods_p = Lexer::methods_p_v;
-vector<int> Runner::methods = Lexer::methods_v;
-vector<int> Runner::tmp_stack;
-vector<int> Runner::call_stack;
+int* Runner::heap_ptr;
+int* Runner::heap_ptr_start;
+int* Runner::class_ptr_start;
+vector<InstructionType> Runner::Instructions;
+vector<int> Runner::parameters;
+vector<int> Runner::methods;
+vector<int> Runner::classes;
+vector<int> Runner::stack;
+vector<int> Runner::heap;
+int* Runner::EBP;
+int Runner::EAX;
 
-void Runner::RunStart() 
+void Runner::RunStart()
 {
 	Instructions = Lexer::instructions_v;
 	parameters = Lexer::parameters_v;
-	//methods_p = Lexer::methods_p_v;
 	methods = Lexer::methods_v;
+	classes = Lexer::classes_v;
 	if(Instructions.size()!=parameters.size())OutPut::RunTimeError("÷∏¡Ó”Î≤Œ ˝≤ª∆•≈‰");
-	call_stack = vector<int>(262144);//1MB µ˜”√’ª
-	tmp_stack = vector<int>(131072);//0.5MB ’ª∂—
+	stack = vector<int>(262144);//1MB ’ª
+	heap = vector<int>(262144);//1MB ∂—
 
 	code_ptr = Instructions.begin()._Ptr;
-	parameter_ptr = parameters.begin()._Ptr;
 	code_ptr_start = Instructions.begin()._Ptr;
+	parameter_ptr = parameters.begin()._Ptr;
 	parameter_ptr_start = parameters.begin()._Ptr;
 	methods_ptr_start = methods.begin()._Ptr;
-	varStack_ptr = call_stack.begin()._Ptr;
-	varStack_ptr--;
-	tmpStack_ptr = tmp_stack.begin()._Ptr;
-	tmpStack_ptr--;
-	try
-	{
-		RunInstructions();
-		return;
-		//vector<InstructionType>::iterator i = Instructions.begin();
-		//InstructionType * aaa = i._Ptr;
-		//cout << *aaa << endl;
-		//aaa++;
-		//cout << *aaa << endl;
-		//vector<int>::iterator ii = tmp_stack.begin();
-		//int * aaaa = ii._Ptr;
-		//cout << *aaaa << endl;
-		//aaaa++;
-		//cout << *aaaa << endl;
-	}
-	catch (const std::exception&)
-	{
-		//if (varStack_ptr == call_stack.size()) 
-		//{
-		//	call_stack.resize(call_stack.size() * 2);
-		//	OutPut::RunTimeWarning("µ˜”√’ª≤ª◊„£¨¿©≥‰...");
-		//	code_ptr = backup_code_ptr;
-		//	tmpStack_ptr = backup_tmpStack_ptr;
-		//	varStack_ptr = backup_varStack_ptr;
-		//	goto back;
-		//}
-		//if (tmpStack_ptr == tmp_stack.size())
-		//{
-		//	tmp_stack.resize(tmp_stack.size() * 2);
-		//	OutPut::RunTimeWarning("¡Ÿ ±’ª≤ª◊„£¨¿©≥‰...");
-		//	code_ptr = backup_code_ptr;
-		//	tmpStack_ptr = backup_tmpStack_ptr;
-		//	varStack_ptr = backup_varStack_ptr;
-		//	goto back;
-		//}
-	}
+	stack_ptr = stack.begin()._Ptr;
+	stack_ptr--;
+	heap_ptr_start = heap.begin()._Ptr;
+	heap_ptr = heap.begin()._Ptr;
+	class_ptr_start = classes.begin()._Ptr;
+
+	RunInstructions();
 }
 
-void Runner::Expansion_tmp() 
+void Runner::ExpansionStack() 
 {
-	//tmp_stack.resize(tmp_stack.size() * 2);
-	OutPut::RunTimeWarning("¡Ÿ ±’ª≤ª◊„£¨¿©≥‰...");
-	//code_ptr = backup_code_ptr;
-	//tmpStack_ptr = backup_tmpStack_ptr;
-	//varStack_ptr = backup_varStack_ptr;
+	OutPut::RunTimeWarning("’ª≤ª◊„£¨¿©≥‰...");
+	stack.resize(stack.size() * 2);
 }
 
-void Runner::Expansion_var()
+void Runner::ExpansionHeap()
 {
-	//call_stack.resize(call_stack.size() * 2);
-	OutPut::RunTimeWarning("µ˜”√’ª≤ª◊„£¨¿©≥‰...");
-	//code_ptr = backup_code_ptr;
-	//tmpStack_ptr = backup_tmpStack_ptr;
-	//varStack_ptr = backup_varStack_ptr;
+	OutPut::RunTimeWarning("∂—≤ª◊„£¨¿©≥‰...");
+	heap.resize(heap.size() * 2);
 }
 
-void Runner::RunInstructions() 
+void Runner::RunInstructions()
 {
+	code_ptr = code_ptr_start + Lexer::entrance_line - 1;
+	parameter_ptr = parameter_ptr_start + Lexer::entrance_line - 1;
+	EBP = stack_ptr + 5;
+	int *i = 0;
+	int a = 0;
+	int stack_end = (unsigned long int)stack.end()._Ptr;
+	int heap_end = (unsigned long int)heap.end()._Ptr;
 start:;
-	//backup_code_ptr = code_ptr;
-	//backup_tmpStack_ptr = tmpStack_ptr;
-	//backup_varStack_ptr = varStack_ptr;
-	//if ((tmp_stack.size() - tmpStack_ptr) <= 10)Expansion_tmp();
-	//if ((call_stack.size() - varStack_ptr) <= 10)Expansion_var();
+	//if (stack_end - (unsigned long int)stack_ptr <= 10)
+	//{
+	//	OutPut::RunTimeError("’ª“Á≥ˆ,‘› ±Œﬁ∑®¿©≥‰");
+	//}
+	//if (heap_end - (unsigned long int)heap_ptr <= 10)
+	//{
+	//	OutPut::RunTimeError("∂—“Á≥ˆ,‘›ŒﬁGC");
+	//}
+	//a++;
 	switch (*code_ptr)
 	{
-	case InstructionType::loadi:
-		*++varStack_ptr = 0;
+	case InstructionType::pushloc://(unsigned long int)
+		*++stack_ptr = *(EBP + *parameter_ptr);
 		break;
-	case InstructionType::unloadi:
-		varStack_ptr--;
+	case InstructionType::pusharg:
+		*++stack_ptr = *(EBP - *parameter_ptr - 4);
 		break;
-	case InstructionType::pushvar:
-		*++tmpStack_ptr = *(varStack_ptr - *parameter_ptr);
+	case InstructionType::pushfield:
+		*stack_ptr = (unsigned long int)((i + (*stack_ptr / 4)) + 1 + *parameter_ptr);
 		break;
 	case InstructionType::pushadr:
 		break;
 	case InstructionType::pushval:
-		*++tmpStack_ptr = *parameter_ptr;
+		*++stack_ptr = *parameter_ptr;
 		break;
-	case InstructionType::poparg:
-		*++varStack_ptr = *tmpStack_ptr--;
-		break;
-	case InstructionType::popvar:
-		*(varStack_ptr - *parameter_ptr) = *tmpStack_ptr--;
+	case InstructionType::pushEAX:
+		*++stack_ptr = EAX;
 		break;
 	case InstructionType::popadr:
 		break;
+	case InstructionType::popEAX:
+		EAX = *stack_ptr--;
+		break;
 	case InstructionType::pop:
-		tmpStack_ptr--;
+		stack_ptr--;
 		break;
-	case InstructionType::add:
-		tmpStack_ptr--;
-		*tmpStack_ptr = *tmpStack_ptr + *(tmpStack_ptr + 1);
+	case InstructionType::storeloc:
+		*(EBP + *parameter_ptr) = *stack_ptr;
+		stack_ptr -= 1;
 		break;
-	case InstructionType::addv:
-		*(varStack_ptr - *parameter_ptr) += *tmpStack_ptr--;
+	case InstructionType::storearg:
+		*(EBP - *parameter_ptr - 4) = *stack_ptr;
+		stack_ptr -= 1;
+		break;
+	case InstructionType::storefield:
+		*((i + (*stack_ptr / 4)) + 1 + *parameter_ptr) = *(stack_ptr - 1);
+		stack_ptr -= 2;
+		break;
+	case InstructionType::add_i:
+		stack_ptr--;
+		*stack_ptr = *stack_ptr + *(stack_ptr + 1);
+		break;
+	case InstructionType::addl:
+		(*((i + (*stack_ptr-- / 4)) + 1))++;
+		break;
+	case InstructionType::adda:
+		break;
+	case InstructionType::addf:
 		break;
 	case InstructionType::add1:
-		(*tmpStack_ptr)++;
+		(*stack_ptr)++;
 		break;
-	case InstructionType::addv1:
-		(*(varStack_ptr - *parameter_ptr))++;
+	case InstructionType::addl1:
 		break;
-	case InstructionType::sub:
-		tmpStack_ptr--;
-		*tmpStack_ptr = *tmpStack_ptr - *(tmpStack_ptr + 1);
+	case InstructionType::adda1:
 		break;
-	case InstructionType::subv:
-		*(varStack_ptr - *parameter_ptr) -= *tmpStack_ptr--;
+	case InstructionType::addf1:
+		break;
+	case InstructionType::sub_i:
+		stack_ptr--;
+		*stack_ptr = *stack_ptr - *(stack_ptr + 1);
+		break;
+	case InstructionType::subl:
+		(*((i + (*stack_ptr-- / 4)) + 1))--;
+		break;
+	case InstructionType::suba:
+		break;
+	case InstructionType::subf:
 		break;
 	case InstructionType::sub1:
-		(*tmpStack_ptr)--;
+		(*stack_ptr)--;
 		break;
-	case InstructionType::subv1:
-		(*(varStack_ptr - *parameter_ptr))--;
+	case InstructionType::subl1:
 		break;
-	case InstructionType::div_:
-		tmpStack_ptr--;
-		*tmpStack_ptr = *tmpStack_ptr / *(tmpStack_ptr + 1);
+	case InstructionType::suba1:
 		break;
-	case InstructionType::divv:
-		*(varStack_ptr - *parameter_ptr) /= *tmpStack_ptr--;
+	case InstructionType::subf1:
 		break;
-	case InstructionType::mul:
-		tmpStack_ptr--;
-		*tmpStack_ptr = *tmpStack_ptr * *(tmpStack_ptr + 1);
+	case InstructionType::div_i:
+		stack_ptr--;
+		*stack_ptr = *stack_ptr / *(stack_ptr + 1);
 		break;
-	case InstructionType::mulv:
-		*(varStack_ptr - *parameter_ptr) *= *tmpStack_ptr--;
+	case InstructionType::divl:
+		break;
+	case InstructionType::diva:
+		break;
+	case InstructionType::divf:
+		break;
+	case InstructionType::mul_i:
+		stack_ptr--;
+		*stack_ptr = *stack_ptr * *(stack_ptr + 1);
+		break;
+	case InstructionType::mull:
+		break;
+	case InstructionType::mula:
+		break;
+	case InstructionType::mulf:
 		break;
 	case InstructionType::jmp:
 		code_ptr = code_ptr_start + *parameter_ptr - 1;
 		parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
 		goto start;
 	case InstructionType::call:
-		//cout << "call" << endl;
-		*++tmpStack_ptr = (int)(code_ptr + 1);
-		*++tmpStack_ptr = (int)(parameter_ptr + 1);
+		*++stack_ptr = (unsigned long int)EBP;
+		*++stack_ptr = (unsigned long int)code_ptr;
+		*++stack_ptr = (unsigned long int)parameter_ptr;
 		code_ptr = code_ptr_start + *(methods_ptr_start + *parameter_ptr) - 1;
 		parameter_ptr = parameter_ptr_start + *(methods_ptr_start + *parameter_ptr) - 1;
+		EBP = stack_ptr + 1;
 		goto start;
 	case InstructionType::ret:
-		parameter_ptr = (int*) *--tmpStack_ptr;
-		code_ptr = (InstructionType*) *--tmpStack_ptr;
-		*tmpStack_ptr = *(tmpStack_ptr + 2);
+		parameter_ptr = i + (*stack_ptr--) / 4;
+		parameter_ptr++;
+		code_ptr = (InstructionType*) *stack_ptr--;
+		code_ptr++;
+		EBP = i + (*stack_ptr--) / 4;
 		goto start;
 	case InstructionType::eqt:
-		if (*(tmpStack_ptr - 1) == *(tmpStack_ptr))
+		if (*((i + (*(stack_ptr - 1) / 4)) + 1) == *((i + (*(stack_ptr) / 4)) + 1))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			tmpStack_ptr -= 2;
+			stack_ptr -= 2;
 			goto start;
 		}
-		tmpStack_ptr -= 2;
+		stack_ptr -= 2;
 		break;
 	case InstructionType::eqf:
-		if (*(tmpStack_ptr - 1) != *(tmpStack_ptr))
+		if (*((i + (*(stack_ptr - 1) / 4)) + 1) != *((i + (*(stack_ptr) / 4)) + 1))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			tmpStack_ptr -= 2;
+			stack_ptr -= 2;
 			goto start;
 		}
-		tmpStack_ptr -= 2;
+		stack_ptr -= 2;
 		break;
 	case InstructionType::let:
-		if (*(tmpStack_ptr - 1) < *(tmpStack_ptr))
+		if (*((i + (*(stack_ptr - 1) / 4)) + 1) < *((i + (*(stack_ptr) / 4)) + 1))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			tmpStack_ptr -= 2;
+			stack_ptr -= 2;
 			goto start;
 		}
-		tmpStack_ptr -= 2;
+		stack_ptr -= 2;
 		break;
 	case InstructionType::lef:
-		if (*(tmpStack_ptr - 1) >= *(tmpStack_ptr))
+		if (*((i + (*(stack_ptr - 1) / 4)) + 1) >= *((i + (*(stack_ptr) / 4)) + 1))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			tmpStack_ptr -= 2;
+			stack_ptr -= 2;
 			goto start;
 		}
-		tmpStack_ptr -= 2;
+		stack_ptr -= 2;
 		break;
 	case InstructionType::mot:
-		if (*(tmpStack_ptr - 1) > *(tmpStack_ptr))
+		if (*((i + (*(stack_ptr - 1) / 4)) + 1) > *((i + (*(stack_ptr) / 4)) + 1))
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			tmpStack_ptr -= 2;
+			stack_ptr -= 2;
 			goto start;
 		}
-		tmpStack_ptr -= 2;
+		stack_ptr -= 2;
 		break;
 	case InstructionType::mof:
-		if (*(tmpStack_ptr - 1) <= *(tmpStack_ptr))
+		if (*(stack_ptr - 1) <= *stack_ptr)
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			tmpStack_ptr -= 2;
+			stack_ptr -= 2;
 			goto start;
 		}
-		tmpStack_ptr -= 2;
+		stack_ptr -= 2;
+		break;
+	case InstructionType::newobjc:
+		*heap_ptr = *parameter_ptr;
+		*++stack_ptr = (unsigned long int)heap_ptr;
+		heap_ptr += *(class_ptr_start + *parameter_ptr - 1) + 1;
+		break;
+	case InstructionType::newobji:
+		*heap_ptr = 0;
+		*++stack_ptr = (unsigned long int)heap_ptr;
+		*++heap_ptr = *parameter_ptr;
+		heap_ptr++;
+		break;
+	case InstructionType::newobjf:
+		break;
+	case InstructionType::newobjs:
+		break;
+	case InstructionType::newobjb:
 		break;
 	case InstructionType::endP:
 		return;

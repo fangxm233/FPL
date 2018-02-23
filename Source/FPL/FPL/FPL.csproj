@@ -45,6 +45,7 @@
     <Compile Include="Encoding\Encoder.cs" />
     <Compile Include="inter\Assign.cs" />
     <Compile Include="inter\Break.cs" />
+    <Compile Include="inter\Class.cs" />
     <Compile Include="inter\Continue.cs" />
     <Compile Include="inter\Do.cs" />
     <Compile Include="inter\Expr.cs" />
@@ -53,7 +54,9 @@
     <Compile Include="inter\FunctionCall.cs" />
     <Compile Include="inter\If.cs" />
     <Compile Include="inter\InstructionsType.cs" />
+    <Compile Include="inter\New.cs" />
     <Compile Include="inter\Node.cs" />
+    <Compile Include="inter\Object.cs" />
     <Compile Include="inter\Parser.cs" />
     <Compile Include="inter\Quote.cs" />
     <Compile Include="inter\Rel.cs" />

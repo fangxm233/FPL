@@ -8,12 +8,81 @@ using FPL.Encoding;
 
 namespace FPL.inter
 {
-    [Serializable]
     public class Rel : Node
     {
         public Expr left;
         public Expr right;
-        //public Token content;
+        public int tag;
+
+        public List<Rel> rels = new List<Rel>();
+
+        public virtual Rel BuildStart()
+        {
+            left = new Expr().BuildStart();
+            switch (Lexer.Peek.tag)
+            {
+                case Tag.EQ:
+                    {
+                        rels.Add(new Eq(left).BuildStart());
+                        break;
+                    }
+                case Tag.NE:
+                    {
+                        rels.Add(new Ne(left).BuildStart());
+                        break;
+                    }
+                case Tag.LE:
+                    {
+                        rels.Add(new Le(left).BuildStart());
+                        break;
+                    }
+                case Tag.GE:
+                    {
+                        rels.Add(new Ge(left).BuildStart());
+                        break;
+                    }
+                case Tag.MORE:
+                    {
+                        rels.Add(new More(left).BuildStart());
+                        break;
+                    }
+                case Tag.LESS:
+                    {
+                        rels.Add(new Less(left).BuildStart());
+                        break;
+                    }
+                default:
+                    {
+                        rels.Add(new Bool_r(left));
+                        break;
+                    }
+            }
+            while (true)
+            {
+                Rel rel = null;
+                switch (Lexer.Peek.tag)
+                {
+                    case Tag.AND:
+                        rel = new Rel().Build();
+                        rels.Add(new And(rels.Last(), rel));
+                        rels.RemoveAt(rels.Count - 2);
+                        rels.Add(((And)rels.Last()).right);
+                        break;
+                    case Tag.OR:
+                        rel = new Rel().Build();
+                        rels.Add(new Or(rels.Last(), rel));
+                        rels.RemoveAt(rels.Count - 2);
+                        rels.Add(((Or)rels.Last()).right);
+                        break;
+                    default:
+                        {
+                            if (rels.Count == 1) return rels.Last();
+                            rels.RemoveAt(rels.Count - 1);
+                            return this;
+                        }
+                }
+            }
+        }
 
         public virtual Rel Build()
         {
@@ -23,38 +92,43 @@ namespace FPL.inter
                 case Tag.EQ:
                     {
                         Eq a = new Eq(left);
-                        a.Build();
+                        a.BuildStart();
                         return a;
                     }
                 case Tag.NE:
                     {
                         Ne a = new Ne(left);
-                        a.Build();
+                        a.BuildStart();
                         return a;
                     }
                 case Tag.LE:
                     {
                         Le a = new Le(left);
-                        a.Build();
+                        a.BuildStart();
                         return a;
                     }
                 case Tag.GE:
                     {
                         Ge a = new Ge(left);
-                        a.Build();
+                        a.BuildStart();
                         return a;
                     }
                 case Tag.MORE:
                     {
                         More a = new More(left);
-                        a.Build();
+                        a.BuildStart();
                         return a;
                     }
                 case Tag.LESS:
                     {
                         Less a = new Less(left);
-                        a.Build();
+                        a.BuildStart();
                         return a;
+                    }
+                default:
+                    {
+                        rels.Add(new Bool_r(left));
+                        break;
                     }
             }
             return null;
@@ -62,21 +136,121 @@ namespace FPL.inter
 
         public virtual void Check()
         {
-            if (left.content.tag != Tag.TRUE && left.content.tag != Tag.FALSE)
+            if(rels[0].tag == Tag.AND)
             {
-                Error(this, "表达式无效");
-                return;
+                ((And)rels[0]).left.left.Check();
+            }
+            else if(rels[0].tag == Tag.OR)
+            {
+                ((Or)rels[0]).left.left.Check();
+            }
+            else
+            {
+                rels[0].Check();
+            }
+            foreach (var item in rels)
+            {
+                item.Check();
             }
             return;
         }
 
-        public virtual void Code()
+        public virtual List<CodingUnit> Code(int tag)
         {
-            return;
+            List<CodingUnit> list = new List<CodingUnit>();
+            foreach (var item in rels)
+            {
+                if(item.tag == Tag.AND)
+                {
+                    list.AddRange(item.Code(0));
+                }
+            }
+            if (list.Count != 0) Encoder.Write(InstructionType.jmp, Encoder.line + 2);
+            foreach (var item in list)
+            {
+                item.parameter = Encoder.line;
+            }
+            list = new List<CodingUnit>();
+            foreach (var item in rels)
+            {
+                if (item.tag == Tag.OR)
+                {
+                    list.AddRange(item.Code(0));
+                }
+            }
+            if (list.Count != 0) Encoder.Write(InstructionType.jmp, Encoder.line + 2);
+            foreach (var item in list)
+            {
+                item.parameter = Encoder.line;
+            }
+            return null;
         }
     }
 
-    [Serializable]
+    public class And : Rel
+    {
+        public new Rel left;
+        public new Rel right;
+        public And(Rel l)
+        {
+            tag = Tag.AND;
+            left = l;
+        }
+        public And(Rel l, Rel r)
+        {
+            tag = Tag.AND;
+            left = l;
+            right = r;
+        }
+
+        public override void Check()
+        {
+            right.Check();
+        }
+
+        public override List<CodingUnit> Code(int tag)
+        {
+            List<CodingUnit> list = new List<CodingUnit>();
+            left.Code(Tag.AND);
+            Encoder.Write(InstructionType.jmp);
+            list.Add(Encoder.code.Last());
+            right.Code(Tag.AND);
+            Encoder.Write(InstructionType.jmp);
+            list.Add(Encoder.code.Last());
+            return list;
+        }
+    }
+    public class Or : Rel
+    {
+        public new Rel left;
+        public new Rel right;
+        public Or(Rel l)
+        {
+            tag = Tag.OR;
+            left = l;
+        }
+        public Or(Rel l, Rel r)
+        {
+            tag = Tag.OR;
+            left = l;
+            right = r;
+        }
+
+        public override void Check()
+        {
+            right.Check();
+        }
+
+        public override List<CodingUnit> Code(int tag)
+        {
+            List<CodingUnit> list = new List<CodingUnit>
+            {
+                left.Code(Tag.OR)[0],
+                right.Code(Tag.OR)[0]
+            };
+            return list;
+        }
+    }
     public class Eq : Rel
     {
         public Eq(Expr l)
@@ -84,7 +258,7 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build()
+        public override Rel BuildStart()
         {
             right = new Expr().BuildStart();
             return this;
@@ -92,37 +266,40 @@ namespace FPL.inter
 
         public override void Check()
         {
-            if (left.Check()) left = left.ToStringPlus();
-            if (right.Check()) right = right.ToStringPlus();
-            switch (left.type.type)
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type_name)
             {
                 case "string":
                     {
-                        if (right.type.type != "string") Error(this, "表达式无效");
+                        if (right.type.type_name != "string") Error(this, "表达式无效");
                         return;
                     }
                 case "int":
                 case "float":
                     {
-                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
                         return;
                     }
                 case "bool":
                     {
-                        if (right.type.type != "bool") Error(this, "表达式无效");
+                        if (right.type.type_name != "bool") Error(this, "表达式无效");
                         return;
                     }
             }
         }
 
-        public override void Code()
+        public override List<CodingUnit> Code(int tag)
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.eqt);
+            Encoder.Write(InstructionType.eqt, tag != Tag.OR ? Encoder.line + 3 : 0);
+            return new List<CodingUnit>()
+            {
+                Encoder.code.Last()
+            };
         }
     }
-    [Serializable]
     public class Ne : Rel
     {
         public Ne(Expr l)
@@ -130,7 +307,7 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build()
+        public override Rel BuildStart()
         {
             right = new Expr().BuildStart();
             return this;
@@ -138,37 +315,40 @@ namespace FPL.inter
 
         public override void Check()
         {
-            if (left.Check()) left = left.ToStringPlus();
-            if (right.Check()) right = right.ToStringPlus();
-            switch (left.type.type)
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type_name)
             {
                 case "string":
                     {
-                        if (right.type.type != "string") Error(this, "表达式无效");
+                        if (right.type.type_name != "string") Error(this, "表达式无效");
                         return;
                     }
                 case "int":
                 case "float":
                     {
-                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
                         return;
                     }
                 case "bool":
                     {
-                        if (right.type.type != "bool") Error(this, "表达式无效");
+                        if (right.type.type_name != "bool") Error(this, "表达式无效");
                         return;
                     }
             }
         }
 
-        public override void Code()
+        public override List<CodingUnit> Code(int tag)
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.eqf);
+            Encoder.Write(InstructionType.eqf, tag != Tag.OR ? Encoder.line + 3 : 0);
+            return new List<CodingUnit>()
+            {
+                Encoder.code.Last()
+            };
         }
     }
-    [Serializable]
     public class Le : Rel
     {
         public Le(Expr l)
@@ -176,7 +356,7 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build()
+        public override Rel BuildStart()
         {
             right = new Expr().BuildStart();
             return this;
@@ -184,27 +364,30 @@ namespace FPL.inter
 
         public override void Check()
         {
-            if (left.Check()) left = left.ToStringPlus();
-            if (right.Check()) right = right.ToStringPlus();
-            switch (left.type.type)
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type_name)
             {
                 case "int":
                 case "float":
                     {
-                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
                         return;
                     }
             }
         }
 
-        public override void Code()
+        public override List<CodingUnit> Code(int tag)
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.mof);
+            Encoder.Write(InstructionType.mof, tag != Tag.OR ? Encoder.line + 3 : 0);
+            return new List<CodingUnit>()
+            {
+                Encoder.code.Last()
+            };
         }
     }
-    [Serializable]
     public class Ge : Rel
     {
         public Ge(Expr l)
@@ -212,7 +395,7 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build()
+        public override Rel BuildStart()
         {
             right = new Expr().BuildStart();
             return this;
@@ -220,27 +403,29 @@ namespace FPL.inter
 
         public override void Check()
         {
-            if (left.Check()) left = left.ToStringPlus();
-            if (right.Check()) right = right.ToStringPlus();
-            switch (left.type.type)
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type_name)
             {
                 case "int":
                 case "float":
                     {
-                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
                         return;
                     }
             }
         }
 
-        public override void Code()
+        public override List<CodingUnit> Code(int tag)
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.lef);
-        }
+            Encoder.Write(InstructionType.lef, tag != Tag.OR ? Encoder.line + 3 : 0);
+            return new List<CodingUnit>()
+            {
+                Encoder.code.Last()
+            };        }
     }
-    [Serializable]
     public class More : Rel
     {
         public More(Expr l)
@@ -248,7 +433,7 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build()
+        public override Rel BuildStart()
         {
             right = new Expr().BuildStart();
             return this;
@@ -256,27 +441,30 @@ namespace FPL.inter
 
         public override void Check()
         {
-            if (left.Check()) left = left.ToStringPlus();
-            if (right.Check()) right = right.ToStringPlus();
-            switch (left.type.type)
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type_name)
             {
                 case "int":
                 case "float":
                     {
-                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
                         return;
                     }
             }
         }
 
-        public override void Code()
+        public override List<CodingUnit> Code(int tag)
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.mot);
+            Encoder.Write(InstructionType.mot, tag != Tag.OR ? Encoder.line + 3 : 0);
+            return new List<CodingUnit>()
+            {
+                Encoder.code.Last()
+            };
         }
     }
-    [Serializable]
     public class Less : Rel
     {
         public Less(Expr l)
@@ -284,7 +472,7 @@ namespace FPL.inter
             left = l;
         }
 
-        public override Rel Build()
+        public override Rel BuildStart()
         {
             right = new Expr().BuildStart();
             return this;
@@ -292,24 +480,52 @@ namespace FPL.inter
 
         public override void Check()
         {
-            if (left.Check()) left = left.ToStringPlus();
-            if (right.Check()) right = right.ToStringPlus();
-            switch (left.type.type)
+            left = left.Check();
+            right = right.Check();
+            switch (left.type.type_name)
             {
                 case "int":
                 case "float":
                     {
-                        if (right.type.type != "int" && right.type.type != "float") Error(this, "表达式无效");
+                        if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
                         return;
                     }
             }
         }
 
-        public override void Code()
+        public override List<CodingUnit> Code(int tag)
         {
             left.Code();
             right.Code();
-            Encoder.Write(InstructionsType.let);
+            Encoder.Write(InstructionType.let, tag != Tag.OR ? Encoder.line + 3 : 0);
+            return new List<CodingUnit>()
+            {
+                Encoder.code.Last()
+            };
+        }
+    }
+    public class Bool_r : Rel
+    {
+        public Bool_r(Expr l)
+        {
+            left = l;
+        }
+
+        public override void Check()
+        {
+            left = left.Check();
+            if (left.type != symbols.Type.Bool) Error(this, "无法将\"" + left.type.type_name + "\"类型转换为\"bool\"");
+        }
+
+        public override List<CodingUnit> Code(int tag)
+        {
+            left.Code();
+            Encoder.Write(InstructionType.pushval, 1);
+            Encoder.Write(InstructionType.mot, tag != Tag.OR ? Encoder.line + 3 : 0);
+            return new List<CodingUnit>()
+            {
+                Encoder.code.Last()
+            };
         }
     }
 }
