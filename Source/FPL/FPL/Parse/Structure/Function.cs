@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
-using FPL.Parse.Expression;
-using FPL.Parse;
+using FPL.Parse.Sentences;
+using FPL.Parse.Sentences.ProcessControl;
 
-namespace FPL.Parse
+namespace FPL.Parse.Structure
 {
     public class Function : Sentence
     {
@@ -14,7 +14,6 @@ namespace FPL.Parse
         public string type_name;
         public List<Statement> par_statements = new List<Statement>();
         public List<Statement> Statements = new List<Statement>();
-        public List<Object_e> objects_e = new List<Object_e>();
         public List<Object_s> objects_s = new List<Object_s>();
         public int head_line;
         public int ID;
@@ -91,9 +90,12 @@ namespace FPL.Parse
                 AddSentence(new Return(Tag.RETURN, name));
                 return;
             }
-            Parse.Parser.analyzing_function = this;
+            Parser.analyzing_function = this;
             if (Sentences.Count == 0)
-                if (return_type != symbols.Type.Void) Error(this, "不是所有路径都有返回值");
+                if (return_type != symbols.Type.Void)
+                {
+                    Error(this, "不是所有路径都有返回值");
+                }
                 else
                 {
                     Sentences.Add(new Return(Tag.RETURN, name));
@@ -106,27 +108,9 @@ namespace FPL.Parse
                 ((Return)Sentences[Sentences.Count - 1]).@class = @class;
             }
             if (par_statements.Count != 0 && name == "Main") Error(this, "入口函数不允许有参数");
-            foreach (Statement item in par_statements)
-            {
-                item.Check();
-            }
-            foreach (Sentence item in Sentences)
-            {
-                item.Check();
-            }
-            if (func_type == FuncType.Static)
-            {
-                foreach (Object_e object_e in objects_e)
-                {
-                    if (object_e.varType == VarType.Field && object_e.is_head) Error(object_e, "对象引用对于非静态的字段、方法或属性\"" + name + "\"是必须的");
-                }
-
-                foreach (Object_s object_s in objects_s)
-                {
-                    if (object_s.varType == VarType.Field && object_s.is_head) Error(object_s, "对象引用对于非静态的字段、方法或属性\"" + name + "\"是必须的");
-                }
-            }
-            Parse.Parser.analyzing_function = null;
+            foreach (Statement item in par_statements) item.Check();
+            foreach (Sentence item in Sentences) item.Check();
+            Parser.analyzing_function = null;
         }
 
         public override void Code()
@@ -137,10 +121,6 @@ namespace FPL.Parse
                 AddSentence(new Return(Tag.RETURN, name));
             }
             head_line = Encoder.line + 1;
-            foreach (var item in objects_e)
-            {
-                item.is_head = false;
-            }
             foreach (var item in objects_s)
             {
                 item.is_head = false;
@@ -175,26 +155,6 @@ namespace FPL.Parse
             {
                 item.CodeSecond();
             }
-        }
-
-        public int GetID(Object_e object_e)
-        {
-            for (int i = 0; i < Statements.Count; i++)
-            {
-                if (Statements[i].name == object_e.name) return Statements.Count - i - 1;
-            }
-            Error(object_e, "未找到变量名\"" + object_e.name + "\"");
-            return 0;
-        }
-
-        public int GetID(Object_s object_s)
-        {
-            for (int i = 0; i < Statements.Count; i++)
-            {
-                if (Statements[i].name == object_s.name) return Statements.Count - i - 1;
-            }
-            Error(object_s, "未找到变量名\"" + object_s.name + "\"");
-            return 0;
         }
 
         public Statement GetStatement(string name)

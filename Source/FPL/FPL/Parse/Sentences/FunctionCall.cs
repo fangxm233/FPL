@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
-using FPL.Parse;
 using FPL.Parse.Expression;
+using FPL.Parse.Structure;
 
-namespace FPL.Parse
+namespace FPL.Parse.Sentences
 {
     public class FunctionCall_s : Sentence
     {

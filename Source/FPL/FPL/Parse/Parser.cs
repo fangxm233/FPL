@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
 using FPL.Parse;
+using FPL.Parse.Sentences;
+using FPL.Parse.Structure;
 using Type = FPL.symbols.Type;
 
 namespace FPL.Parse

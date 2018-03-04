@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FPL.LexicalAnalysis;
+﻿using FPL.LexicalAnalysis;
 
-namespace FPL.Parse
+namespace FPL.Parse.Sentences
 {
     public class Using : Sentence
     {

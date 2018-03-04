@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FPL.symbols;
+﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
-using FPL.Parse;
+using FPL.Parse.Expression;
 
-namespace FPL.Parse
+namespace FPL.Parse.Sentences.ProcessControl
 {
     public class If : Sentence
     {

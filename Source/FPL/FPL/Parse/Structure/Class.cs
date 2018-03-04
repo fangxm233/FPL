@@ -1,18 +1,15 @@
 ﻿using System.Collections.Generic;
 using FPL.LexicalAnalysis;
-using FPL.Parse.Expression;
-using FPL.Parse;
+using FPL.Parse.Sentences;
 
-namespace FPL.Parse
+namespace FPL.Parse.Structure
 {
     public class Class : Sentence
     {
-        //List<Sentence> Sentences = new List<Sentence>();
         public List<Function> Functions = new List<Function>();
         public List<FunctionCall_s> FunctionCalls_s = new List<FunctionCall_s>();
         public List<FunctionCall_e> FunctionCalls_e = new List<FunctionCall_e>();
         public List<Object_s> Objects_s = new List<Object_s>();
-        //public List<Object_e> Objects_e = new List<Object_e>();
         public List<Statement> Statement = new List<Statement>();
         public Function init_function;
         public string name;
@@ -34,13 +31,10 @@ namespace FPL.Parse
             Parser.analyzing_class = this;
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
-            /*Sentences = */BuildClass();
+            BuildClass();
             if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
-            if(GetFunction(name) == null)
-            {
-                Functions.Add(new Function(FuncType.Constructor, Tag.CONSTRUCTOR, name));
-            }
+            if(GetFunction(name) == null) Functions.Add(new Function(FuncType.Constructor, Tag.CONSTRUCTOR, name));
             init_function = new Function(FuncType.InitFunction, Tag.INIT_FUNCTION, ".init");
             Functions.Add(init_function);
             Parser.analyzing_class = null;
@@ -87,13 +81,7 @@ namespace FPL.Parse
 
         public int GetWidth()
         {
-            int w = 0;
-            foreach (var item in Statement)
-            {
-                //if (item.assign.type.tag != Tag.BASIC) w += item.assign.type.width;
-                /*else*/ w++;
-            }
-            return w;
+            return Statement.Count;
         }
     }
 }

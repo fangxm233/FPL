@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using FPL.Encoding;
-using System.Diagnostics;
-using FPL.LexicalAnalysis;
+﻿using FPL.LexicalAnalysis;
 using FPL.Parse;
+using System;
+using System.Diagnostics;
 
 namespace FPL
 {

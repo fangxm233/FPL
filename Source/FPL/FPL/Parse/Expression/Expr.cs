@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using FPL.LexicalAnalysis;
+using System.Collections.Generic;
 using System.Linq;
-using FPL.Encoding;
-using FPL.LexicalAnalysis;
+using FPL.Parse.Sentences;
+using FPL.Parse.Structure;
 
 namespace FPL.Parse.Expression
 {
@@ -15,11 +16,9 @@ namespace FPL.Parse.Expression
         public string name;
         public int tag;
 
-        //public static LinkedList<Expr> expr;
-
         public virtual void Build() { }
 
-        public Expr BuildStart() //表达式建立的开始调用的，不可重写
+        public Expr BuildStart()
         {
             LinkedList<Expr> expr = MatchAll();
             if (expr.Count == 1)
@@ -118,19 +117,6 @@ namespace FPL.Parse.Expression
         }
 
         public virtual void Check() { }
-
         public virtual void Code() { }
-
-        public virtual void CodeSecond()
-        {
-            left.CodeSecond();
-            right.CodeSecond();
-        }
-    }
-
-    public class Object_e : Expr
-    {
-        public bool is_head;
-        public VarType varType;
     }
 }

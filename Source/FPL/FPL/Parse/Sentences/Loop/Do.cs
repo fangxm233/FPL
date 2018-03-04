@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
-using FPL.Parse;
+using FPL.Parse.Expression;
 
-namespace FPL.Parse
+namespace FPL.Parse.Sentences.Loop
 {
     public class Do : Sentence
     {

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FPL.Encoding;
+﻿using FPL.Encoding;
 using FPL.LexicalAnalysis;
-using FPL.Parse;
 using FPL.Parse.Expression;
+using FPL.Parse.Structure;
 
-namespace FPL.Parse
+namespace FPL.Parse.Sentences.ProcessControl
 {
     class Return : Sentence
     {
@@ -18,7 +14,7 @@ namespace FPL.Parse
 
         public Return(int tag) : base(tag)
         {
-            function_name = Parse.Parser.analyzing_function.name;
+            function_name = Parser.analyzing_function.name;
         }
 
         public Return(int tag, string name) : base(tag)
@@ -28,7 +24,7 @@ namespace FPL.Parse
 
         public override Sentence Build()
         {
-            @class = Parse.Parser.analyzing_class;
+            @class = Parser.analyzing_class;
             expr = new Expr().BuildStart();
             if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
@@ -54,10 +50,7 @@ namespace FPL.Parse
                 expr.Code();
                 Encoder.Write(InstructionType.popEAX);
             }
-            for (int i = 0; i < function.Statements.Count; i++)
-            {
-                Encoder.Write(InstructionType.pop);
-            }
+            for (int i = 0; i < function.Statements.Count; i++) Encoder.Write(InstructionType.pop);
             Encoder.Write(InstructionType.ret);
         }
     }

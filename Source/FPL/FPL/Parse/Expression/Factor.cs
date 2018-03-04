@@ -1,6 +1,7 @@
 ﻿using FPL.LexicalAnalysis;
 using System.Collections.Generic;
 using FPL.Encoding;
+using FPL.Parse.Sentences;
 
 namespace FPL.Parse.Expression
 {
@@ -93,8 +94,10 @@ namespace FPL.Parse.Expression
                 Encoder.Write(InstructionType.pushsta, ID);
                 return;
             }
-            if (is_head)
+            if (is_head && varType == VarType.Field)
             {
+                if (Parser.analyzing_function.func_type == FuncType.Static)
+                    Error(this, "对象引用对于非静态的字段、方法或属性\"" + name + "\"是必须的");
                 Encoder.Write(InstructionType.pusharg);//this
                 Encoder.Write(InstructionType.pushfield, ID);
                 return;

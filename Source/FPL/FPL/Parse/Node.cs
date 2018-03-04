@@ -1,5 +1,7 @@
 ﻿using FPL.LexicalAnalysis;
 using FPL.Parse.Expression;
+using FPL.Parse.Sentences;
+using FPL.Parse.Structure;
 using System;
 using System.Collections;
 using System.Linq;

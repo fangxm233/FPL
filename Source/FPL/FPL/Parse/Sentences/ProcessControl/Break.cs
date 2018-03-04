@@ -1,18 +1,15 @@
 ﻿using FPL.Encoding;
 using FPL.LexicalAnalysis;
-using FPL.Parse;
+using FPL.Parse.Sentences.Loop;
 
-namespace FPL.Parse
+namespace FPL.Parse.Sentences.ProcessControl
 {
     public class Break : Sentence
     {
         Sentence loop;
         CodingUnit unit;
 
-        public Break(int tag) : base(tag)
-        {
-            
-        }
+        public Break(int tag) : base(tag) { }
 
         public override Sentence Build()
         {
@@ -23,8 +20,8 @@ namespace FPL.Parse
 
         public override void Check()
         {
-            if (Parse.Parser.analyzing_loop == null) Error(this, "没有要中断或继续的循环");
-            loop = Parse.Parser.analyzing_loop;
+            if (Parser.analyzing_loop == null) Error(this, "没有要中断或继续的循环");
+            loop = Parser.analyzing_loop;
         }
 
         public override void Code()

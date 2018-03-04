@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FPL.LexicalAnalysis;
-using FPL.Parse;
+﻿using FPL.LexicalAnalysis;
 using FPL.Parse.Expression;
+using FPL.Parse.Sentences;
+using FPL.Parse.Sentences.Loop;
+using FPL.Parse.Sentences.ProcessControl;
+using FPL.Parse.Structure;
+using System.Collections.Generic;
 
 namespace FPL.Parse
 {

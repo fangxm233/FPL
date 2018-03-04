@@ -2,9 +2,8 @@
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
 using FPL.Parse.Expression;
-using FPL.Parse;
 
-namespace FPL.Parse
+namespace FPL.Parse.Sentences
 {
     public class Assign : Sentence
     {
