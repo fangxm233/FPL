@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="头文件\TemplateInter">
+      <UniqueIdentifier>{b8255465-21d6-46cb-8dc0-18ef40a82a24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\TemplateInter">
+      <UniqueIdentifier>{413dab30-b1b3-4aa3-bb7d-7e7ac061d3ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -26,6 +32,9 @@
     <ClInclude Include="Runner.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MasmGenerator.h">
+      <Filter>头文件\TemplateInter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -42,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="Runner.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MasmGenerator.cpp">
+      <Filter>源文件\TemplateInter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

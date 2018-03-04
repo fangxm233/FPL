@@ -13,6 +13,7 @@ list<int> Lexer::classes;
 ifstream Lexer::infile;
 int Lexer::line;
 int Lexer::entrance_line;
+int Lexer::static_count;
 int peek_int;
 char peek_char;
 string peek_string;
@@ -42,8 +43,15 @@ void Lexer::AnalysisFilehead()
 	ReadchInt();
 	ReadchInt();
 	entrance_line = peek_int;
+	ReadchInt();
+	static_count = peek_int;
+	for (int i = 0; i < static_count; i++)
+	{
+		ReadchString();
+		ReadchString();
+	}
 	infile >> peek_char;
-	for (; !isdigit(peek_char) || peek_char == 0; infile >> peek_char)
+	for (; !isdigit(peek_char); infile >> peek_char)
 	{
 		infile.seekg(-1, ios::cur);
 		ReadchString();

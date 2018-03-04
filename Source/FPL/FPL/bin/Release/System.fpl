@@ -1,0 +1,5 @@
+//这些基本类型只实现了int QAQ
+class Int{}
+class Float{}
+class String{}
+class Bool{}

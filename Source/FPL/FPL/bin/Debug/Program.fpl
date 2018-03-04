@@ -1,19 +1,17 @@
 ﻿class Program
 {
-    Program program;
+	Program program;
 	int i;
-	void Main()
+	static void Main()
 	{
-		int a;
-		for(int i = 0;i <= 10000000;i = i + 1)
-		{
-			a = a + 1;
-		}
+		int a = 666 + 555 * 1 / 666 * (555 + 1);
+		int b = a + 1 + pp(555, new Program().i);
+		program.i = 0;
 	}
 
-	Program(int a)
+	static int pp(int a, int ssss)
 	{
-		i = a;
+		return 0;
 	}
 }
 
@@ -41,4 +39,6 @@ class类型
 只有普通表达式才支持括号QAQ （说告诉我怎么区分bool表达式和普通表达式的括号啊）
 
 支持单行注释和多行注释
+
+静态变量和函数支持编译，但是不支持执行，写别啊
 */

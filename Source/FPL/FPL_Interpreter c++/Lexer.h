@@ -11,6 +11,7 @@ public:
 	static vector<int> methods_v;
 	static vector<int> classes_v;
 	static int entrance_line;
+	static int static_count;
 private:
 	static int line;
 	static list<InstructionType> instructions;

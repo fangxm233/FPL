@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FPL.lexer;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using FPL.inter;
 using FPL.Encoding;
 using System.Diagnostics;
+using FPL.LexicalAnalysis;
+using FPL.Parse;
 
 namespace FPL
 {
@@ -24,37 +24,26 @@ namespace FPL
          * 强类型运算
          * 函数
          */
-
-        static void Main(string[] args)
+        //TODO:消除Object_e,把bool表达式整合进expr
+        //TODO:更改报错文本位置，使用单独的类
+        //TODO:整理文件
+        private static void Main(string[] args)
         {
             if(args.Length == 0)
             {
                 Console.WriteLine("未指明文件");
+                Console.ReadKey();
                 return;
             }
             if (Compile(args))
             {
-                //ProcessStartInfo processin = new ProcessStartInfo()
-                //{
-                //    FileName = "FPL_Interpreter.exe",
-                //    RedirectStandardOutput = true,
-                //    CreateNoWindow = false,
-                //    UseShellExecute = false,
-                //};
-                //Process process = Process.Start(processin);
-                //process.OutputDataReceived += OutPut;
-                Console.WriteLine("启动解释器");
-                Process.Start("FPL_Interpreter c++.exe");
+                //Console.WriteLine("启动解释器");
+                //Process.Start("FPL_Interpreter c++.exe");
             }
             Console.ReadKey();
         }
 
-        //private static void OutPut(object sender, DataReceivedEventArgs e)
-        //{
-        //    Console.WriteLine(e.Data);
-        //}
-
-        static bool Compile(string[] args)
+        private static bool Compile(string[] args)
         {
             try
             {
@@ -64,10 +53,10 @@ namespace FPL
                 Lexer.Analysis(args);
                 Parser parser = new Parser();
                 parser.Compile();
-                Encoder.Init("Program.fplc");
-                parser.Code();
-                parser.CodeSecond();
-                Encoder.WriteToFile();
+                //Encoder.Init("Program.fplc");
+                //parser.Code();
+                //parser.CodeSecond();
+                //Encoder.WriteToFile();
 
                 watch.Stop();
                 TimeSpan timespan = watch.Elapsed;

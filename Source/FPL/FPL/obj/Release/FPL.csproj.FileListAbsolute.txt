@@ -5,7 +5,6 @@ G:\GIT\FPL\Source\FPL\FPL\bin\Release\FPL.pdb
 G:\GIT\FPL\Source\FPL\FPL\obj\Release\FPL.csproj.CoreCompileInputs.cache
 G:\GIT\FPL\Source\FPL\FPL\obj\Release\FPL.exe
 G:\GIT\FPL\Source\FPL\FPL\obj\Release\FPL.pdb
-G:\GIT\FPL\Source\FPL\FPL\obj\Release\FPL.csprojResolveAssemblyReference.cache
 C:\f\FPL\FPL\bin\Release\Program.fpl
 C:\f\FPL\FPL\bin\Release\FPL.exe.config
 C:\f\FPL\FPL\bin\Release\FPL.exe

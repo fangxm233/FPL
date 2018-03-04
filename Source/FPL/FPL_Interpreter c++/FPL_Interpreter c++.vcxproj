@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Lexer.h" />
+    <ClInclude Include="MasmGenerator.h" />
     <ClInclude Include="OutPut.h" />
     <ClInclude Include="Runner.h" />
     <ClInclude Include="stdafx.h" />
@@ -159,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="FPL_Interpreter.cpp" />
     <ClCompile Include="Lexer.cpp" />
+    <ClCompile Include="MasmGenerator.cpp" />
     <ClCompile Include="OutPut.cpp" />
     <ClCompile Include="Runner.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -20,3 +20,4 @@ C:\f\FPL\FPL\obj\Debug\FPL.csprojResolveAssemblyReference.cache
 C:\f\FPL\FPL\obj\Debug\FPL.csproj.CoreCompileInputs.cache
 C:\f\FPL\FPL\obj\Debug\FPL.exe
 C:\f\FPL\FPL\obj\Debug\FPL.pdb
+G:\GIT\FPL\Source\FPL\FPL\obj\Debug\FPL.csprojResolveAssemblyReference.cache

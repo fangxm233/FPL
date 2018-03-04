@@ -1,5 +1,4 @@
 #pragma once
-//#include "InstructionType.h"
 #include "Lexer.h"
 
 class Runner
@@ -23,6 +22,9 @@ private:
 	static int* heap_ptr;
 	static int* heap_ptr_start;
 	static int* class_ptr_start;
+	static int* static_ptr_start;
+
+	static int static_count;
 
 	static int* EBP;
 	static int EAX;

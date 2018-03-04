@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FPL.inter;
+using FPL.Parse;
 using System.IO;
 
 namespace FPL.Encoding
@@ -84,17 +84,14 @@ namespace FPL.Encoding
                 if (code[i].name == "")
                 {
                     streamWriter.WriteLine(code[i].parameter);
-                    continue;
                 }
                 else if(code[i].type != "")
                 {
                     streamWriter.WriteLine(code[i].type + " " + code[i].name);
-                    continue;
                 }
                 else
                 {
-                    streamWriter.WriteLine(code[i].name + " " + code[i].lineNum);
-                    continue;
+                    streamWriter.WriteLine(code[i].name + " " + code[i].line_num);
                 }
                 //if (code[i].ins_type == InstructionType.nop) streamWriter.WriteLine(/*(int)*/InstructionType.nop);
             }
@@ -115,7 +112,7 @@ namespace FPL.Encoding
 
     public class CodingUnit
     {
-        public int lineNum;
+        public int line_num;
         public InstructionType ins_type = InstructionType.nop;
         public int parameter;
         public string name = "";
@@ -123,19 +120,19 @@ namespace FPL.Encoding
 
         public CodingUnit(int line, InstructionType type, int parm = 0)
         {
-            lineNum = line;
+            line_num = line;
             ins_type = type;
             parameter = parm;
         }
         public CodingUnit(int line, InstructionType type, string parm)
         {
-            lineNum = line;
+            line_num = line;
             ins_type = type;
             name = parm;
         }
         public CodingUnit(string name, int lineNum)
         {
-            this.lineNum = lineNum;
+            line_num = lineNum;
             this.name = name;
         }
         public CodingUnit(string type, string name)
