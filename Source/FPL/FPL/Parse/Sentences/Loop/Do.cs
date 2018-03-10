@@ -7,15 +7,14 @@ namespace FPL.Parse.Sentences.Loop
 {
     public class Do : Sentence
     {
-        Rel rel;
-        public List<Sentence> sentences;
         public int end_line;
-        int head_line;
+        private int head_line;
+        private Rel rel;
         public int rel_line;
+        public List<Sentence> sentences;
 
         public Do(int tag) : base(tag)
         {
-
         }
 
         public override Sentence Build()
@@ -35,6 +34,7 @@ namespace FPL.Parse.Sentences.Loop
                     BuildOne()
                 };
             }
+
             Lexer.Next();
             if (Lexer.Peek.tag != Tag.WHILE) Error("应输入\"while\"");
             Lexer.Next();
@@ -52,19 +52,17 @@ namespace FPL.Parse.Sentences.Loop
             rel.Check();
             foreach (Sentence item in sentences)
             {
-                Parse.Parser.analyzing_loop = this;
+                Parser.AnalyzingLoop = this;
                 item.Check();
             }
-            Parse.Parser.analyzing_loop = null;
+
+            Parser.AnalyzingLoop = null;
         }
 
         public override void Code()
         {
             head_line = Encoder.line + 1;
-            foreach (var item in sentences)
-            {
-                item.Code();
-            }
+            foreach (Sentence item in sentences) item.Code();
             if (Encoder.line == head_line) return;
             rel_line = Encoder.line + 1;
             rel.Code(0);

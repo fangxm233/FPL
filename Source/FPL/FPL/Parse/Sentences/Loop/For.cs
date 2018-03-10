@@ -7,16 +7,15 @@ namespace FPL.Parse.Sentences.Loop
 {
     public class For : Sentence
     {
-        Statement statement;
-        Rel rel;
-        Sentence assign;
-        public List<Sentence> sentences;
+        private Sentence assign;
         public int end_line;
+        private Rel rel;
+        public List<Sentence> sentences;
+        private Statement statement;
         public CodingUnit to_rel;
 
         public For(int tag) : base(tag)
         {
-
         }
 
         public override Sentence Build()
@@ -29,7 +28,7 @@ namespace FPL.Parse.Sentences.Loop
             statement.Build();
             rel = new Rel();
             rel = rel.BuildStart();
-            assign = new Assign(new Expr().BuildStart(),Tag.ASSIGN);
+            assign = new Assign(new Expr().BuildStart(), Tag.ASSIGN);
             assign = assign.Build();
             if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
@@ -46,6 +45,7 @@ namespace FPL.Parse.Sentences.Loop
                     BuildOne()
                 };
             }
+
             DestroyScope();
             return this;
         }
@@ -59,20 +59,18 @@ namespace FPL.Parse.Sentences.Loop
                 assign.Check();
             foreach (Sentence item in sentences)
             {
-                Parse.Parser.analyzing_loop = this;
+                Parser.AnalyzingLoop = this;
                 item.Check();
             }
-            Parse.Parser.analyzing_loop = null;
+
+            Parser.AnalyzingLoop = null;
         }
 
         public override void Code()
         {
             statement.Code();
             to_rel = Encoder.Write(InstructionType.jmp);
-            foreach (var item in sentences)
-            {
-                item.Code();
-            }
+            foreach (Sentence item in sentences) item.Code();
             if (assign != null)
                 assign.Code();
             to_rel.parameter = Encoder.line + 1;
@@ -87,10 +85,7 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void CodeSecond()
         {
-            foreach (var item in sentences)
-            {
-                item.CodeSecond();
-            }
+            foreach (Sentence item in sentences) item.CodeSecond();
         }
     }
 }

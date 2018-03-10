@@ -1,20 +1,20 @@
-﻿using FPL.LexicalAnalysis;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FPL.Encoding;
+using FPL.LexicalAnalysis;
 using FPL.Parse.Sentences;
 
 namespace FPL.Parse.Expression
 {
     public class Factor : Expr
     {
-        public LinkedListNode<Expr> position;
         public LinkedListNode<Expr> end_position;
+        public int ID;
+        public bool is_head;
+        public LinkedListNode<Expr> position;
         public bool should_destory = true;
 
         public Statement statement;
-        public bool is_head;
         public VarType varType;
-        public int ID;
 
         public Factor(int tag, Token c)
         {
@@ -32,10 +32,7 @@ namespace FPL.Parse.Expression
         {
             if (tag == Tag.LBRACKETS)
             {
-                if (position.Previous != null && position.Previous.Value.tag == Tag.ID)
-                {
-                    should_destory = false;
-                }
+                if (position.Previous != null && position.Previous.Value.tag == Tag.ID) should_destory = false;
                 BuildTree(position, end_position);
                 if (should_destory)
                 {
@@ -52,12 +49,12 @@ namespace FPL.Parse.Expression
             //获取class和statement
             if (@class == null)
             {
-                @class = Parser.analyzing_class;
+                @class = Parser.AnalyzingClass;
                 statement = @class.GetStatement(name);
-                if (Parser.analyzing_function != null)
+                if (Parser.AnalyzingFunction != null)
                 {
-                    statement = Parser.analyzing_function.GetStatement(name);
-                    type = Parser.analyzing_function.GetTypeByLocalName(name);
+                    statement = Parser.AnalyzingFunction.GetStatement(name);
+                    type = Parser.AnalyzingFunction.GetTypeByLocalName(name);
                     if (statement == null)
                     {
                         is_head = true;
@@ -73,16 +70,18 @@ namespace FPL.Parse.Expression
                 }
             }
             else
+            {
                 statement = @class.GetStatement(name);
+            }
+
             varType = statement.varType;
             if (type == null) Error(this, "类型\"" + @class.name + "\"中未包含\"" + name + "\"的定义");
-            return;
         }
 
         public override void Code()
         {
-            if(tag ==Tag.NUM) Encoder.Write(InstructionType.pushval, (int)content.GetValue());
-            if(tag == Tag.ID) ObjectCode();
+            if (tag == Tag.NUM) Encoder.Write(InstructionType.pushval, (int) content.GetValue());
+            if (tag == Tag.ID) ObjectCode();
         }
 
         public void ObjectCode()
@@ -94,14 +93,16 @@ namespace FPL.Parse.Expression
                 Encoder.Write(InstructionType.pushsta, ID);
                 return;
             }
+
             if (is_head && varType == VarType.Field)
             {
-                if (Parser.analyzing_function.func_type == FuncType.Static)
+                if (Parser.AnalyzingFunction.func_type == FuncType.Static)
                     Error(this, "对象引用对于非静态的字段、方法或属性\"" + name + "\"是必须的");
-                Encoder.Write(InstructionType.pusharg);//this
+                Encoder.Write(InstructionType.pusharg); //this
                 Encoder.Write(InstructionType.pushfield, ID);
                 return;
             }
+
             switch (varType)
             {
                 case VarType.Arg:

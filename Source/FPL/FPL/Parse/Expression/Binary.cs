@@ -1,6 +1,6 @@
-﻿using FPL.Encoding;
+﻿using System.Collections.Generic;
+using FPL.Encoding;
 using FPL.LexicalAnalysis;
-using System.Collections.Generic;
 
 namespace FPL.Parse.Expression
 {
@@ -30,7 +30,7 @@ namespace FPL.Parse.Expression
 
         public override void Check()
         {
-            if(tag == Tag.DOT)
+            if (tag == Tag.DOT)
             {
                 DotCheck();
                 return;
@@ -50,9 +50,10 @@ namespace FPL.Parse.Expression
                     Error("表达式暂不支持除\"int\"\"float\"\"bool\"\"string\"以外的类型");
                     break;
             }
-            if (left.type != right.type) Error(this, "运算符\"+\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
+
+            if (left.type != right.type)
+                Error(this, "运算符\"+\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
             type = left.type;
-            return;
         }
 
         public void DotCheck()
@@ -69,10 +70,10 @@ namespace FPL.Parse.Expression
             left.Code();
             right.Code();
 
-            if (tag == Tag.DOT)return;
-            if (Parser.ins_table.ContainsKey(tag))
-                if (Parser.ins_table[tag].ContainsKey(type.type_name))
-                    Encoder.Write(Parser.ins_table[tag][type.type_name]);
+            if (tag == Tag.DOT) return;
+            if (Parser.InsTable.ContainsKey(tag))
+                if (Parser.InsTable[tag].ContainsKey(type.type_name))
+                    Encoder.Write(Parser.InsTable[tag][type.type_name]);
                 else
                     Error(this, "暂无符号重载");
             else

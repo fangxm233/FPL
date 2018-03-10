@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FPL.Parse;
+﻿using System.Collections.Generic;
 using System.IO;
+using FPL.Parse;
 
 namespace FPL.Encoding
 {
     public class Encoder
     {
-        static FileStream fileStream;
-        static StreamWriter streamWriter;
+        private static FileStream fileStream;
+        private static StreamWriter streamWriter;
         public static List<CodingUnit> code = new List<CodingUnit>();
-        public static int line = 0;
+        public static int line;
 
         public static void Init(string file)
         {
@@ -32,6 +28,7 @@ namespace FPL.Encoding
                     line = -1;
                     break;
             }
+
             code.Add(new CodingUnit(++line, type, parameter));
             return code[code.Count - 1];
         }
@@ -44,6 +41,7 @@ namespace FPL.Encoding
                     line = -1;
                     break;
             }
+
             code.Add(new CodingUnit(line, type, parameter));
             return code[code.Count - 1];
         }
@@ -82,28 +80,25 @@ namespace FPL.Encoding
             {
                 if (code[i].ins_type == InstructionType.define) break;
                 if (code[i].name == "")
-                {
                     streamWriter.WriteLine(code[i].parameter);
-                }
-                else if(code[i].type != "")
-                {
+                else if (code[i].type != "")
                     streamWriter.WriteLine(code[i].type + " " + code[i].name);
-                }
                 else
-                {
                     streamWriter.WriteLine(code[i].name + " " + code[i].line_num);
-                }
                 //if (code[i].ins_type == InstructionType.nop) streamWriter.WriteLine(/*(int)*/InstructionType.nop);
             }
+
             for (; i < code.Count; i++)
             {
-                if(code[i].ins_type == InstructionType.endF)
+                if (code[i].ins_type == InstructionType.endF)
                 {
-                    streamWriter.Write((int)code[i].ins_type + " " + code[i].parameter);
+                    streamWriter.Write((int) code[i].ins_type + " " + code[i].parameter);
                     continue;
                 }
-                streamWriter.WriteLine((int)code[i].ins_type + " " + code[i].parameter);
+
+                streamWriter.WriteLine((int) code[i].ins_type + " " + code[i].parameter);
             }
+
             streamWriter.Flush();
             streamWriter.Close();
             fileStream.Close();
@@ -112,10 +107,10 @@ namespace FPL.Encoding
 
     public class CodingUnit
     {
-        public int line_num;
         public InstructionType ins_type = InstructionType.nop;
-        public int parameter;
+        public int line_num;
         public string name = "";
+        public int parameter;
         public string type = "";
 
         public CodingUnit(int line, InstructionType type, int parm = 0)
@@ -124,26 +119,31 @@ namespace FPL.Encoding
             ins_type = type;
             parameter = parm;
         }
+
         public CodingUnit(int line, InstructionType type, string parm)
         {
             line_num = line;
             ins_type = type;
             name = parm;
         }
+
         public CodingUnit(string name, int lineNum)
         {
             line_num = lineNum;
             this.name = name;
         }
+
         public CodingUnit(string type, string name)
         {
             this.type = type;
             this.name = name;
         }
+
         public CodingUnit(int c)
         {
             parameter = c;
         }
+
         public void Remove()
         {
             Encoder.code.Remove(this);

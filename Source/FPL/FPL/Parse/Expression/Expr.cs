@@ -1,26 +1,29 @@
-﻿using FPL.LexicalAnalysis;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using FPL.LexicalAnalysis;
 using FPL.Parse.Sentences;
 using FPL.Parse.Structure;
+using FPL.symbols;
 
 namespace FPL.Parse.Expression
 {
     public class Expr : Node
     {
-        public Expr left;
-        public Expr right;
-        public Token content;
-        public symbols.Type type = symbols.Type.Int;
         public Class @class;
+        public Token content;
+        public Expr left;
         public string name;
+        public Expr right;
         public int tag;
+        public Type type = Type.Int;
 
-        public virtual void Build() { }
+        public virtual void Build()
+        {
+        }
 
         public Expr BuildStart()
         {
-            LinkedList<Expr> expr = MatchAll();
+            var expr = MatchAll();
             if (expr.Count == 1)
                 return null;
             BuildTree(expr.First, expr.Last);
@@ -29,21 +32,17 @@ namespace FPL.Parse.Expression
 
         protected void BuildTree(LinkedListNode<Expr> start, LinkedListNode<Expr> end)
         {
-            foreach (Dictionary<int, int> dictionary in Parser.symbol_priority)
-            {
-                for (LinkedListNode<Expr> node = start.Next; node != end.Next; node = node.Next)
-                {
+            foreach (var dictionary in Parser.SymbolPriority)
+                for (var node = start.Next; node != end.Next; node = node.Next)
                     if (dictionary.ContainsKey(node.Value.tag))
                         node.Value.Build();
-                }
-            }
         }
 
         private LinkedList<Expr> MatchAll()
         {
-            LinkedList<Expr> expr = new LinkedList<Expr>();
+            var expr = new LinkedList<Expr>();
             expr.AddFirst(new Expr());
-            List<Factor> Brackets = new List<Factor>();
+            var Brackets = new List<Factor>();
             while (true)
             {
                 Lexer.Next();
@@ -70,6 +69,7 @@ namespace FPL.Parse.Expression
                             expr.Last.Value.Build();
                             continue;
                         }
+
                         Lexer.Back();
                         break;
                     case Tag.NEW:
@@ -77,15 +77,16 @@ namespace FPL.Parse.Expression
                         expr.Last.Value.Build();
                         continue;
                 }
-                if (!Parser.type_of_expr.ContainsKey(Lexer.Peek.tag))
+
+                if (!Parser.TypeOfExpr.ContainsKey(Lexer.Peek.tag))
                     Error("意外的字符" + Lexer.Peek);
-                switch (Parser.type_of_expr[Lexer.Peek.tag])
+                switch (Parser.TypeOfExpr[Lexer.Peek.tag])
                 {
                     case Tag.FACTOR:
                         Factor f = new Factor(Lexer.Peek.tag, Lexer.Peek);
                         expr.AddLast(f);
                         f.Set_position(expr.Last);
-                        if (Lexer.Peek.tag == Tag.LBRACKETS)Brackets.Add((Factor)expr.Last());
+                        if (Lexer.Peek.tag == Tag.LBRACKETS) Brackets.Add((Factor) expr.Last());
                         if (Lexer.Peek.tag == Tag.RBRACKETS)
                         {
                             if (Brackets.Count == 0)
@@ -93,9 +94,11 @@ namespace FPL.Parse.Expression
                                 expr.RemoveLast();
                                 return expr;
                             }
+
                             Brackets.Last().end_position = expr.Last;
                             Brackets.RemoveAt(Brackets.Count - 1);
                         }
+
                         break;
                     case Tag.BINATY:
                         Binary b = new Binary(Lexer.Peek.tag);
@@ -116,7 +119,12 @@ namespace FPL.Parse.Expression
             }
         }
 
-        public virtual void Check() { }
-        public virtual void Code() { }
+        public virtual void Check()
+        {
+        }
+
+        public virtual void Code()
+        {
+        }
     }
 }

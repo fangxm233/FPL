@@ -73,6 +73,6 @@
         @class,
         define,
         classEnd,
-        funcEnd,
+        funcEnd
     }
 }

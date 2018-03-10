@@ -7,14 +7,13 @@ namespace FPL.Parse.Sentences.ProcessControl
 {
     public class If : Sentence
     {
-        Rel rel;
-        List<Sentence> sentences;
-        List<Sentence> sentences_else;
-        CodingUnit to_end;
+        private Rel rel;
+        private List<Sentence> sentences;
+        private List<Sentence> sentences_else;
+        private CodingUnit to_end;
 
         public If(int tag) : base(tag)
         {
-            
         }
 
         public override Sentence Build()
@@ -25,7 +24,7 @@ namespace FPL.Parse.Sentences.ProcessControl
             rel = new Rel().BuildStart();
             if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
-            if(Lexer.Peek.tag == Tag.LBRACE)
+            if (Lexer.Peek.tag == Tag.LBRACE)
             {
                 sentences = BuildMethod();
                 if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
@@ -38,6 +37,7 @@ namespace FPL.Parse.Sentences.ProcessControl
                     BuildOne()
                 };
             }
+
             DestroyScope();
             Lexer.Next();
             if (Lexer.Peek.tag == Tag.ELSE)
@@ -57,25 +57,23 @@ namespace FPL.Parse.Sentences.ProcessControl
                         BuildOne()
                     };
                 }
+
                 DestroyScope();
             }
             else
+            {
                 Lexer.Back();
+            }
+
             return this;
         }
 
         public override void Check()
         {
             rel.Check();
-            foreach (Sentence item in sentences)
-            {
-                item.Check();
-            }
+            foreach (Sentence item in sentences) item.Check();
             if (sentences_else == null) return;
-            foreach (var item in sentences_else)
-            {
-                item.Check();
-            }
+            foreach (Sentence item in sentences_else) item.Check();
         }
 
         public override void Code()
@@ -84,24 +82,15 @@ namespace FPL.Parse.Sentences.ProcessControl
             CodingUnit u = Encoder.code[Encoder.code.Count - 1];
             u.parameter = Encoder.line + 2;
             to_end = Encoder.Write(InstructionType.jmp);
-            foreach (var item in sentences)
-            {
-                item.Code();
-            }
+            foreach (Sentence item in sentences) item.Code();
             to_end.parameter = Encoder.line + 1;
             if (sentences_else == null) return;
-            foreach (var item in sentences_else)
-            {
-                item.Code();
-            }
+            foreach (Sentence item in sentences_else) item.Code();
         }
 
         public override void CodeSecond()
         {
-            foreach (var item in sentences)
-            {
-                item.CodeSecond();
-            }
+            foreach (Sentence item in sentences) item.CodeSecond();
         }
     }
 }

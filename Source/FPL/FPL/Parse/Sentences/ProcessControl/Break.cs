@@ -6,10 +6,12 @@ namespace FPL.Parse.Sentences.ProcessControl
 {
     public class Break : Sentence
     {
-        Sentence loop;
-        CodingUnit unit;
+        private Sentence loop;
+        private CodingUnit unit;
 
-        public Break(int tag) : base(tag) { }
+        public Break(int tag) : base(tag)
+        {
+        }
 
         public override Sentence Build()
         {
@@ -20,8 +22,8 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Check()
         {
-            if (Parser.analyzing_loop == null) Error(this, "没有要中断或继续的循环");
-            loop = Parser.analyzing_loop;
+            if (Parser.AnalyzingLoop == null) Error(this, "没有要中断或继续的循环");
+            loop = Parser.AnalyzingLoop;
         }
 
         public override void Code()
@@ -34,13 +36,13 @@ namespace FPL.Parse.Sentences.ProcessControl
             switch (loop.tag)
             {
                 case Tag.WHILE:
-                    unit.parameter = ((While)loop).end_line + 1;
+                    unit.parameter = ((While) loop).end_line + 1;
                     break;
                 case Tag.FOR:
-                    unit.parameter = ((For)loop).end_line + 1;
+                    unit.parameter = ((For) loop).end_line + 1;
                     break;
                 case Tag.DO:
-                    unit.parameter = ((Do)loop).end_line + 1;
+                    unit.parameter = ((Do) loop).end_line + 1;
                     break;
             }
         }

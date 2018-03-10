@@ -20,7 +20,7 @@ namespace FPL.Parse.Expression
         public override void Build()
         {
             right = position.Next.Value;
-            if (Parser.type_of_expr[right.tag] != Tag.FACTOR) Error(this, "表达式错误");
+            if (Parser.TypeOfExpr[right.tag] != Tag.FACTOR) Error(this, "表达式错误");
             position.List.Remove(position.Next);
         }
     }

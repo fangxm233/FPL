@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using FPL.Parse;
+using Type = FPL.symbols.Type;
 
 namespace FPL.LexicalAnalysis
 {
@@ -24,7 +25,7 @@ namespace FPL.LexicalAnalysis
         private static int index;
         private static readonly List<int> backups = new List<int>();
 
-        static void Reserve(Word w)
+        private static void Reserve(Word w)
         {
             words.Add(w.lexeme, w);
         }
@@ -52,56 +53,54 @@ namespace FPL.LexicalAnalysis
             Reserve(new Word("static", Tag.STATIC));
             Reserve(Word.True);
             Reserve(Word.False);
-            Reserve(symbols.Type.Int);
-            Reserve(symbols.Type.Char);
-            Reserve(symbols.Type.Bool);
-            Reserve(symbols.Type.Float);
-            Reserve(symbols.Type.String);
-            Reserve(symbols.Type.Void);
+            Reserve(Type.Int);
+            Reserve(Type.Char);
+            Reserve(Type.Bool);
+            Reserve(Type.Float);
+            Reserve(Type.String);
+            Reserve(Type.Void);
             foreach (string item in files)
             {
                 stream_reader = new StreamReader(item);
                 now_file_name = item;
                 peek = ' ';
-                while (!stream_reader.EndOfStream)
-                {
-                    Scan();
-                }
+                while (!stream_reader.EndOfStream) Scan();
                 if (peeks.Last().tag != Tag.EOF)
                     Scan();
                 line = 1;
                 stream_reader.Close();
             }
+
             peeks.Add(new Token(Tag.EOF));
             now_file_name = files[0];
         }
 
         private static void Scan()
         {
-            for (; ; Readch()) //去掉所有空白
-            {
+            for (;; Readch()) //去掉所有空白
                 if (peek == ' ' || peek == '\t' || peek == '\n')
                 {
-                    continue;
                 }
                 else if (peek == '\r')
                 {
                     line++;
                     peeks.Add(new Token(Tag.EOL));
                 }
-                else if(peek == 65535)
+                else if (peek == 65535)
                 {
                     peeks.Add(new Token(Tag.EOF));
                     return;
                 }
-                else break;
-            }
+                else
+                {
+                    break;
+                }
+
             if (peek == '/') //开始检测注释
             {
                 Readch();
                 if (peek == '/')
-                {
-                    for (; ; Readch())
+                    for (;; Readch())
                     {
                         if (peek == '\r')
                         {
@@ -110,17 +109,18 @@ namespace FPL.LexicalAnalysis
                             Readch();
                             return;
                         }
-                        if(peek == '\uffff')//如果是文件未就返回一个文件尾
+
+                        if (peek == '\uffff') //如果是文件未就返回一个文件尾
                         {
                             peeks.Add(new Token(peek));
                             return;
                         }
                     }
-                }
+
                 if (peek == '*')
                 {
                     Readch();
-                    for (; ; Readch())
+                    for (;; Readch())
                     {
                         if (peek == '\r')
                         {
@@ -128,6 +128,7 @@ namespace FPL.LexicalAnalysis
                             peeks.Add(new Token(Tag.EOL));
                             Readch();
                         }
+
                         if (peek == '*')
                         {
                             Readch();
@@ -137,6 +138,7 @@ namespace FPL.LexicalAnalysis
                                 return;
                             }
                         }
+
                         if (peek == '\uffff')
                         {
                             peeks.Add(new Token(peek));
@@ -144,9 +146,11 @@ namespace FPL.LexicalAnalysis
                         }
                     }
                 }
+
                 peeks.Add(Word.divide);
                 return;
             }
+
             switch (peek) //检测并返回各个符号以及组合符号
             {
                 case '&':
@@ -220,11 +224,12 @@ namespace FPL.LexicalAnalysis
                     Readch();
                     return;
             }
+
             if (peek == '"')
             {
                 string s = "";
                 Readch();
-                for (; ; Readch())
+                for (;; Readch())
                 {
                     if (peek == '"')
                     {
@@ -233,6 +238,7 @@ namespace FPL.LexicalAnalysis
                         peeks.Add(str);
                         return;
                     }
+
                     if (peek == '\n')
                     {
                         Node.Error("应输入\"\"\"");
@@ -241,9 +247,11 @@ namespace FPL.LexicalAnalysis
                         peeks.Add(str);
                         return;
                     }
+
                     s = s + peek;
                 }
             }
+
             if (char.IsDigit(peek)) //检测数字
             {
                 string n = "";
@@ -252,6 +260,7 @@ namespace FPL.LexicalAnalysis
                     n = n + peek;
                     Readch();
                 } while (char.IsDigit(peek));
+
                 if (peek != '.')
                 {
                     try
@@ -262,8 +271,10 @@ namespace FPL.LexicalAnalysis
                     {
                         Node.Error("整数超出范围");
                     }
+
                     return;
                 }
+
                 string f = n;
                 f = f + peek;
                 for (;;)
@@ -272,6 +283,7 @@ namespace FPL.LexicalAnalysis
                     if (!char.IsDigit(peek)) break;
                     f = f + peek;
                 }
+
                 try
                 {
                     peeks.Add(new Real(float.Parse(f)));
@@ -280,8 +292,10 @@ namespace FPL.LexicalAnalysis
                 {
                     Node.Error("浮点数超出范围");
                 }
+
                 return;
             }
+
             if (char.IsLetter(peek) || peek == '_') //检测标识符
             {
                 StringBuilder b = new StringBuilder();
@@ -290,20 +304,23 @@ namespace FPL.LexicalAnalysis
                     b.Append(peek);
                     Readch();
                 } while (char.IsLetterOrDigit(peek) || peek == '_');
+
                 string s = b.ToString();
                 Word w = null;
                 if (words.ContainsKey(s))
-                w = words[s];
+                    w = words[s];
                 if (w != null)
                 {
                     peeks.Add(w);
                     return;
                 }
+
                 w = new Word(s, Tag.ID);
                 words.Add(s, w);
                 peeks.Add(w);
                 return;
             }
+
             Node.Error("意外的字符" + "\"" + peek + "\"");
         }
 
@@ -336,10 +353,7 @@ namespace FPL.LexicalAnalysis
                         line++;
                         continue;
                     case Tag.ID:
-                        if (quote.ContainsKey(Peek.ToString()))
-                        {
-                            Peek.tag = Tag.QUOTE;
-                        }
+                        if (quote.ContainsKey(Peek.ToString())) Peek.tag = Tag.QUOTE;
                         break;
                     case Tag.EOF:
                         if (now_file_id == files.Length - 1)
@@ -349,6 +363,7 @@ namespace FPL.LexicalAnalysis
                         now_file_name = files[++now_file_id];
                         continue;
                 }
+
                 break;
             }
         }
@@ -364,13 +379,14 @@ namespace FPL.LexicalAnalysis
                     line--;
                     continue;
                 }
+
                 break;
             }
         }
 
         private static void Readch()
         {
-            peek = (char)stream_reader.Read();
+            peek = (char) stream_reader.Read();
         }
 
         private static bool Readch(char c)

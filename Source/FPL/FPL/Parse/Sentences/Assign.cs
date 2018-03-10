@@ -2,16 +2,17 @@
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
 using FPL.Parse.Expression;
+using FPL.symbols;
 
 namespace FPL.Parse.Sentences
 {
     public class Assign : Sentence
     {
+        public int id;
         public Expr left;
         public Expr right;
-        public int id;
+        public Type type;
         public string TypeName = null;
-        public symbols.Type type;
 
         public Assign(Expr left, int tag) : base(tag)
         {
@@ -27,6 +28,7 @@ namespace FPL.Parse.Sentences
                 case Tag.COMMA:
                     return this;
             }
+
             if (Lexer.Peek.tag != Tag.ASSIGN) Error("应输入\"=\"");
             right = new Expr().BuildStart();
             return this;
@@ -34,7 +36,7 @@ namespace FPL.Parse.Sentences
 
         public override void Check()
         {
-            if (TypeName != null) type = symbols.Type.GetType(TypeName);
+            if (TypeName != null) type = Type.GetType(TypeName);
             if (type == null && TypeName != null) Error(this, "当前上下文中不存在名称" + TypeName);
             left.Check();
             type = left.type;
@@ -45,7 +47,7 @@ namespace FPL.Parse.Sentences
 
         public override void Code()
         {
-            if(right == null) return;
+            if (right == null) return;
             right.Code();
             left.Code();
             CodingUnit codingUnit = Encoder.code.Last();

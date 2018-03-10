@@ -7,16 +7,17 @@ namespace FPL.Parse.Sentences
     public class Statement : Sentence
     {
         public Assign assign;
-        public string name;
-        string type_name;
-        public int ID;
         public Class @class;
+        public int ID;
+        public string name;
+        private string type_name;
         public VarType varType;
 
         public Statement(VarType varType, int tag) : base(tag)
         {
             this.varType = varType;
         }
+
         public override Sentence Build()
         {
             //switch (((Word)Lexer.Peek).lexeme)
@@ -57,18 +58,15 @@ namespace FPL.Parse.Sentences
             //        }
             //}
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.ID)
-            {
-                Error("应输入标识符");
-            }
+            if (Lexer.Peek.tag != Tag.ID) Error("应输入标识符");
             name = Lexer.Peek.ToString();
             AddVar(this, varType);
             Lexer.Back();
-            @class = Parser.analyzing_class;
-            type_name = ((Word)Lexer.Peek).lexeme;
-            assign = (Assign)new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build();
-            if (Parser.analyzing_function != null)
-                Parser.analyzing_function.Statements.Add(this);
+            @class = Parser.AnalyzingClass;
+            type_name = ((Word) Lexer.Peek).lexeme;
+            assign = (Assign) new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build();
+            if (Parser.AnalyzingFunction != null)
+                Parser.AnalyzingFunction.Statements.Add(this);
             else
                 @class.Statement.Add(this);
             if (Lexer.Peek.tag == Tag.COMMA) return this;

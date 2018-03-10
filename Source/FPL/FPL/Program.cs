@@ -1,11 +1,11 @@
-﻿using FPL.LexicalAnalysis;
-using FPL.Parse;
-using System;
+﻿using System;
 using System.Diagnostics;
+using FPL.LexicalAnalysis;
+using FPL.Parse;
 
 namespace FPL
 {
-    class Program
+    internal class Program
     {
         /* 目前支持
          * for
@@ -18,22 +18,23 @@ namespace FPL
          * 强类型运算
          * 函数
          */
-        //TODO:消除Object_e,把bool表达式整合进expr
+        //TODO:把bool表达式整合进expr
         //TODO:更改报错文本位置，使用单独的类
-        //TODO:整理文件
         private static void Main(string[] args)
         {
-            if(args.Length == 0)
+            if (args.Length == 0)
             {
                 Console.WriteLine("未指明文件");
                 Console.ReadKey();
                 return;
             }
+
             if (Compile(args))
             {
                 //Console.WriteLine("启动解释器");
                 //Process.Start("FPL_Interpreter c++.exe");
             }
+
             Console.ReadKey();
         }
 
@@ -59,7 +60,10 @@ namespace FPL
                 Console.WriteLine("");
                 return true;
             }
-            catch (CompileException) { return false; }
+            catch (CompileException)
+            {
+                return false;
+            }
         }
     }
 }
