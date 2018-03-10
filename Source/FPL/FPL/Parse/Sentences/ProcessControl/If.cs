@@ -7,10 +7,10 @@ namespace FPL.Parse.Sentences.ProcessControl
 {
     public class If : Sentence
     {
-        private Rel rel;
-        private List<Sentence> sentences;
-        private List<Sentence> sentences_else;
-        private CodingUnit to_end;
+        private Rel Rel;
+        private List<Sentence> Sentences;
+        private List<Sentence> SentencesElse;
+        private CodingUnit ToEnd;
 
         public If(int tag) : base(tag)
         {
@@ -20,19 +20,19 @@ namespace FPL.Parse.Sentences.ProcessControl
         {
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            rel = new Rel().BuildStart();
-            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Rel = new Rel().BuildStart();
+            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.LBRACE)
+            if (Lexer.NextToken.tag == Tag.LBRACE)
             {
-                sentences = BuildMethod();
-                if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Sentences = BuildMethod();
+                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
             }
             else
             {
                 Lexer.Back();
-                sentences = new List<Sentence>
+                Sentences = new List<Sentence>
                 {
                     BuildOne()
                 };
@@ -40,19 +40,19 @@ namespace FPL.Parse.Sentences.ProcessControl
 
             DestroyScope();
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.ELSE)
+            if (Lexer.NextToken.tag == Tag.ELSE)
             {
                 NewScope();
                 Lexer.Next();
-                if (Lexer.Peek.tag == Tag.LBRACKETS)
+                if (Lexer.NextToken.tag == Tag.LBRACKETS)
                 {
-                    sentences_else = BuildMethod();
-                    if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+                    SentencesElse = BuildMethod();
+                    if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
                 }
                 else
                 {
                     Lexer.Back();
-                    sentences_else = new List<Sentence>
+                    SentencesElse = new List<Sentence>
                     {
                         BuildOne()
                     };
@@ -70,27 +70,27 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Check()
         {
-            rel.Check();
-            foreach (Sentence item in sentences) item.Check();
-            if (sentences_else == null) return;
-            foreach (Sentence item in sentences_else) item.Check();
+            Rel.Check();
+            foreach (Sentence item in Sentences) item.Check();
+            if (SentencesElse == null) return;
+            foreach (Sentence item in SentencesElse) item.Check();
         }
 
         public override void Code()
         {
-            rel.Code(0);
-            CodingUnit u = Encoder.code[Encoder.code.Count - 1];
-            u.parameter = Encoder.line + 2;
-            to_end = Encoder.Write(InstructionType.jmp);
-            foreach (Sentence item in sentences) item.Code();
-            to_end.parameter = Encoder.line + 1;
-            if (sentences_else == null) return;
-            foreach (Sentence item in sentences_else) item.Code();
+            Rel.Code(0);
+            CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
+            u.parameter = Encoder.Line + 2;
+            ToEnd = Encoder.Write(InstructionType.jmp);
+            foreach (Sentence item in Sentences) item.Code();
+            ToEnd.parameter = Encoder.Line + 1;
+            if (SentencesElse == null) return;
+            foreach (Sentence item in SentencesElse) item.Code();
         }
 
         public override void CodeSecond()
         {
-            foreach (Sentence item in sentences) item.CodeSecond();
+            foreach (Sentence item in Sentences) item.CodeSecond();
         }
     }
 }

@@ -5,23 +5,23 @@ namespace FPL.Parse.Expression
 {
     public class Unary : Expr
     {
-        public LinkedListNode<Expr> position;
+        public LinkedListNode<Expr> Position;
 
         public Unary(int tag)
         {
-            this.tag = tag;
+            Tag = tag;
         }
 
         public void Set_position(LinkedListNode<Expr> pos)
         {
-            position = pos;
+            Position = pos;
         }
 
         public override void Build()
         {
-            right = position.Next.Value;
-            if (Parser.TypeOfExpr[right.tag] != Tag.FACTOR) Error(this, "表达式错误");
-            position.List.Remove(position.Next);
+            Right = Position.Next.Value;
+            if (Parser.TypeOfExpr[Right.Tag] != LexicalAnalysis.Tag.FACTOR) Error(this, "表达式错误");
+            Position.List.Remove(Position.Next);
         }
     }
 }

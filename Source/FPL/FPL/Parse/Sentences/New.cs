@@ -9,88 +9,88 @@ namespace FPL.Parse.Sentences
 {
     public class New_s : Sentence
     {
-        private Class @class;
-        private Function function;
-        private Sentence next;
-        public List<Expr> parameters = new List<Expr>();
-        private Type type;
-        private readonly string Type_Name;
+        private Class Class;
+        private Function Function;
+        private Sentence Next;
+        public List<Expr> Parameters = new List<Expr>();
+        private Type Type;
+        private readonly string TypeName;
 
         public New_s(int tag) : base(tag)
         {
             Lexer.Next();
-            Type_Name = ((Word) Lexer.Peek).lexeme;
+            TypeName = ((Word) Lexer.NextToken).Lexeme;
         }
 
         public override Sentence Build()
         {
-            @class = GetClass(Type_Name);
+            Class = GetClass(TypeName);
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            while (Lexer.Peek.tag != Tag.RBRACKETS)
+            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
-                parameters.Add(new Expr().BuildStart());
-                if (parameters[parameters.Count - 1] == null)
+                Parameters.Add(new Expr().BuildStart());
+                if (Parameters[Parameters.Count - 1] == null)
                 {
-                    if (Lexer.Peek.tag == Tag.COMMA) Error("缺少参数");
-                    if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
-                    parameters.RemoveAt(parameters.Count - 1);
+                    if (Lexer.NextToken.tag == Tag.COMMA) Error("缺少参数");
+                    if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
+                    Parameters.RemoveAt(Parameters.Count - 1);
                     break;
                 }
             }
 
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.DOT)
+            if (Lexer.NextToken.tag != Tag.DOT)
             {
-                if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
+                if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
                 return this;
             }
 
-            next = BuildNext();
+            Next = BuildNext();
             Lexer.Next();
             return this;
         }
 
         public override void Check()
         {
-            if (parameters.Count != 0) Error(this, "暂不支持构造函数重载");
-            function = @class.GetFunction(Type_Name);
-            if (function == null) Error(this, "该类型不存在构造函数");
-            type = Type.GetType(@class.name);
-            if (next != null)
+            if (Parameters.Count != 0) Error(this, "暂不支持构造函数重载");
+            Function = Class.GetFunction(TypeName);
+            if (Function == null) Error(this, "该类型不存在构造函数");
+            Type = Type.GetType(Class.Name);
+            if (Next != null)
             {
-                if (next.tag == Tag.FUNCTIONCALL)
+                if (Next.tag == Tag.FUNCTIONCALL)
                 {
-                    ((FunctionCall_s) next).@class = GetClass(type.type_name);
-                    ((FunctionCall_s) next).is_head = false;
+                    ((FunctionCall_s) Next).Class = GetClass(Type.type_name);
+                    ((FunctionCall_s) Next).isHead = false;
                 }
 
-                if (next.tag == Tag.OBJECT)
+                if (Next.tag == Tag.OBJECT)
                 {
-                    ((Object_s) next).@class = GetClass(type.type_name);
-                    ((FunctionCall_s) next).is_head = false;
+                    ((Object_s) Next).Class = GetClass(Type.type_name);
+                    ((FunctionCall_s) Next).isHead = false;
                 }
 
-                next.Check();
+                Next.Check();
             }
         }
 
         public override void Code()
         {
-            Encoder.Write(InstructionType.newobjc, @class.ID);
-            Encoder.Write(InstructionType.call, @class.GetFunction(".init").ID);
-            if (function.par_statements.Count != 0)
-                for (int i = parameters.Count - 1; i >= 0; i--)
-                    parameters[i].Code();
-            Encoder.Write(InstructionType.call, @class.GetFunction(@class.name).ID);
+            Encoder.Write(InstructionType.newobjc, Class.ID);
+            Encoder.Write(InstructionType.call, Class.GetFunction(".init").ID);
+            if (Function.ParStatements.Count != 0)
+                for (int i = Parameters.Count - 1; i >= 0; i--)
+                    Parameters[i].Code();
+            Encoder.Write(InstructionType.call, Class.GetFunction(Class.Name).ID);
         }
 
         public Sentence BuildNext()
         {
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.ID) Error(this, "\"" + Lexer.Peek + "\"无效");
+            if (Lexer.NextToken.tag != Tag.ID) Error(this, "\"" + Lexer.NextToken + "\"无效");
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.LBRACKETS)
+            if (Lexer.NextToken.tag == Tag.LBRACKETS)
             {
                 Lexer.Back();
                 return new FunctionCall_s(Tag.FUNCTIONCALL).Build();
@@ -103,51 +103,51 @@ namespace FPL.Parse.Sentences
 
     public class New_e : Expr
     {
-        private Function function;
-        public List<Expr> parameters = new List<Expr>();
-        private readonly string Type_Name;
+        private Function Function;
+        public List<Expr> Parameters = new List<Expr>();
+        private readonly string TypeName;
 
         public New_e()
         {
-            tag = Tag.NEW;
+            Tag = LexicalAnalysis.Tag.NEW;
             Lexer.Next();
-            Type_Name = ((Word) Lexer.Peek).lexeme;
+            TypeName = ((Word) Lexer.NextToken).Lexeme;
         }
 
         public override void Build()
         {
-            @class = GetClass(Type_Name);
+            Class = GetClass(TypeName);
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            while (Lexer.Peek.tag != Tag.RBRACKETS)
+            if (Lexer.NextToken.tag != LexicalAnalysis.Tag.LBRACKETS) Error("应输入\"(\"");
+            while (Lexer.NextToken.tag != LexicalAnalysis.Tag.RBRACKETS)
             {
-                parameters.Add(new Expr().BuildStart());
-                if (parameters[parameters.Count - 1] != null) continue;
-                if (Lexer.Peek.tag == Tag.COMMA) Error("缺少参数");
-                if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
-                parameters.RemoveAt(parameters.Count - 1);
+                Parameters.Add(new Expr().BuildStart());
+                if (Parameters[Parameters.Count - 1] != null) continue;
+                if (Lexer.NextToken.tag == LexicalAnalysis.Tag.COMMA) Error("缺少参数");
+                if (Lexer.NextToken.tag != LexicalAnalysis.Tag.RBRACKETS) Error("应输入\")\"");
+                Parameters.RemoveAt(Parameters.Count - 1);
                 break;
             }
         }
 
         public override void Check()
         {
-            if (@class.GetFunction(@class.name).par_statements.Count != parameters.Count)
-                Error(this, "该类型不存在" + parameters.Count + "个参数的构造函数");
-            @class = GetClass(Type_Name);
-            function = @class.GetFunction(Type_Name);
-            if (function == null) Error(this, "该类型不存在构造函数");
-            type = Type.GetType(@class.name);
+            if (Class.GetFunction(Class.Name).ParStatements.Count != Parameters.Count)
+                Error(this, "该类型不存在" + Parameters.Count + "个参数的构造函数");
+            Class = GetClass(TypeName);
+            Function = Class.GetFunction(TypeName);
+            if (Function == null) Error(this, "该类型不存在构造函数");
+            Type = Type.GetType(Class.Name);
         }
 
         public override void Code()
         {
-            Encoder.Write(InstructionType.newobjc, @class.ID);
-            Encoder.Write(InstructionType.call, @class.GetFunction(".init").ID);
-            if (function.par_statements.Count != 0)
-                for (int i = parameters.Count - 1; i >= 0; i--)
-                    parameters[i].Code();
-            Encoder.Write(InstructionType.call, @class.GetFunction(@class.name).ID);
+            Encoder.Write(InstructionType.newobjc, Class.ID);
+            Encoder.Write(InstructionType.call, Class.GetFunction(".init").ID);
+            if (Function.ParStatements.Count != 0)
+                for (int i = Parameters.Count - 1; i >= 0; i--)
+                    Parameters[i].Code();
+            Encoder.Write(InstructionType.call, Class.GetFunction(Class.Name).ID);
         }
     }
 }

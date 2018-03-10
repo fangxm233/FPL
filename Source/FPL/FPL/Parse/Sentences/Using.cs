@@ -11,7 +11,7 @@ namespace FPL.Parse.Sentences
         public override Sentence Build()
         {
             Lexer.Next();
-            switch (((Word) Lexer.Peek).lexeme)
+            switch (((Word) Lexer.NextToken).Lexeme)
             {
                 case "Console":
                 {
@@ -31,7 +31,7 @@ namespace FPL.Parse.Sentences
             }
 
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
     }

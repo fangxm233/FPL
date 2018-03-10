@@ -8,50 +8,50 @@ namespace FPL.Parse.Expression
 {
     public class Rel : Node
     {
-        public Expr left;
+        public Expr Left;
 
-        public List<Rel> rels = new List<Rel>();
-        public Expr right;
-        public int tag;
+        public List<Rel> Rels = new List<Rel>();
+        public Expr Right;
+        public int Tag;
 
         public virtual Rel BuildStart()
         {
-            left = new Expr().BuildStart();
-            switch (Lexer.Peek.tag)
+            Left = new Expr().BuildStart();
+            switch (Lexer.NextToken.tag)
             {
-                case Tag.EQ:
+                case LexicalAnalysis.Tag.EQ:
                 {
-                    rels.Add(new Eq(left).BuildStart());
+                    Rels.Add(new Eq(Left).BuildStart());
                     break;
                 }
-                case Tag.NE:
+                case LexicalAnalysis.Tag.NE:
                 {
-                    rels.Add(new Ne(left).BuildStart());
+                    Rels.Add(new Ne(Left).BuildStart());
                     break;
                 }
-                case Tag.LE:
+                case LexicalAnalysis.Tag.LE:
                 {
-                    rels.Add(new Le(left).BuildStart());
+                    Rels.Add(new Le(Left).BuildStart());
                     break;
                 }
-                case Tag.GE:
+                case LexicalAnalysis.Tag.GE:
                 {
-                    rels.Add(new Ge(left).BuildStart());
+                    Rels.Add(new Ge(Left).BuildStart());
                     break;
                 }
-                case Tag.MORE:
+                case LexicalAnalysis.Tag.MORE:
                 {
-                    rels.Add(new More(left).BuildStart());
+                    Rels.Add(new More(Left).BuildStart());
                     break;
                 }
-                case Tag.LESS:
+                case LexicalAnalysis.Tag.LESS:
                 {
-                    rels.Add(new Less(left).BuildStart());
+                    Rels.Add(new Less(Left).BuildStart());
                     break;
                 }
                 default:
                 {
-                    rels.Add(new Bool_r(left));
+                    Rels.Add(new Bool_r(Left));
                     break;
                 }
             }
@@ -59,24 +59,24 @@ namespace FPL.Parse.Expression
             while (true)
             {
                 Rel rel = null;
-                switch (Lexer.Peek.tag)
+                switch (Lexer.NextToken.tag)
                 {
-                    case Tag.AND:
+                    case LexicalAnalysis.Tag.AND:
                         rel = new Rel().Build();
-                        rels.Add(new And(rels.Last(), rel));
-                        rels.RemoveAt(rels.Count - 2);
-                        rels.Add(((And) rels.Last()).right);
+                        Rels.Add(new And(Rels.Last(), rel));
+                        Rels.RemoveAt(Rels.Count - 2);
+                        Rels.Add(((And) Rels.Last()).right);
                         break;
-                    case Tag.OR:
+                    case LexicalAnalysis.Tag.OR:
                         rel = new Rel().Build();
-                        rels.Add(new Or(rels.Last(), rel));
-                        rels.RemoveAt(rels.Count - 2);
-                        rels.Add(((Or) rels.Last()).right);
+                        Rels.Add(new Or(Rels.Last(), rel));
+                        Rels.RemoveAt(Rels.Count - 2);
+                        Rels.Add(((Or) Rels.Last()).right);
                         break;
                     default:
                     {
-                        if (rels.Count == 1) return rels.Last();
-                        rels.RemoveAt(rels.Count - 1);
+                        if (Rels.Count == 1) return Rels.Last();
+                        Rels.RemoveAt(Rels.Count - 1);
                         return this;
                     }
                 }
@@ -85,48 +85,48 @@ namespace FPL.Parse.Expression
 
         public virtual Rel Build()
         {
-            left = new Expr().BuildStart();
-            switch (Lexer.Peek.tag)
+            Left = new Expr().BuildStart();
+            switch (Lexer.NextToken.tag)
             {
-                case Tag.EQ:
+                case LexicalAnalysis.Tag.EQ:
                 {
-                    Eq a = new Eq(left);
+                    Eq a = new Eq(Left);
                     a.BuildStart();
                     return a;
                 }
-                case Tag.NE:
+                case LexicalAnalysis.Tag.NE:
                 {
-                    Ne a = new Ne(left);
+                    Ne a = new Ne(Left);
                     a.BuildStart();
                     return a;
                 }
-                case Tag.LE:
+                case LexicalAnalysis.Tag.LE:
                 {
-                    Le a = new Le(left);
+                    Le a = new Le(Left);
                     a.BuildStart();
                     return a;
                 }
-                case Tag.GE:
+                case LexicalAnalysis.Tag.GE:
                 {
-                    Ge a = new Ge(left);
+                    Ge a = new Ge(Left);
                     a.BuildStart();
                     return a;
                 }
-                case Tag.MORE:
+                case LexicalAnalysis.Tag.MORE:
                 {
-                    More a = new More(left);
+                    More a = new More(Left);
                     a.BuildStart();
                     return a;
                 }
-                case Tag.LESS:
+                case LexicalAnalysis.Tag.LESS:
                 {
-                    Less a = new Less(left);
+                    Less a = new Less(Left);
                     a.BuildStart();
                     return a;
                 }
                 default:
                 {
-                    rels.Add(new Bool_r(left));
+                    Rels.Add(new Bool_r(Left));
                     break;
                 }
             }
@@ -136,29 +136,29 @@ namespace FPL.Parse.Expression
 
         public virtual void Check()
         {
-            if (rels[0].tag == Tag.AND)
-                ((And) rels[0]).left.left.Check();
-            else if (rels[0].tag == Tag.OR)
-                ((Or) rels[0]).left.left.Check();
+            if (Rels[0].Tag == LexicalAnalysis.Tag.AND)
+                ((And) Rels[0]).left.Left.Check();
+            else if (Rels[0].Tag == LexicalAnalysis.Tag.OR)
+                ((Or) Rels[0]).left.Left.Check();
             else
-                rels[0].Check();
-            foreach (Rel item in rels) item.Check();
+                Rels[0].Check();
+            foreach (Rel item in Rels) item.Check();
         }
 
         public virtual List<CodingUnit> Code(int tag)
         {
             var list = new List<CodingUnit>();
-            foreach (Rel item in rels)
-                if (item.tag == Tag.AND)
+            foreach (Rel item in Rels)
+                if (item.Tag == LexicalAnalysis.Tag.AND)
                     list.AddRange(item.Code(0));
-            if (list.Count != 0) Encoder.Write(InstructionType.jmp, Encoder.line + 2);
-            foreach (CodingUnit item in list) item.parameter = Encoder.line;
+            if (list.Count != 0) Encoder.Write(InstructionType.jmp, Encoder.Line + 2);
+            foreach (CodingUnit item in list) item.parameter = Encoder.Line;
             list = new List<CodingUnit>();
-            foreach (Rel item in rels)
-                if (item.tag == Tag.OR)
+            foreach (Rel item in Rels)
+                if (item.Tag == LexicalAnalysis.Tag.OR)
                     list.AddRange(item.Code(0));
-            if (list.Count != 0) Encoder.Write(InstructionType.jmp, Encoder.line + 2);
-            foreach (CodingUnit item in list) item.parameter = Encoder.line;
+            if (list.Count != 0) Encoder.Write(InstructionType.jmp, Encoder.Line + 2);
+            foreach (CodingUnit item in list) item.parameter = Encoder.Line;
             return null;
         }
     }
@@ -170,13 +170,13 @@ namespace FPL.Parse.Expression
 
         public And(Rel l)
         {
-            tag = Tag.AND;
+            Tag = LexicalAnalysis.Tag.AND;
             left = l;
         }
 
         public And(Rel l, Rel r)
         {
-            tag = Tag.AND;
+            Tag = LexicalAnalysis.Tag.AND;
             left = l;
             right = r;
         }
@@ -189,12 +189,12 @@ namespace FPL.Parse.Expression
         public override List<CodingUnit> Code(int tag)
         {
             var list = new List<CodingUnit>();
-            left.Code(Tag.AND);
+            left.Code(LexicalAnalysis.Tag.AND);
             Encoder.Write(InstructionType.jmp);
-            list.Add(Encoder.code.Last());
-            right.Code(Tag.AND);
+            list.Add(Encoder.Code.Last());
+            right.Code(LexicalAnalysis.Tag.AND);
             Encoder.Write(InstructionType.jmp);
-            list.Add(Encoder.code.Last());
+            list.Add(Encoder.Code.Last());
             return list;
         }
     }
@@ -206,13 +206,13 @@ namespace FPL.Parse.Expression
 
         public Or(Rel l)
         {
-            tag = Tag.OR;
+            Tag = LexicalAnalysis.Tag.OR;
             left = l;
         }
 
         public Or(Rel l, Rel r)
         {
-            tag = Tag.OR;
+            Tag = LexicalAnalysis.Tag.OR;
             left = l;
             right = r;
         }
@@ -226,8 +226,8 @@ namespace FPL.Parse.Expression
         {
             var list = new List<CodingUnit>
             {
-                left.Code(Tag.OR)[0],
-                right.Code(Tag.OR)[0]
+                left.Code(LexicalAnalysis.Tag.OR)[0],
+                right.Code(LexicalAnalysis.Tag.OR)[0]
             };
             return list;
         }
@@ -237,35 +237,35 @@ namespace FPL.Parse.Expression
     {
         public Eq(Expr l)
         {
-            left = l;
+            Left = l;
         }
 
         public override Rel BuildStart()
         {
-            right = new Expr().BuildStart();
+            Right = new Expr().BuildStart();
             return this;
         }
 
         public override void Check()
         {
-            left.Check();
-            right.Check();
-            switch (left.type.type_name)
+            Left.Check();
+            Right.Check();
+            switch (Left.Type.type_name)
             {
                 case "string":
                 {
-                    if (right.type.type_name != "string") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "string") Error(this, "表达式无效");
                     return;
                 }
                 case "int":
                 case "float":
                 {
-                    if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "int" && Right.Type.type_name != "float") Error(this, "表达式无效");
                     return;
                 }
                 case "bool":
                 {
-                    if (right.type.type_name != "bool") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "bool") Error(this, "表达式无效");
                     return;
                 }
             }
@@ -273,12 +273,12 @@ namespace FPL.Parse.Expression
 
         public override List<CodingUnit> Code(int tag)
         {
-            left.Code();
-            right.Code();
-            Encoder.Write(InstructionType.eqt, tag != Tag.OR ? Encoder.line + 3 : 0);
+            Left.Code();
+            Right.Code();
+            Encoder.Write(InstructionType.eqt, tag != LexicalAnalysis.Tag.OR ? Encoder.Line + 3 : 0);
             return new List<CodingUnit>
             {
-                Encoder.code.Last()
+                Encoder.Code.Last()
             };
         }
     }
@@ -287,35 +287,35 @@ namespace FPL.Parse.Expression
     {
         public Ne(Expr l)
         {
-            left = l;
+            Left = l;
         }
 
         public override Rel BuildStart()
         {
-            right = new Expr().BuildStart();
+            Right = new Expr().BuildStart();
             return this;
         }
 
         public override void Check()
         {
-            left.Check();
-            right.Check();
-            switch (left.type.type_name)
+            Left.Check();
+            Right.Check();
+            switch (Left.Type.type_name)
             {
                 case "string":
                 {
-                    if (right.type.type_name != "string") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "string") Error(this, "表达式无效");
                     return;
                 }
                 case "int":
                 case "float":
                 {
-                    if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "int" && Right.Type.type_name != "float") Error(this, "表达式无效");
                     return;
                 }
                 case "bool":
                 {
-                    if (right.type.type_name != "bool") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "bool") Error(this, "表达式无效");
                     return;
                 }
             }
@@ -323,12 +323,12 @@ namespace FPL.Parse.Expression
 
         public override List<CodingUnit> Code(int tag)
         {
-            left.Code();
-            right.Code();
-            Encoder.Write(InstructionType.eqf, tag != Tag.OR ? Encoder.line + 3 : 0);
+            Left.Code();
+            Right.Code();
+            Encoder.Write(InstructionType.eqf, tag != LexicalAnalysis.Tag.OR ? Encoder.Line + 3 : 0);
             return new List<CodingUnit>
             {
-                Encoder.code.Last()
+                Encoder.Code.Last()
             };
         }
     }
@@ -337,25 +337,25 @@ namespace FPL.Parse.Expression
     {
         public Le(Expr l)
         {
-            left = l;
+            Left = l;
         }
 
         public override Rel BuildStart()
         {
-            right = new Expr().BuildStart();
+            Right = new Expr().BuildStart();
             return this;
         }
 
         public override void Check()
         {
-            left.Check();
-            right.Check();
-            switch (left.type.type_name)
+            Left.Check();
+            Right.Check();
+            switch (Left.Type.type_name)
             {
                 case "int":
                 case "float":
                 {
-                    if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "int" && Right.Type.type_name != "float") Error(this, "表达式无效");
                     return;
                 }
             }
@@ -363,12 +363,12 @@ namespace FPL.Parse.Expression
 
         public override List<CodingUnit> Code(int tag)
         {
-            left.Code();
-            right.Code();
-            Encoder.Write(InstructionType.mof, tag != Tag.OR ? Encoder.line + 3 : 0);
+            Left.Code();
+            Right.Code();
+            Encoder.Write(InstructionType.mof, tag != LexicalAnalysis.Tag.OR ? Encoder.Line + 3 : 0);
             return new List<CodingUnit>
             {
-                Encoder.code.Last()
+                Encoder.Code.Last()
             };
         }
     }
@@ -377,25 +377,25 @@ namespace FPL.Parse.Expression
     {
         public Ge(Expr l)
         {
-            left = l;
+            Left = l;
         }
 
         public override Rel BuildStart()
         {
-            right = new Expr().BuildStart();
+            Right = new Expr().BuildStart();
             return this;
         }
 
         public override void Check()
         {
-            left.Check();
-            right.Check();
-            switch (left.type.type_name)
+            Left.Check();
+            Right.Check();
+            switch (Left.Type.type_name)
             {
                 case "int":
                 case "float":
                 {
-                    if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "int" && Right.Type.type_name != "float") Error(this, "表达式无效");
                     return;
                 }
             }
@@ -403,12 +403,12 @@ namespace FPL.Parse.Expression
 
         public override List<CodingUnit> Code(int tag)
         {
-            left.Code();
-            right.Code();
-            Encoder.Write(InstructionType.lef, tag != Tag.OR ? Encoder.line + 3 : 0);
+            Left.Code();
+            Right.Code();
+            Encoder.Write(InstructionType.lef, tag != LexicalAnalysis.Tag.OR ? Encoder.Line + 3 : 0);
             return new List<CodingUnit>
             {
-                Encoder.code.Last()
+                Encoder.Code.Last()
             };
         }
     }
@@ -417,25 +417,25 @@ namespace FPL.Parse.Expression
     {
         public More(Expr l)
         {
-            left = l;
+            Left = l;
         }
 
         public override Rel BuildStart()
         {
-            right = new Expr().BuildStart();
+            Right = new Expr().BuildStart();
             return this;
         }
 
         public override void Check()
         {
-            left.Check();
-            right.Check();
-            switch (left.type.type_name)
+            Left.Check();
+            Right.Check();
+            switch (Left.Type.type_name)
             {
                 case "int":
                 case "float":
                 {
-                    if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "int" && Right.Type.type_name != "float") Error(this, "表达式无效");
                     return;
                 }
             }
@@ -443,12 +443,12 @@ namespace FPL.Parse.Expression
 
         public override List<CodingUnit> Code(int tag)
         {
-            left.Code();
-            right.Code();
-            Encoder.Write(InstructionType.mot, tag != Tag.OR ? Encoder.line + 3 : 0);
+            Left.Code();
+            Right.Code();
+            Encoder.Write(InstructionType.mot, tag != LexicalAnalysis.Tag.OR ? Encoder.Line + 3 : 0);
             return new List<CodingUnit>
             {
-                Encoder.code.Last()
+                Encoder.Code.Last()
             };
         }
     }
@@ -457,25 +457,25 @@ namespace FPL.Parse.Expression
     {
         public Less(Expr l)
         {
-            left = l;
+            Left = l;
         }
 
         public override Rel BuildStart()
         {
-            right = new Expr().BuildStart();
+            Right = new Expr().BuildStart();
             return this;
         }
 
         public override void Check()
         {
-            left.Check();
-            right.Check();
-            switch (left.type.type_name)
+            Left.Check();
+            Right.Check();
+            switch (Left.Type.type_name)
             {
                 case "int":
                 case "float":
                 {
-                    if (right.type.type_name != "int" && right.type.type_name != "float") Error(this, "表达式无效");
+                    if (Right.Type.type_name != "int" && Right.Type.type_name != "float") Error(this, "表达式无效");
                     return;
                 }
             }
@@ -483,12 +483,12 @@ namespace FPL.Parse.Expression
 
         public override List<CodingUnit> Code(int tag)
         {
-            left.Code();
-            right.Code();
-            Encoder.Write(InstructionType.let, tag != Tag.OR ? Encoder.line + 3 : 0);
+            Left.Code();
+            Right.Code();
+            Encoder.Write(InstructionType.let, tag != LexicalAnalysis.Tag.OR ? Encoder.Line + 3 : 0);
             return new List<CodingUnit>
             {
-                Encoder.code.Last()
+                Encoder.Code.Last()
             };
         }
     }
@@ -497,23 +497,23 @@ namespace FPL.Parse.Expression
     {
         public Bool_r(Expr l)
         {
-            left = l;
+            Left = l;
         }
 
         public override void Check()
         {
-            left.Check();
-            if (left.type != Type.Bool) Error(this, "无法将\"" + left.type.type_name + "\"类型转换为\"bool\"");
+            Left.Check();
+            if (Left.Type != Type.Bool) Error(this, "无法将\"" + Left.Type.type_name + "\"类型转换为\"bool\"");
         }
 
         public override List<CodingUnit> Code(int tag)
         {
-            left.Code();
+            Left.Code();
             Encoder.Write(InstructionType.pushval, 1);
-            Encoder.Write(InstructionType.mot, tag != Tag.OR ? Encoder.line + 3 : 0);
+            Encoder.Write(InstructionType.mot, tag != LexicalAnalysis.Tag.OR ? Encoder.Line + 3 : 0);
             return new List<CodingUnit>
             {
-                Encoder.code.Last()
+                Encoder.Code.Last()
             };
         }
     }

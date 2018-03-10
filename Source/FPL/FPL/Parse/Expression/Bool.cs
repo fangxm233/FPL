@@ -4,24 +4,24 @@ namespace FPL.Parse.Expression
 {
     public class Bool : Expr
     {
-        public LinkedListNode<Expr> position;
+        public LinkedListNode<Expr> Position;
 
         public Bool(int tag)
         {
-            this.tag = tag;
+            Tag = tag;
         }
 
         public void Set_position(LinkedListNode<Expr> pos)
         {
-            position = pos;
+            Position = pos;
         }
 
         public override void Build()
         {
-            left = position.Previous.Value;
-            right = position.Next.Value;
-            position.List.Remove(left);
-            position.List.Remove(right);
+            Left = Position.Previous.Value;
+            Right = Position.Next.Value;
+            Position.List.Remove(Left);
+            Position.List.Remove(Right);
         }
     }
 }

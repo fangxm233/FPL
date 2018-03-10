@@ -7,103 +7,103 @@ namespace FPL.Parse.Sentences
 {
     public class Object_s : Sentence
     {
-        public Class @class;
+        public Class Class;
         private int ID;
-        public bool is_head = true;
-        public string name;
-        private Sentence next;
-        public Statement statement;
-        public Type type;
-        public VarType varType;
+        public bool IsHead = true;
+        public string Name;
+        private Sentence Next;
+        public Statement Statement;
+        public Type Type;
+        public VarType VarType;
 
         public Object_s(int tag) : base(tag)
         {
-            name = ((Word) Lexer.Peek).lexeme;
+            Name = ((Word) Lexer.NextToken).Lexeme;
         }
 
         public override Sentence Build()
         {
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.DOT)
+            if (Lexer.NextToken.tag != Tag.DOT)
             {
                 //Error("只有赋值，函数调用，new 对象表达式可作为语句");
                 Lexer.Back();
                 return this;
             }
 
-            next = BuildNext();
+            Next = BuildNext();
             return this;
         }
 
         public override void Check()
         {
-            if (@class == null && statement != null)
+            if (Class == null && Statement != null)
             {
-                @class = statement.@class;
-                is_head = true;
+                Class = Statement.Class;
+                IsHead = true;
             }
-            else if (statement != null)
+            else if (Statement != null)
             {
-                statement = @class.GetStatement(name);
+                Statement = Class.GetStatement(Name);
             }
             else
             {
-                if (Type.GetType(name) == null)
+                if (Type.GetType(Name) == null)
                 {
-                    if (@class == null)
-                        @class = Parser.AnalyzingClass;
-                    else if (Parser.AnalyzingFunction.func_type != FuncType.Static)
-                        statement = @class.GetStatement(name);
+                    if (Class == null)
+                        Class = Parser.AnalyzingClass;
+                    else if (Parser.AnalyzingFunction.FuncType != FuncType.Static)
+                        Statement = Class.GetStatement(Name);
                 }
                 else
                 {
-                    @class = GetClass(name);
-                    varType = VarType.Class;
+                    Class = GetClass(Name);
+                    VarType = VarType.Class;
                     return;
                 }
             }
 
-            varType = statement.varType;
+            VarType = Statement.VarType;
             if (Parser.AnalyzingFunction != null)
             {
-                type = Parser.AnalyzingFunction.GetTypeByLocalName(name);
-                if (type != null)
+                Type = Parser.AnalyzingFunction.GetTypeByLocalName(Name);
+                if (Type != null)
                 {
                     Parser.AnalyzingFunction.objects_s.Add(this);
                     return;
                 }
             }
 
-            type = @class.GetTypeByLocalName(name);
-            if (type == null) Error(this, "类型\"" + @class.name + "\"中未包含\"" + name + "\"的定义");
-            if (next == null) Error(this, "只有赋值，函数调用和new 对象表达式可用作语句");
-            if (next.tag == Tag.FUNCTIONCALL) ((FunctionCall_s) next).@class = GetClass(type.type_name);
-            if (next.tag == Tag.OBJECT) ((Object_s) next).@class = GetClass(type.type_name);
-            @class = GetClass(type.type_name);
-            @class.Objects_s.Add(this);
-            next.Check();
+            Type = Class.GetTypeByLocalName(Name);
+            if (Type == null) Error(this, "类型\"" + Class.Name + "\"中未包含\"" + Name + "\"的定义");
+            if (Next == null) Error(this, "只有赋值，函数调用和new 对象表达式可用作语句");
+            if (Next.tag == Tag.FUNCTIONCALL) ((FunctionCall_s) Next).Class = GetClass(Type.type_name);
+            if (Next.tag == Tag.OBJECT) ((Object_s) Next).Class = GetClass(Type.type_name);
+            Class = GetClass(Type.type_name);
+            Class.Objects_s.Add(this);
+            Next.Check();
         }
 
         public override void Code()
         {
-            ID = statement.ID;
+            ID = Statement.ID;
 
-            if (varType == VarType.Static)
+            if (VarType == VarType.Static)
             {
                 Encoder.Write(InstructionType.pushsta, ID);
                 return;
             }
 
-            if (is_head && varType == VarType.Field)
+            if (IsHead && VarType == VarType.Field)
             {
-                if (Parser.AnalyzingFunction.func_type == FuncType.Static)
-                    Error(this, "对象引用对于非静态的字段、方法或属性\"" + name + "\"是必须的");
+                if (Parser.AnalyzingFunction.FuncType == FuncType.Static)
+                    Error(this, "对象引用对于非静态的字段、方法或属性\"" + Name + "\"是必须的");
                 Encoder.Write(InstructionType.pusharg); //this
                 Encoder.Write(InstructionType.pushfield, ID);
                 return;
             }
 
-            switch (varType)
+            switch (VarType)
             {
                 case VarType.Arg:
                     Encoder.Write(InstructionType.pusharg, ID);
@@ -120,9 +120,9 @@ namespace FPL.Parse.Sentences
         public Sentence BuildNext()
         {
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.ID) Error(this, "\"" + Lexer.Peek + "\"无效");
+            if (Lexer.NextToken.tag != Tag.ID) Error(this, "\"" + Lexer.NextToken + "\"无效");
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.LBRACKETS)
+            if (Lexer.NextToken.tag == Tag.LBRACKETS)
             {
                 Lexer.Back();
                 return new FunctionCall_s(Tag.FUNCTIONCALL).Build();

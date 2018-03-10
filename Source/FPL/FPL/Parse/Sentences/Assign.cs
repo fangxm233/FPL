@@ -8,20 +8,20 @@ namespace FPL.Parse.Sentences
 {
     public class Assign : Sentence
     {
-        public int id;
-        public Expr left;
-        public Expr right;
-        public Type type;
+        public int Id;
+        public Expr Left;
+        public Expr Right;
+        public Type Type;
         public string TypeName = null;
 
         public Assign(Expr left, int tag) : base(tag)
         {
-            this.left = left;
+            Left = left;
         }
 
         public override Sentence Build()
         {
-            switch (Lexer.Peek.tag)
+            switch (Lexer.NextToken.tag)
             {
                 case Tag.SEMICOLON:
                 case Tag.RBRACKETS:
@@ -29,28 +29,28 @@ namespace FPL.Parse.Sentences
                     return this;
             }
 
-            if (Lexer.Peek.tag != Tag.ASSIGN) Error("应输入\"=\"");
-            right = new Expr().BuildStart();
+            if (Lexer.NextToken.tag != Tag.ASSIGN) Error("应输入\"=\"");
+            Right = new Expr().BuildStart();
             return this;
         }
 
         public override void Check()
         {
-            if (TypeName != null) type = Type.GetType(TypeName);
-            if (type == null && TypeName != null) Error(this, "当前上下文中不存在名称" + TypeName);
-            left.Check();
-            type = left.type;
-            if (right == null) return;
-            right.Check();
-            if (type != right.type) Error(this, "无法将类型\"" + right.type.type_name + "\"转换为类型\"" + type.type_name + "\"");
+            if (TypeName != null) Type = Type.GetType(TypeName);
+            if (Type == null && TypeName != null) Error(this, "当前上下文中不存在名称" + TypeName);
+            Left.Check();
+            Type = Left.Type;
+            if (Right == null) return;
+            Right.Check();
+            if (Type != Right.Type) Error(this, "无法将类型\"" + Right.Type.type_name + "\"转换为类型\"" + Type.type_name + "\"");
         }
 
         public override void Code()
         {
-            if (right == null) return;
-            right.Code();
-            left.Code();
-            CodingUnit codingUnit = Encoder.code.Last();
+            if (Right == null) return;
+            Right.Code();
+            Left.Code();
+            CodingUnit codingUnit = Encoder.Code.Last();
             Encoder.Back();
             switch (codingUnit.ins_type)
             {

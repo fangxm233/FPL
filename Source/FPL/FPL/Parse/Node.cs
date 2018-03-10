@@ -10,36 +10,36 @@ namespace FPL.Parse
 {
     public class Node
     {
-        public readonly string file;
-        public readonly int line;
+        public readonly string File;
+        public readonly int Line;
 
         protected Node()
         {
-            line = Lexer.line;
-            file = Lexer.now_file_name;
+            Line = Lexer.Line;
+            File = Lexer.NowFileName;
         }
 
         public static void Error(string s)
         {
-            Console.WriteLine("文件 " + Lexer.now_file_name + ": " + "行 " + Lexer.line + ": " + s);
+            Console.WriteLine("文件 " + Lexer.NowFileName + ": " + "行 " + Lexer.Line + ": " + s);
             throw new CompileException();
         }
 
         public static void Error(Token c, string s)
         {
-            Console.WriteLine("文件 " + c.file + ": " + "行 " + c.line + ": " + s);
+            Console.WriteLine("文件 " + c.File + ": " + "行 " + c.Line + ": " + s);
             throw new CompileException();
         }
 
         public static void Error(Expr c, string s)
         {
-            Console.WriteLine("文件 " + c.file + ": " + "行 " + c.line + ": " + s);
+            Console.WriteLine("文件 " + c.File + ": " + "行 " + c.Line + ": " + s);
             throw new CompileException();
         }
 
         public static void Error(Node c, string s)
         {
-            Console.WriteLine("文件 " + c.file + ": " + "行 " + c.line + ": " + s);
+            Console.WriteLine("文件 " + c.File + ": " + "行 " + c.Line + ": " + s);
             throw new CompileException();
         }
 
@@ -47,15 +47,15 @@ namespace FPL.Parse
         {
             if (varType == VarType.Static)
             {
-                if (Parser.SymbolsList.Last()[".s" + statement.name] != null)
-                    Error(this, "当前上下文中已经包含\"" + statement.name + "\"的定义");
-                Parser.SymbolsList[Parser.SymbolsList.Count - 1].Add(".s" + statement.name, statement);
+                if (Parser.SymbolsList.Last()[".s" + statement.Name] != null)
+                    Error(this, "当前上下文中已经包含\"" + statement.Name + "\"的定义");
+                Parser.SymbolsList[Parser.SymbolsList.Count - 1].Add(".s" + statement.Name, statement);
             }
             else
             {
-                if (Parser.SymbolsList[Parser.SymbolsList.Count - 1][statement.name] != null)
-                    Error(this, "当前上下文中已经包含\"" + statement.name + "\"的定义");
-                Parser.SymbolsList[Parser.SymbolsList.Count - 1].Add(statement.name, statement);
+                if (Parser.SymbolsList[Parser.SymbolsList.Count - 1][statement.Name] != null)
+                    Error(this, "当前上下文中已经包含\"" + statement.Name + "\"的定义");
+                Parser.SymbolsList[Parser.SymbolsList.Count - 1].Add(statement.Name, statement);
             }
         }
 

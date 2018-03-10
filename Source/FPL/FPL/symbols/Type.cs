@@ -8,13 +8,13 @@ namespace FPL.symbols
         public static Dictionary<string, Type> Types = new Dictionary<string, Type>();
 
         public static readonly Type
-            Int = new Type("int", Tag.BASIC, 4),
-            Float = new Type("float", Tag.BASIC, 8),
-            Char = new Type("char", Tag.BASIC, 1),
-            Bool = new Type("bool", Tag.BASIC, 1),
-            String = new Type("string", Tag.CLASS, 1),
-            Void = new Type("void", Tag.BASIC, 0),
-            UnKnown = new Type("UnKnown", Tag.BASIC, 0);
+            Int = new Type("int", LexicalAnalysis.Tag.BASIC, 4),
+            Float = new Type("float", LexicalAnalysis.Tag.BASIC, 8),
+            Char = new Type("char", LexicalAnalysis.Tag.BASIC, 1),
+            Bool = new Type("bool", LexicalAnalysis.Tag.BASIC, 1),
+            String = new Type("string", LexicalAnalysis.Tag.CLASS, 1),
+            Void = new Type("void", LexicalAnalysis.Tag.BASIC, 0),
+            UnKnown = new Type("UnKnown", LexicalAnalysis.Tag.BASIC, 0);
 
         public readonly string type_name;
         public int width;

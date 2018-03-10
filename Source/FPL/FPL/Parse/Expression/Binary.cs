@@ -6,40 +6,40 @@ namespace FPL.Parse.Expression
 {
     public class Binary : Expr
     {
-        public LinkedListNode<Expr> position;
+        public LinkedListNode<Expr> Position;
 
         public Binary(int tag)
         {
-            this.tag = tag;
+            this.Tag = tag;
         }
 
         public void Set_position(LinkedListNode<Expr> pos)
         {
-            position = pos;
+            Position = pos;
         }
 
         public override void Build()
         {
-            left = position.Previous.Value;
-            right = position.Next.Value;
+            Left = Position.Previous.Value;
+            Right = Position.Next.Value;
             //if ((left.tag != Tag.ID || right.tag != Tag.ID)&&tag == Tag.DOT)
             //    Error(this, "表达式错误");
-            position.List.Remove(left);
-            position.List.Remove(right);
+            Position.List.Remove(Left);
+            Position.List.Remove(Right);
         }
 
         public override void Check()
         {
-            if (tag == Tag.DOT)
+            if (Tag == LexicalAnalysis.Tag.DOT)
             {
                 DotCheck();
                 return;
             }
 
-            if (left == null || right == null) Error(this, "表达式错误");
-            left.Check();
-            right.Check();
-            switch (left.type.type_name)
+            if (Left == null || Right == null) Error(this, "表达式错误");
+            Left.Check();
+            Right.Check();
+            switch (Left.Type.type_name)
             {
                 case "int":
                 case "float":
@@ -51,29 +51,29 @@ namespace FPL.Parse.Expression
                     break;
             }
 
-            if (left.type != right.type)
-                Error(this, "运算符\"+\"不能用于\"" + left.type.type_name + "\"和\"" + right.type.type_name + "\"操作数");
-            type = left.type;
+            if (Left.Type != Right.Type)
+                Error(this, "运算符\"+\"不能用于\"" + Left.Type.type_name + "\"和\"" + Right.Type.type_name + "\"操作数");
+            Type = Left.Type;
         }
 
         public void DotCheck()
         {
-            left.Check();
-            right.@class = left.@class;
-            right.Check();
-            type = right.type;
-            @class = right.@class;
+            Left.Check();
+            Right.Class = Left.Class;
+            Right.Check();
+            Type = Right.Type;
+            Class = Right.Class;
         }
 
         public override void Code()
         {
-            left.Code();
-            right.Code();
+            Left.Code();
+            Right.Code();
 
-            if (tag == Tag.DOT) return;
-            if (Parser.InsTable.ContainsKey(tag))
-                if (Parser.InsTable[tag].ContainsKey(type.type_name))
-                    Encoder.Write(Parser.InsTable[tag][type.type_name]);
+            if (Tag == LexicalAnalysis.Tag.DOT) return;
+            if (Parser.InsTable.ContainsKey(Tag))
+                if (Parser.InsTable[Tag].ContainsKey(Type.type_name))
+                    Encoder.Write(Parser.InsTable[Tag][Type.type_name]);
                 else
                     Error(this, "暂无符号重载");
             else

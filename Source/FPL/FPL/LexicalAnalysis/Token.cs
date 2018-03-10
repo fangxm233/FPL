@@ -2,15 +2,15 @@
 {
     public class Token
     {
-        public readonly string file;
-        public readonly int line;
+        public readonly string File;
+        public readonly int Line;
         public int tag;
 
         public Token(int i)
         {
             tag = i;
-            line = Lexer.line;
-            file = Lexer.now_file_name;
+            Line = Lexer.Line;
+            File = Lexer.NowFileName;
         }
 
         public override string ToString()
@@ -28,7 +28,7 @@
     {
         public readonly int value;
 
-        public Num(int i) : base(Tag.NUM)
+        public Num(int i) : base(LexicalAnalysis.Tag.NUM)
         {
             value = i;
         }
@@ -49,7 +49,7 @@
     {
         public readonly float value;
 
-        public Real(float f) : base(Tag.REAL)
+        public Real(float f) : base(LexicalAnalysis.Tag.REAL)
         {
             value = f;
         }
@@ -70,7 +70,7 @@
     {
         public readonly string value;
 
-        public Str(string s) : base(Tag.STR)
+        public Str(string s) : base(LexicalAnalysis.Tag.STR)
         {
             value = s;
         }

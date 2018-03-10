@@ -6,8 +6,8 @@ namespace FPL.Parse.Sentences.ProcessControl
 {
     internal class Continue : Sentence
     {
-        private Sentence loop;
-        private CodingUnit unit;
+        private Sentence Loop;
+        private CodingUnit Unit;
 
         public Continue(int tag) : base(tag)
         {
@@ -16,33 +16,33 @@ namespace FPL.Parse.Sentences.ProcessControl
         public override Sentence Build()
         {
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
 
         public override void Check()
         {
             if (Parser.AnalyzingLoop == null) Error(this, "没有要中断或继续的循环");
-            loop = Parser.AnalyzingLoop;
+            Loop = Parser.AnalyzingLoop;
         }
 
         public override void Code()
         {
-            unit = Encoder.Write(InstructionType.jmp);
+            Unit = Encoder.Write(InstructionType.jmp);
         }
 
         public override void CodeSecond()
         {
-            switch (loop.tag)
+            switch (Loop.tag)
             {
                 case Tag.WHILE:
-                    unit.parameter = ((While) loop).to_rel.parameter;
+                    Unit.parameter = ((While) Loop).ToRel.parameter;
                     break;
                 case Tag.FOR:
-                    unit.parameter = ((For) loop).to_rel.parameter;
+                    Unit.parameter = ((For) Loop).ToRel.parameter;
                     break;
                 case Tag.DO:
-                    unit.parameter = ((Do) loop).rel_line;
+                    Unit.parameter = ((Do) Loop).RelLine;
                     break;
             }
         }

@@ -11,33 +11,33 @@ namespace FPL.Parse.Structure
         public List<FunctionCall_s> FunctionCalls_s = new List<FunctionCall_s>();
         public List<Function> Functions = new List<Function>();
         public int ID;
-        public Function init_function;
-        public string name;
+        public Function InitFunction;
+        public string Name;
         public List<Object_s> Objects_s = new List<Object_s>();
         public List<Statement> Statement = new List<Statement>();
-        public int width;
+        public int Width;
 
         public Class(int tag) : base(tag)
         {
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.ID)
-                name = ((Word) Lexer.Peek).lexeme;
-            else Error("\"" + ((Word) Lexer.Peek).lexeme + "\"无效");
+            if (Lexer.NextToken.tag == Tag.ID)
+                Name = ((Word) Lexer.NextToken).Lexeme;
+            else Error("\"" + ((Word) Lexer.NextToken).Lexeme + "\"无效");
         }
 
         public override Sentence Build()
         {
-            AddClass(name, this);
+            AddClass(Name, this);
             NewScope();
             Parser.AnalyzingClass = this;
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
+            if (Lexer.NextToken.tag != Tag.LBRACE) Error("应输入\"{\"");
             BuildClass();
-            if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+            if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
-            if (GetFunction(name) == null) Functions.Add(new Function(FuncType.Constructor, Tag.CONSTRUCTOR, name));
-            init_function = new Function(FuncType.InitFunction, Tag.INIT_FUNCTION, ".init");
-            Functions.Add(init_function);
+            if (GetFunction(Name) == null) Functions.Add(new Function(FuncType.Constructor, Tag.CONSTRUCTOR, Name));
+            InitFunction = new Function(FuncType.InitFunction, Tag.INIT_FUNCTION, ".init");
+            Functions.Add(InitFunction);
             Parser.AnalyzingClass = null;
             return this;
         }
@@ -50,7 +50,7 @@ namespace FPL.Parse.Structure
         public Function GetFunction(string name)
         {
             foreach (Function item in Functions)
-                if (item.name == name)
+                if (item.Name == name)
                     return item;
             return null;
         }
@@ -58,7 +58,7 @@ namespace FPL.Parse.Structure
         public Statement GetStatement(string name)
         {
             foreach (Statement item in Statement)
-                if (item.name == name)
+                if (item.Name == name)
                     return item;
             return null;
         }
@@ -66,15 +66,15 @@ namespace FPL.Parse.Structure
         public Type GetTypeByLocalName(string name)
         {
             foreach (Statement item in Statement)
-                if (item.name == name)
-                    return item.assign.type;
+                if (item.Name == name)
+                    return item.Assign.Type;
             return null;
         }
 
         public Class GetClassByLocalName(string name)
         {
             foreach (Function item in Functions)
-                if (item.name == name)
+                if (item.Name == name)
                     return this;
             return GetClass(GetTypeByLocalName(name).type_name);
         }

@@ -3,45 +3,50 @@
     public class Word : Token
     {
         public static readonly Word
-            and = new Word("&&", Tag.AND),
-            or = new Word("||", Tag.OR),
-            eq = new Word("==", Tag.EQ),
-            ne = new Word("!=", Tag.NE),
-            le = new Word("<=", Tag.LE),
-            ge = new Word(">=", Tag.GE),
-            more = new Word(">", Tag.MORE),
-            less = new Word("<", Tag.LESS),
-            increase = new Word("++", Tag.INCREASE),
-            decline = new Word("--", Tag.DECLINE),
-            modulo = new Word("%", Tag.MODULO),
-            plus = new Word("+", Tag.PLUS),
-            minus = new Word("-", Tag.MINUS),
-            multiply = new Word("*", Tag.MULTIPLY),
-            divide = new Word("/", Tag.DIVIDE),
-            dot = new Word(".", Tag.DOT),
-            assign = new Word("=", Tag.ASSIGN),
-            semicolon = new Word(";", Tag.SEMICOLON),
-            Lparenthesis = new Word("(", Tag.LBRACKETS),
-            Rparenthesis = new Word(")", Tag.RBRACKETS),
+            And = new Word("&&", Tag.AND),
+            Or = new Word("||", Tag.OR),
+            Eq = new Word("==", Tag.EQ),
+            Ne = new Word("!=", Tag.NE),
+            Le = new Word("<=", Tag.LE),
+            Ge = new Word(">=", Tag.GE),
+            More = new Word(">", Tag.MORE),
+            Less = new Word("<", Tag.LESS),
+
+            Increase = new Word("++", Tag.INCREASE),
+            Decline = new Word("--", Tag.DECLINE),
+            Modulo = new Word("%", Tag.MODULO),
+
+            Plus = new Word("+", Tag.PLUS),
+            Minus = new Word("-", Tag.MINUS),
+            Multiply = new Word("*", Tag.MULTIPLY),
+            Divide = new Word("/", Tag.DIVIDE),
+            Dot = new Word(".", Tag.DOT),
+            Assign = new Word("=", Tag.ASSIGN),
+
+            Semicolon = new Word(";", Tag.SEMICOLON),
+            Comma = new Word(",", Tag.COMMA),
+
             LBrace = new Word("{", Tag.LBRACE),
             RBrace = new Word("}", Tag.RBRACE),
-            comma = new Word(",", Tag.COMMA),
+            Lparenthesis = new Word("(", Tag.LBRACKETS),
+            Rparenthesis = new Word(")", Tag.RBRACKETS),
             LSquBrackets = new Word("[", Tag.LSQUBRACKETS),
-            RSquBrackets = new Word("[", Tag.RSQUBRACKETS),
+            RSquBrackets = new Word("]", Tag.RSQUBRACKETS),
+
             True = new Word("true", Tag.TRUE),
             False = new Word("false", Tag.FALSE),
-            temp = new Word("temp", Tag.TEMP);
+            Temp = new Word("temp", Tag.TEMP);
 
-        public string lexeme = "";
+        public string Lexeme = "";
 
         public Word(string s, int i) : base(i)
         {
-            lexeme = s;
+            Lexeme = s;
         }
 
         public override string ToString()
         {
-            return lexeme;
+            return Lexeme;
         }
     }
 }

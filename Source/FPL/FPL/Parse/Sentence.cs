@@ -24,7 +24,7 @@ namespace FPL.Parse
             while (true)
             {
                 Lexer.Next();
-                switch (Lexer.Peek.tag)
+                switch (Lexer.NextToken.tag)
                 {
                     case Tag.RBRACE:
                     {
@@ -73,7 +73,7 @@ namespace FPL.Parse
                     case Tag.ID:
                     {
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        if (Lexer.NextToken.tag == Tag.LBRACKETS)
                         {
                             Lexer.Back();
                             sentences.Add(new FunctionCall_s(Tag.FUNCTIONCALL).Build());
@@ -81,7 +81,7 @@ namespace FPL.Parse
                             break;
                         }
 
-                        if (Lexer.Peek.tag == Tag.ID)
+                        if (Lexer.NextToken.tag == Tag.ID)
                         {
                             Lexer.Back();
                             sentences.Add(new Statement(VarType.Local, Tag.STATEMENT).Build());
@@ -92,11 +92,11 @@ namespace FPL.Parse
                         Lexer.AddBackup();
                         sentences.Add(new Object_s(Tag.OBJECT).Build());
                         //Parser.analyzing_class.Objects_s.Add((Object_s)sentences[sentences.Count - 1]);
-                        ((Object_s) sentences[sentences.Count - 1]).statement =
-                            GetStatement(((Object_s) sentences[sentences.Count - 1]).name, VarType.Unknown);
-                        if (Lexer.Peek.tag == Tag.SEMICOLON) break;
+                        ((Object_s) sentences[sentences.Count - 1]).Statement =
+                            GetStatement(((Object_s) sentences[sentences.Count - 1]).Name, VarType.Unknown);
+                        if (Lexer.NextToken.tag == Tag.SEMICOLON) break;
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.ASSIGN)
+                        if (Lexer.NextToken.tag == Tag.ASSIGN)
                         {
                             Lexer.Recovery();
                             Lexer.Back();
@@ -130,7 +130,7 @@ namespace FPL.Parse
         public Sentence BuildOne()
         {
             Lexer.Next();
-            switch (Lexer.Peek.tag)
+            switch (Lexer.NextToken.tag)
             {
                 case Tag.BASIC:
                 {
@@ -167,7 +167,7 @@ namespace FPL.Parse
                 case Tag.ID:
                 {
                     Lexer.Next();
-                    if (Lexer.Peek.tag == Tag.LBRACKETS)
+                    if (Lexer.NextToken.tag == Tag.LBRACKETS)
                     {
                         Lexer.Back();
                         Sentence sentence = new FunctionCall_s(Tag.FUNCTIONCALL).Build();
@@ -175,7 +175,7 @@ namespace FPL.Parse
                         return sentence;
                     }
 
-                    if (Lexer.Peek.tag == Tag.ID)
+                    if (Lexer.NextToken.tag == Tag.ID)
                     {
                         Lexer.Back();
                         return new Statement(VarType.Local, Tag.STATEMENT).Build();
@@ -185,10 +185,10 @@ namespace FPL.Parse
                         Lexer.Back();
                         Lexer.AddBackup();
                         Sentence sentence = new Object_s(Tag.OBJECT).Build();
-                        ((Object_s) sentence).statement = GetStatement(((Object_s) sentence).name, VarType.Unknown);
-                        if (Lexer.Peek.tag == Tag.SEMICOLON) return sentence;
+                        ((Object_s) sentence).Statement = GetStatement(((Object_s) sentence).Name, VarType.Unknown);
+                        if (Lexer.NextToken.tag == Tag.SEMICOLON) return sentence;
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.ASSIGN)
+                        if (Lexer.NextToken.tag == Tag.ASSIGN)
                         {
                             Lexer.Recovery();
                             Lexer.Back();
@@ -218,13 +218,13 @@ namespace FPL.Parse
             while (true)
             {
                 Lexer.Next();
-                switch (Lexer.Peek.tag)
+                switch (Lexer.NextToken.tag)
                 {
                     case Tag.BASIC:
                     {
                         Lexer.Next();
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        if (Lexer.NextToken.tag == Tag.LBRACKETS)
                         {
                             Lexer.Back();
                             Lexer.Back();
@@ -243,7 +243,7 @@ namespace FPL.Parse
                         Lexer.Next();
                         Lexer.Next();
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        if (Lexer.NextToken.tag == Tag.LBRACKETS)
                         {
                             Lexer.Back();
                             Lexer.Back();
@@ -260,17 +260,17 @@ namespace FPL.Parse
                     case Tag.ID:
                     {
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        if (Lexer.NextToken.tag == Tag.LBRACKETS)
                         {
                             Lexer.Back();
-                            if (Lexer.Peek.ToString() != Parser.AnalyzingClass.name) Error("应输入类型");
+                            if (Lexer.NextToken.ToString() != Parser.AnalyzingClass.Name) Error("应输入类型");
                             sentences.Add(new Function(FuncType.Constructor, Type.Void, Tag.CONSTRUCTOR).Build());
                             break;
                         }
 
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.LBRACKETS)
-                            if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        if (Lexer.NextToken.tag == Tag.LBRACKETS)
+                            if (Lexer.NextToken.tag == Tag.LBRACKETS)
                             {
                                 Lexer.Back();
                                 Lexer.Back();
@@ -303,7 +303,7 @@ namespace FPL.Parse
             while (true)
             {
                 Lexer.Next();
-                switch (Lexer.Peek.tag)
+                switch (Lexer.NextToken.tag)
                 {
                     case Tag.EOF:
                     {

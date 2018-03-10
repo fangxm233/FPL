@@ -7,11 +7,11 @@ namespace FPL.Parse.Sentences.Loop
 {
     public class Do : Sentence
     {
-        public int end_line;
-        private int head_line;
-        private Rel rel;
-        public int rel_line;
-        public List<Sentence> sentences;
+        public int EndLine;
+        private int HeadLine;
+        private Rel Rel;
+        public int RelLine;
+        public List<Sentence> Sentences;
 
         public Do(int tag) : base(tag)
         {
@@ -21,36 +21,36 @@ namespace FPL.Parse.Sentences.Loop
         {
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.LBRACE)
+            if (Lexer.NextToken.tag == Tag.LBRACE)
             {
-                sentences = BuildMethod();
-                if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Sentences = BuildMethod();
+                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
             }
             else
             {
                 Lexer.Back();
-                sentences = new List<Sentence>
+                Sentences = new List<Sentence>
                 {
                     BuildOne()
                 };
             }
 
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.WHILE) Error("应输入\"while\"");
+            if (Lexer.NextToken.tag != Tag.WHILE) Error("应输入\"while\"");
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            rel = new Rel().BuildStart();
-            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Rel = new Rel().BuildStart();
+            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
             DestroyScope();
             return this;
         }
 
         public override void Check()
         {
-            rel.Check();
-            foreach (Sentence item in sentences)
+            Rel.Check();
+            foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;
                 item.Check();
@@ -61,14 +61,14 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Code()
         {
-            head_line = Encoder.line + 1;
-            foreach (Sentence item in sentences) item.Code();
-            if (Encoder.line == head_line) return;
-            rel_line = Encoder.line + 1;
-            rel.Code(0);
-            CodingUnit u = Encoder.code[Encoder.code.Count - 1];
-            u.parameter = head_line;
-            end_line = u.line_num;
+            HeadLine = Encoder.Line + 1;
+            foreach (Sentence item in Sentences) item.Code();
+            if (Encoder.Line == HeadLine) return;
+            RelLine = Encoder.Line + 1;
+            Rel.Code(0);
+            CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
+            u.parameter = HeadLine;
+            EndLine = u.line_num;
         }
     }
 }

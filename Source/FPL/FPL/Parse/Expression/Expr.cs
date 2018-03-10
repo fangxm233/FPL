@@ -9,13 +9,13 @@ namespace FPL.Parse.Expression
 {
     public class Expr : Node
     {
-        public Class @class;
-        public Token content;
-        public Expr left;
-        public string name;
-        public Expr right;
-        public int tag;
-        public Type type = Type.Int;
+        public Class Class;
+        public Token Content;
+        public Expr Left;
+        public string Name;
+        public Expr Right;
+        public int Tag;
+        public Type Type = Type.Int;
 
         public virtual void Build()
         {
@@ -34,7 +34,7 @@ namespace FPL.Parse.Expression
         {
             foreach (var dictionary in Parser.SymbolPriority)
                 for (var node = start.Next; node != end.Next; node = node.Next)
-                    if (dictionary.ContainsKey(node.Value.tag))
+                    if (dictionary.ContainsKey(node.Value.Tag))
                         node.Value.Build();
         }
 
@@ -46,48 +46,48 @@ namespace FPL.Parse.Expression
             while (true)
             {
                 Lexer.Next();
-                switch (Lexer.Peek.tag)
+                switch (Lexer.NextToken.tag)
                 {
-                    case Tag.SEMICOLON:
-                    case Tag.AND:
-                    case Tag.OR:
-                    case Tag.EQ:
-                    case Tag.NE:
-                    case Tag.LE:
-                    case Tag.GE:
-                    case Tag.MORE:
-                    case Tag.LESS:
-                    case Tag.COMMA:
-                    case Tag.ASSIGN:
+                    case LexicalAnalysis.Tag.SEMICOLON:
+                    case LexicalAnalysis.Tag.AND:
+                    case LexicalAnalysis.Tag.OR:
+                    case LexicalAnalysis.Tag.EQ:
+                    case LexicalAnalysis.Tag.NE:
+                    case LexicalAnalysis.Tag.LE:
+                    case LexicalAnalysis.Tag.GE:
+                    case LexicalAnalysis.Tag.MORE:
+                    case LexicalAnalysis.Tag.LESS:
+                    case LexicalAnalysis.Tag.COMMA:
+                    case LexicalAnalysis.Tag.ASSIGN:
                         return expr;
-                    case Tag.ID:
+                    case LexicalAnalysis.Tag.ID:
                         Lexer.Next();
-                        if (Lexer.Peek.tag == Tag.LBRACKETS)
+                        if (Lexer.NextToken.tag == LexicalAnalysis.Tag.LBRACKETS)
                         {
                             Lexer.Back();
-                            expr.AddLast(new FunctionCall_e(Tag.FUNCTIONCALL));
+                            expr.AddLast(new FunctionCall_e(LexicalAnalysis.Tag.FUNCTIONCALL));
                             expr.Last.Value.Build();
                             continue;
                         }
 
                         Lexer.Back();
                         break;
-                    case Tag.NEW:
+                    case LexicalAnalysis.Tag.NEW:
                         expr.AddLast(new New_e());
                         expr.Last.Value.Build();
                         continue;
                 }
 
-                if (!Parser.TypeOfExpr.ContainsKey(Lexer.Peek.tag))
-                    Error("意外的字符" + Lexer.Peek);
-                switch (Parser.TypeOfExpr[Lexer.Peek.tag])
+                if (!Parser.TypeOfExpr.ContainsKey(Lexer.NextToken.tag))
+                    Error("意外的字符" + Lexer.NextToken);
+                switch (Parser.TypeOfExpr[Lexer.NextToken.tag])
                 {
-                    case Tag.FACTOR:
-                        Factor f = new Factor(Lexer.Peek.tag, Lexer.Peek);
+                    case LexicalAnalysis.Tag.FACTOR:
+                        Factor f = new Factor(Lexer.NextToken.tag, Lexer.NextToken);
                         expr.AddLast(f);
                         f.Set_position(expr.Last);
-                        if (Lexer.Peek.tag == Tag.LBRACKETS) Brackets.Add((Factor) expr.Last());
-                        if (Lexer.Peek.tag == Tag.RBRACKETS)
+                        if (Lexer.NextToken.tag == LexicalAnalysis.Tag.LBRACKETS) Brackets.Add((Factor) expr.Last());
+                        if (Lexer.NextToken.tag == LexicalAnalysis.Tag.RBRACKETS)
                         {
                             if (Brackets.Count == 0)
                             {
@@ -95,23 +95,23 @@ namespace FPL.Parse.Expression
                                 return expr;
                             }
 
-                            Brackets.Last().end_position = expr.Last;
+                            Brackets.Last().EndPosition = expr.Last;
                             Brackets.RemoveAt(Brackets.Count - 1);
                         }
 
                         break;
-                    case Tag.BINATY:
-                        Binary b = new Binary(Lexer.Peek.tag);
+                    case LexicalAnalysis.Tag.BINATY:
+                        Binary b = new Binary(Lexer.NextToken.tag);
                         expr.AddLast(b);
                         b.Set_position(expr.Last);
                         break;
-                    case Tag.UNARY:
-                        Unary u = new Unary(Lexer.Peek.tag);
+                    case LexicalAnalysis.Tag.UNARY:
+                        Unary u = new Unary(Lexer.NextToken.tag);
                         expr.AddLast(u);
                         u.Set_position(expr.Last);
                         break;
-                    case Tag.BOOL:
-                        Bool bo = new Bool(Lexer.Peek.tag);
+                    case LexicalAnalysis.Tag.BOOL:
+                        Bool bo = new Bool(Lexer.NextToken.tag);
                         expr.AddLast(bo);
                         bo.Set_position(expr.Last);
                         break;

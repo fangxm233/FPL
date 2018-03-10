@@ -7,10 +7,10 @@ namespace FPL.Parse.Sentences.Loop
 {
     public class While : Sentence
     {
-        public int end_line;
-        private Rel rel;
-        public List<Sentence> sentences;
-        public CodingUnit to_rel;
+        public int EndLine;
+        private Rel Rel;
+        public List<Sentence> Sentences;
+        public CodingUnit ToRel;
 
         public While(int tag) : base(tag)
         {
@@ -20,19 +20,19 @@ namespace FPL.Parse.Sentences.Loop
         {
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            rel = new Rel().BuildStart();
-            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Rel = new Rel().BuildStart();
+            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.LBRACE)
+            if (Lexer.NextToken.tag == Tag.LBRACE)
             {
-                sentences = BuildMethod();
-                if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Sentences = BuildMethod();
+                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
             }
             else
             {
                 Lexer.Back();
-                sentences = new List<Sentence>
+                Sentences = new List<Sentence>
                 {
                     BuildOne()
                 };
@@ -44,9 +44,9 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Check()
         {
-            if (rel == null) Error(this, "条件判断无效");
-            rel.Check();
-            foreach (Sentence item in sentences)
+            if (Rel == null) Error(this, "条件判断无效");
+            Rel.Check();
+            foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;
                 item.Check();
@@ -57,24 +57,24 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Code()
         {
-            to_rel = Encoder.Write(InstructionType.jmp);
-            foreach (Sentence item in sentences) item.Code();
-            if (Encoder.line == to_rel.line_num)
+            ToRel = Encoder.Write(InstructionType.jmp);
+            foreach (Sentence item in Sentences) item.Code();
+            if (Encoder.Line == ToRel.line_num)
             {
-                to_rel.Remove();
+                ToRel.Remove();
                 return;
             }
 
-            to_rel.parameter = Encoder.line + 1;
-            rel.Code(0);
-            CodingUnit u = Encoder.code[Encoder.code.Count - 1];
-            u.parameter = to_rel.line_num + 1;
-            end_line = u.line_num;
+            ToRel.parameter = Encoder.Line + 1;
+            Rel.Code(0);
+            CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
+            u.parameter = ToRel.line_num + 1;
+            EndLine = u.line_num;
         }
 
         public override void CodeSecond()
         {
-            foreach (Sentence item in sentences) item.CodeSecond();
+            foreach (Sentence item in Sentences) item.CodeSecond();
         }
     }
 }

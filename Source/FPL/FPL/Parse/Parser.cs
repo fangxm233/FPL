@@ -79,13 +79,13 @@ namespace FPL.Parse
                 //{
                 //    item1.@class = item.Value;
                 //}
-                item.Value.width = item.Value.GetWidth();
-                Type.AddType(new Type(item.Value.name, Tag.CLASS, item.Value.width));
+                item.Value.Width = item.Value.GetWidth();
+                Type.AddType(new Type(item.Value.Name, Tag.CLASS, item.Value.Width));
                 int s = 0;
                 int static_count = 0;
                 foreach (Statement item1 in item.Value.Statement)
                 {
-                    if (item1.varType == VarType.Static)
+                    if (item1.VarType == VarType.Static)
                     {
                         item1.ID = static_count++;
                         continue;
@@ -99,8 +99,8 @@ namespace FPL.Parse
                 foreach (Statement item1 in item.Value.Statement)
                 {
                     item1.Check();
-                    if (item1.assign.right != null)
-                        item.Value.init_function.AddSentence(item1);
+                    if (item1.Assign.Right != null)
+                        item.Value.InitFunction.AddSentence(item1);
                 }
 
                 AnalyzingClass = null;
@@ -113,7 +113,7 @@ namespace FPL.Parse
                 {
                     if (item1.tag == Tag.CONSTRUCTOR) continue;
                     if (item1.tag == Tag.INIT_FUNCTION) continue;
-                    item1.return_type = Type.GetType(item1.type_name);
+                    item1.ReturnType = Type.GetType(item1.TypeName);
                 }
 
                 foreach (Function item1 in item.Value.Functions) item1.Check();
@@ -130,17 +130,17 @@ namespace FPL.Parse
             foreach (var @class in Classes)
             foreach (Statement statement in @class.Value.Statement)
             {
-                if (statement.varType != VarType.Static) continue;
-                Encoder.Write(statement.assign.left.type.type_name, statement.name);
+                if (statement.VarType != VarType.Static) continue;
+                Encoder.Write(statement.Assign.Left.Type.type_name, statement.Name);
                 static_count.parameter++;
             }
 
             foreach (var item in Classes)
             {
-                ClassesUnit.Add(Encoder.Write(item.Value.name));
-                Encoder.Write(item.Value.width);
-                foreach (Statement var in item.Value.Statement) Encoder.Write(var.assign.left.type.type_name, var.name);
-                foreach (Function func in item.Value.Functions) FunctionsUnit.Add(Encoder.Write(func.name));
+                ClassesUnit.Add(Encoder.Write(item.Value.Name));
+                Encoder.Write(item.Value.Width);
+                foreach (Statement var in item.Value.Statement) Encoder.Write(var.Assign.Left.Type.type_name, var.Name);
+                foreach (Function func in item.Value.Functions) FunctionsUnit.Add(Encoder.Write(func.Name));
                 Encoder.Write(InstructionType.nop);
             }
 
@@ -150,17 +150,17 @@ namespace FPL.Parse
             foreach (var item in Classes)
             {
                 Encoder.Write(InstructionType.@class);
-                ClassesUnit[class_i++].line_num = Encoder.line;
+                ClassesUnit[class_i++].line_num = Encoder.Line;
                 foreach (Function func in item.Value.Functions)
                 {
                     Encoder.Write(InstructionType.func);
-                    if (func.name == "Main" && func.func_type == FuncType.Static)
+                    if (func.Name == "Main" && func.FuncType == FuncType.Static)
                     {
-                        entrance_line.parameter = Encoder.line + 1;
+                        entrance_line.parameter = Encoder.Line + 1;
                         Encoder.Write(InstructionType.call, func.ID);
                     }
 
-                    FunctionsUnit[func_i++].line_num = Encoder.line + 1;
+                    FunctionsUnit[func_i++].line_num = Encoder.Line + 1;
                     func.Code();
                     Encoder.Write(InstructionType.funcEnd);
                 }

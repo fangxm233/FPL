@@ -10,34 +10,34 @@ namespace FPL.LexicalAnalysis
 {
     public class Lexer
     {
-        public static Token Peek;
-        public static int line = 1;
-        public static string now_file_name;
-        private static char peek = ' ';
-        private static readonly Dictionary<string, Word> words = new Dictionary<string, Word>();
+        public static Token NextToken;
+        public static int Line = 1;
+        public static string NowFileName;
+        private static char Peek = ' ';
+        private static readonly Dictionary<string, Word> Words = new Dictionary<string, Word>();
 
-        private static readonly Dictionary<string, int> quote = new Dictionary<string, int>();
-        private static StreamReader stream_reader;
-        private static string[] files;
-        private static int now_file_id;
+        private static readonly Dictionary<string, int> Quote = new Dictionary<string, int>();
+        private static StreamReader StreamReader;
+        private static string[] Files;
+        private static int NowFileId;
 
-        private static readonly List<Token> peeks = new List<Token>();
-        private static int index;
-        private static readonly List<int> backups = new List<int>();
+        private static readonly List<Token> Peeks = new List<Token>();
+        private static int Index;
+        private static readonly List<int> Backups = new List<int>();
 
         private static void Reserve(Word w)
         {
-            words.Add(w.lexeme, w);
+            Words.Add(w.Lexeme, w);
         }
 
         public static void AddQuote(string s)
         {
-            quote.Add(s, Tag.QUOTE);
+            Quote.Add(s, Tag.QUOTE);
         }
 
         public static void Analysis(string[] args)
         {
-            files = args;
+            Files = args;
             //把各种保留字写在这
             Reserve(new Word("if", Tag.IF));
             Reserve(new Word("else", Tag.ELSE));
@@ -59,36 +59,36 @@ namespace FPL.LexicalAnalysis
             Reserve(Type.Float);
             Reserve(Type.String);
             Reserve(Type.Void);
-            foreach (string item in files)
+            foreach (string item in Files)
             {
-                stream_reader = new StreamReader(item);
-                now_file_name = item;
-                peek = ' ';
-                while (!stream_reader.EndOfStream) Scan();
-                if (peeks.Last().tag != Tag.EOF)
+                StreamReader = new StreamReader(item);
+                NowFileName = item;
+                Peek = ' ';
+                while (!StreamReader.EndOfStream) Scan();
+                if (Peeks.Last().tag != Tag.EOF)
                     Scan();
-                line = 1;
-                stream_reader.Close();
+                Line = 1;
+                StreamReader.Close();
             }
 
-            peeks.Add(new Token(Tag.EOF));
-            now_file_name = files[0];
+            Peeks.Add(new Token(Tag.EOF));
+            NowFileName = Files[0];
         }
 
         private static void Scan()
         {
             for (;; Readch()) //去掉所有空白
-                if (peek == ' ' || peek == '\t' || peek == '\n')
+                if (Peek == ' ' || Peek == '\t' || Peek == '\n')
                 {
                 }
-                else if (peek == '\r')
+                else if (Peek == '\r')
                 {
-                    line++;
-                    peeks.Add(new Token(Tag.EOL));
+                    Line++;
+                    Peeks.Add(new Token(Tag.EOL));
                 }
-                else if (peek == 65535)
+                else if (Peek == 65535)
                 {
-                    peeks.Add(new Token(Tag.EOF));
+                    Peeks.Add(new Token(Tag.EOF));
                     return;
                 }
                 else
@@ -96,176 +96,176 @@ namespace FPL.LexicalAnalysis
                     break;
                 }
 
-            if (peek == '/') //开始检测注释
+            if (Peek == '/') //开始检测注释
             {
                 Readch();
-                if (peek == '/')
+                if (Peek == '/')
                     for (;; Readch())
                     {
-                        if (peek == '\r')
+                        if (Peek == '\r')
                         {
-                            line++;
-                            peeks.Add(new Token(Tag.EOL));
+                            Line++;
+                            Peeks.Add(new Token(Tag.EOL));
                             Readch();
                             return;
                         }
 
-                        if (peek == '\uffff') //如果是文件未就返回一个文件尾
+                        if (Peek == '\uffff') //如果是文件未就返回一个文件尾
                         {
-                            peeks.Add(new Token(peek));
+                            Peeks.Add(new Token(Peek));
                             return;
                         }
                     }
 
-                if (peek == '*')
+                if (Peek == '*')
                 {
                     Readch();
                     for (;; Readch())
                     {
-                        if (peek == '\r')
+                        if (Peek == '\r')
                         {
-                            line++;
-                            peeks.Add(new Token(Tag.EOL));
+                            Line++;
+                            Peeks.Add(new Token(Tag.EOL));
                             Readch();
                         }
 
-                        if (peek == '*')
+                        if (Peek == '*')
                         {
                             Readch();
-                            if (peek == '/')
+                            if (Peek == '/')
                             {
                                 Readch();
                                 return;
                             }
                         }
 
-                        if (peek == '\uffff')
+                        if (Peek == '\uffff')
                         {
-                            peeks.Add(new Token(peek));
+                            Peeks.Add(new Token(Peek));
                             return;
                         }
                     }
                 }
 
-                peeks.Add(Word.divide);
+                Peeks.Add(Word.Divide);
                 return;
             }
 
-            switch (peek) //检测并返回各个符号以及组合符号
+            switch (Peek) //检测并返回各个符号以及组合符号
             {
                 case '&':
-                    peeks.Add(Readch('&') ? Word.and : new Token('&'));
+                    Peeks.Add(Readch('&') ? Word.And : new Token('&'));
                     return;
                 case '|':
-                    peeks.Add(Readch('|') ? Word.or : new Token('|'));
+                    Peeks.Add(Readch('|') ? Word.Or : new Token('|'));
                     return;
                 case '=':
-                    peeks.Add(Readch('=') ? Word.eq : Word.assign);
+                    Peeks.Add(Readch('=') ? Word.Eq : Word.Assign);
                     return;
                 case '!':
-                    peeks.Add(Readch('=') ? Word.ne : new Token('!'));
+                    Peeks.Add(Readch('=') ? Word.Ne : new Token('!'));
                     return;
                 case '<':
-                    peeks.Add(Readch('=') ? Word.le : Word.less);
+                    Peeks.Add(Readch('=') ? Word.Le : Word.Less);
                     return;
                 case '>':
-                    peeks.Add(Readch('=') ? Word.ge : Word.more);
+                    Peeks.Add(Readch('=') ? Word.Ge : Word.More);
                     return;
                 case '+':
-                    peeks.Add(Readch('+') ? Word.increase : Word.plus);
+                    Peeks.Add(Readch('+') ? Word.Increase : Word.Plus);
                     return;
                 case '-':
-                    peeks.Add(Readch('-') ? Word.decline : Word.minus);
+                    Peeks.Add(Readch('-') ? Word.Decline : Word.Minus);
                     return;
                 case '*':
-                    peeks.Add(Word.multiply);
+                    Peeks.Add(Word.Multiply);
                     Readch();
                     return;
                 case '/':
                     break; //除号已在前面处理过了
                 case ';':
-                    peeks.Add(Word.semicolon);
+                    Peeks.Add(Word.Semicolon);
                     Readch();
                     return;
                 case '(':
-                    peeks.Add(Word.Lparenthesis);
+                    Peeks.Add(Word.Lparenthesis);
                     Readch();
                     return;
                 case ')':
-                    peeks.Add(Word.Rparenthesis);
+                    Peeks.Add(Word.Rparenthesis);
                     Readch();
                     return;
                 case '{':
-                    peeks.Add(Word.LBrace);
+                    Peeks.Add(Word.LBrace);
                     Readch();
                     return;
                 case '}':
-                    peeks.Add(Word.RBrace);
+                    Peeks.Add(Word.RBrace);
                     Readch();
                     return;
                 case '[':
-                    peeks.Add(Word.LSquBrackets);
+                    Peeks.Add(Word.LSquBrackets);
                     Readch();
                     return;
                 case ']':
-                    peeks.Add(Word.RSquBrackets);
+                    Peeks.Add(Word.RSquBrackets);
                     Readch();
                     return;
                 case '%':
-                    peeks.Add(Word.modulo);
+                    Peeks.Add(Word.Modulo);
                     Readch();
                     return;
                 case ',':
-                    peeks.Add(Word.comma);
+                    Peeks.Add(Word.Comma);
                     Readch();
                     return;
                 case '.':
-                    peeks.Add(Word.dot);
+                    Peeks.Add(Word.Dot);
                     Readch();
                     return;
             }
 
-            if (peek == '"')
+            if (Peek == '"')
             {
                 string s = "";
                 Readch();
                 for (;; Readch())
                 {
-                    if (peek == '"')
+                    if (Peek == '"')
                     {
                         Str str = new Str(s);
                         Readch();
-                        peeks.Add(str);
+                        Peeks.Add(str);
                         return;
                     }
 
-                    if (peek == '\n')
+                    if (Peek == '\n')
                     {
                         Node.Error("应输入\"\"\"");
                         Str str = new Str(s);
                         Readch();
-                        peeks.Add(str);
+                        Peeks.Add(str);
                         return;
                     }
 
-                    s = s + peek;
+                    s = s + Peek;
                 }
             }
 
-            if (char.IsDigit(peek)) //检测数字
+            if (char.IsDigit(Peek)) //检测数字
             {
                 string n = "";
                 do
                 {
-                    n = n + peek;
+                    n = n + Peek;
                     Readch();
-                } while (char.IsDigit(peek));
+                } while (char.IsDigit(Peek));
 
-                if (peek != '.')
+                if (Peek != '.')
                 {
                     try
                     {
-                        peeks.Add(new Num(int.Parse(n)));
+                        Peeks.Add(new Num(int.Parse(n)));
                     }
                     catch (Exception)
                     {
@@ -276,17 +276,17 @@ namespace FPL.LexicalAnalysis
                 }
 
                 string f = n;
-                f = f + peek;
+                f = f + Peek;
                 for (;;)
                 {
                     Readch();
-                    if (!char.IsDigit(peek)) break;
-                    f = f + peek;
+                    if (!char.IsDigit(Peek)) break;
+                    f = f + Peek;
                 }
 
                 try
                 {
-                    peeks.Add(new Real(float.Parse(f)));
+                    Peeks.Add(new Real(float.Parse(f)));
                 }
                 catch (Exception)
                 {
@@ -296,48 +296,48 @@ namespace FPL.LexicalAnalysis
                 return;
             }
 
-            if (char.IsLetter(peek) || peek == '_') //检测标识符
+            if (char.IsLetter(Peek) || Peek == '_') //检测标识符
             {
                 StringBuilder b = new StringBuilder();
                 do
                 {
-                    b.Append(peek);
+                    b.Append(Peek);
                     Readch();
-                } while (char.IsLetterOrDigit(peek) || peek == '_');
+                } while (char.IsLetterOrDigit(Peek) || Peek == '_');
 
                 string s = b.ToString();
                 Word w = null;
-                if (words.ContainsKey(s))
-                    w = words[s];
+                if (Words.ContainsKey(s))
+                    w = Words[s];
                 if (w != null)
                 {
-                    peeks.Add(w);
+                    Peeks.Add(w);
                     return;
                 }
 
                 w = new Word(s, Tag.ID);
-                words.Add(s, w);
-                peeks.Add(w);
+                Words.Add(s, w);
+                Peeks.Add(w);
                 return;
             }
 
-            Node.Error("意外的字符" + "\"" + peek + "\"");
+            Node.Error("意外的字符" + "\"" + Peek + "\"");
         }
 
         public static void AddBackup()
         {
-            backups.Add(index);
+            Backups.Add(Index);
         }
 
         public static void ThrowBackup()
         {
-            backups.RemoveAt(backups.Count - 1);
+            Backups.RemoveAt(Backups.Count - 1);
         }
 
         public static void Recovery()
         {
-            index = backups[backups.Count - 1];
-            index--;
+            Index = Backups[Backups.Count - 1];
+            Index--;
             Next();
             ThrowBackup();
         }
@@ -346,21 +346,21 @@ namespace FPL.LexicalAnalysis
         {
             while (true)
             {
-                Peek = peeks[index++];
-                switch (Peek.tag)
+                NextToken = Peeks[Index++];
+                switch (NextToken.tag)
                 {
                     case Tag.EOL:
-                        line++;
+                        Line++;
                         continue;
                     case Tag.ID:
-                        if (quote.ContainsKey(Peek.ToString())) Peek.tag = Tag.QUOTE;
+                        if (Quote.ContainsKey(NextToken.ToString())) NextToken.tag = Tag.QUOTE;
                         break;
                     case Tag.EOF:
-                        if (now_file_id == files.Length - 1)
+                        if (NowFileId == Files.Length - 1)
                             return;
                         else
-                            line = 1;
-                        now_file_name = files[++now_file_id];
+                            Line = 1;
+                        NowFileName = Files[++NowFileId];
                         continue;
                 }
 
@@ -372,11 +372,11 @@ namespace FPL.LexicalAnalysis
         {
             while (true)
             {
-                index -= 2;
-                Peek = peeks[index++];
-                if (Peek.tag == Tag.EOL)
+                Index -= 2;
+                NextToken = Peeks[Index++];
+                if (NextToken.tag == Tag.EOL)
                 {
-                    line--;
+                    Line--;
                     continue;
                 }
 
@@ -386,14 +386,14 @@ namespace FPL.LexicalAnalysis
 
         private static void Readch()
         {
-            peek = (char) stream_reader.Read();
+            Peek = (char) StreamReader.Read();
         }
 
         private static bool Readch(char c)
         {
             Readch();
-            if (peek != c) return false;
-            peek = ' ';
+            if (Peek != c) return false;
+            Peek = ' ';
             return true;
         }
     }

@@ -6,16 +6,16 @@ namespace FPL.Parse.Sentences
 {
     public class Statement : Sentence
     {
-        public Assign assign;
-        public Class @class;
+        public Assign Assign;
+        public Class Class;
         public int ID;
-        public string name;
-        private string type_name;
-        public VarType varType;
+        public string Name;
+        private string TypeName;
+        public VarType VarType;
 
         public Statement(VarType varType, int tag) : base(tag)
         {
-            this.varType = varType;
+            this.VarType = varType;
         }
 
         public override Sentence Build()
@@ -58,32 +58,32 @@ namespace FPL.Parse.Sentences
             //        }
             //}
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.ID) Error("应输入标识符");
-            name = Lexer.Peek.ToString();
-            AddVar(this, varType);
+            if (Lexer.NextToken.tag != Tag.ID) Error("应输入标识符");
+            Name = Lexer.NextToken.ToString();
+            AddVar(this, VarType);
             Lexer.Back();
-            @class = Parser.AnalyzingClass;
-            type_name = ((Word) Lexer.Peek).lexeme;
-            assign = (Assign) new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build();
+            Class = Parser.AnalyzingClass;
+            TypeName = ((Word) Lexer.NextToken).Lexeme;
+            Assign = (Assign) new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build();
             if (Parser.AnalyzingFunction != null)
                 Parser.AnalyzingFunction.Statements.Add(this);
             else
-                @class.Statement.Add(this);
-            if (Lexer.Peek.tag == Tag.COMMA) return this;
-            if (Lexer.Peek.tag == Tag.RBRACKETS) return this;
-            if (Lexer.Peek.tag != Tag.SEMICOLON) Error("应输入\";\"");
+                Class.Statement.Add(this);
+            if (Lexer.NextToken.tag == Tag.COMMA) return this;
+            if (Lexer.NextToken.tag == Tag.RBRACKETS) return this;
+            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
             return this;
         }
 
         public override void Check()
         {
-            assign.TypeName = type_name;
-            assign.Check();
+            Assign.TypeName = TypeName;
+            Assign.Check();
         }
 
         public override void Code()
         {
-            assign.Code();
+            Assign.Code();
         }
     }
 }

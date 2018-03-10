@@ -9,76 +9,76 @@ namespace FPL.Parse.Structure
 {
     public class Function : Sentence
     {
-        public Class @class;
-        public FuncType func_type;
-        public int head_line;
+        public Class Class;
+        public FuncType FuncType;
+        public int HeadLine;
         public int ID;
-        public string name;
+        public string Name;
         public List<Object_s> objects_s = new List<Object_s>();
-        public List<Statement> par_statements = new List<Statement>();
-        public Type return_type;
+        public List<Statement> ParStatements = new List<Statement>();
+        public Type ReturnType;
         private List<Sentence> Sentences = new List<Sentence>();
         public List<Statement> Statements = new List<Statement>();
-        public string type_name;
+        public string TypeName;
 
         public Function(FuncType type, int tag) : base(tag)
         {
-            func_type = type;
-            type_name = ((Word) Lexer.Peek).lexeme;
+            FuncType = type;
+            TypeName = ((Word) Lexer.NextToken).Lexeme;
             //return_type = (symbols.Type)Lexer.Peek;
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.ID)
-                name = ((Word) Lexer.Peek).lexeme;
-            else Error("\"" + ((Word) Lexer.Peek).lexeme + "\"无效");
+            if (Lexer.NextToken.tag == Tag.ID)
+                Name = ((Word) Lexer.NextToken).Lexeme;
+            else Error("\"" + ((Word) Lexer.NextToken).Lexeme + "\"无效");
         }
 
         public Function(FuncType type, int tag, string name) : base(tag)
         {
-            func_type = type;
-            this.name = name;
+            FuncType = type;
+            this.Name = name;
         }
 
         public Function(FuncType type, Type return_type, int tag) : base(tag)
         {
-            func_type = type;
-            this.return_type = return_type;
-            if (Lexer.Peek.tag == Tag.ID)
-                name = ((Word) Lexer.Peek).lexeme;
-            else Error("\"" + ((Word) Lexer.Peek).lexeme + "\"无效");
+            FuncType = type;
+            this.ReturnType = return_type;
+            if (Lexer.NextToken.tag == Tag.ID)
+                Name = ((Word) Lexer.NextToken).Lexeme;
+            else Error("\"" + ((Word) Lexer.NextToken).Lexeme + "\"无效");
         }
 
         public Function(FuncType type, Type return_type, string name, int tag) : base(tag)
         {
-            func_type = type;
-            @class = GetClass(name);
-            this.return_type = return_type;
-            this.name = name;
+            FuncType = type;
+            Class = GetClass(name);
+            this.ReturnType = return_type;
+            this.Name = name;
         }
 
         public override Sentence Build()
         {
-            @class = Parser.AnalyzingClass;
-            Parser.AnalyzingClass.AddFunction(name, this);
+            Class = Parser.AnalyzingClass;
+            Parser.AnalyzingClass.AddFunction(Name, this);
             NewScope();
             Parser.AnalyzingFunction = this;
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             Lexer.Next();
             while (true)
             {
-                if (Lexer.Peek.tag == Tag.RBRACKETS) break;
-                par_statements.Add((Statement) new Statement(VarType.Arg, Tag.STATEMENT).Build());
-                if (Lexer.Peek.tag == Tag.COMMA)
+                if (Lexer.NextToken.tag == Tag.RBRACKETS) break;
+                ParStatements.Add((Statement) new Statement(VarType.Arg, Tag.STATEMENT).Build());
+                if (Lexer.NextToken.tag == Tag.COMMA)
                     Lexer.Next();
                 else
                     break;
             }
 
-            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACE) Error("应输入\"{\"");
+            if (Lexer.NextToken.tag != Tag.LBRACE) Error("应输入\"{\"");
             Sentences = BuildMethod();
-            if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+            if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
             DestroyScope();
             Parser.AnalyzingFunction = null;
             return this;
@@ -89,32 +89,32 @@ namespace FPL.Parse.Structure
             if (tag == Tag.INIT_FUNCTION) return;
             if (tag == Tag.CONSTRUCTOR && Sentences.Count == 0)
             {
-                return_type = Type.Void;
-                AddSentence(new Return(Tag.RETURN, name));
+                ReturnType = Type.Void;
+                AddSentence(new Return(Tag.RETURN, Name));
                 return;
             }
 
             Parser.AnalyzingFunction = this;
             if (Sentences.Count == 0)
-                if (return_type != Type.Void)
+                if (ReturnType != Type.Void)
                 {
                     Error(this, "不是所有路径都有返回值");
                 }
                 else
                 {
-                    Sentences.Add(new Return(Tag.RETURN, name));
-                    ((Return) Sentences[Sentences.Count - 1]).@class = @class;
+                    Sentences.Add(new Return(Tag.RETURN, Name));
+                    ((Return) Sentences[Sentences.Count - 1]).Class = Class;
                 }
 
             if (Sentences[Sentences.Count - 1].tag != Tag.RETURN) //检查函数返回
             {
-                if (return_type != Type.Void) Error(this, "不是所有路径都有返回值");
-                Sentences.Add(new Return(Tag.RETURN, name));
-                ((Return) Sentences[Sentences.Count - 1]).@class = @class;
+                if (ReturnType != Type.Void) Error(this, "不是所有路径都有返回值");
+                Sentences.Add(new Return(Tag.RETURN, Name));
+                ((Return) Sentences[Sentences.Count - 1]).Class = Class;
             }
 
-            if (par_statements.Count != 0 && name == "Main") Error(this, "入口函数不允许有参数");
-            foreach (Statement item in par_statements) item.Check();
+            if (ParStatements.Count != 0 && Name == "Main") Error(this, "入口函数不允许有参数");
+            foreach (Statement item in ParStatements) item.Check();
             foreach (Sentence item in Sentences) item.Check();
             Parser.AnalyzingFunction = null;
         }
@@ -123,15 +123,15 @@ namespace FPL.Parse.Structure
         {
             if (tag == Tag.INIT_FUNCTION)
             {
-                return_type = Type.Void;
-                AddSentence(new Return(Tag.RETURN, name));
+                ReturnType = Type.Void;
+                AddSentence(new Return(Tag.RETURN, Name));
             }
 
-            head_line = Encoder.line + 1;
-            foreach (Object_s item in objects_s) item.is_head = false;
-            for (int i = 1; i < par_statements.Count + 1; i++) par_statements[i - 1].ID = i;
-            for (int i = par_statements.Count + 2; i < Statements.Count; i++) Statements[i].ID = i;
-            for (int i = 0; i < Statements.Count - par_statements.Count; i++) Encoder.Write(InstructionType.pushval);
+            HeadLine = Encoder.Line + 1;
+            foreach (Object_s item in objects_s) item.IsHead = false;
+            for (int i = 1; i < ParStatements.Count + 1; i++) ParStatements[i - 1].ID = i;
+            for (int i = ParStatements.Count + 2; i < Statements.Count; i++) Statements[i].ID = i;
+            for (int i = 0; i < Statements.Count - ParStatements.Count; i++) Encoder.Write(InstructionType.pushval);
             foreach (Sentence item in Sentences)
             {
                 if (item.tag == Tag.RETURN && tag == Tag.INIT_FUNCTION || tag == Tag.CONSTRUCTOR)
@@ -154,7 +154,7 @@ namespace FPL.Parse.Structure
         public Statement GetStatement(string name)
         {
             foreach (Statement item in Statements)
-                if (item.name == name)
+                if (item.Name == name)
                     return item;
             return null;
         }
@@ -162,8 +162,8 @@ namespace FPL.Parse.Structure
         public Type GetTypeByLocalName(string name)
         {
             foreach (Statement item in Statements)
-                if (item.name == name)
-                    return item.assign.type;
+                if (item.Name == name)
+                    return item.Assign.Type;
             return null;
         }
 

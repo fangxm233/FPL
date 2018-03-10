@@ -7,63 +7,63 @@ namespace FPL.Parse.Expression
 {
     public class Factor : Expr
     {
-        public LinkedListNode<Expr> end_position;
+        public LinkedListNode<Expr> EndPosition;
         public int ID;
-        public bool is_head;
-        public LinkedListNode<Expr> position;
-        public bool should_destory = true;
+        public bool IsHead;
+        public LinkedListNode<Expr> Position;
+        public bool ShouldDestory = true;
 
-        public Statement statement;
-        public VarType varType;
+        public Statement Statement;
+        public VarType VarType;
 
         public Factor(int tag, Token c)
         {
-            this.tag = tag;
-            content = c;
-            if (tag == Tag.ID) name = content.ToString();
+            this.Tag = tag;
+            Content = c;
+            if (tag == LexicalAnalysis.Tag.ID) Name = Content.ToString();
         }
 
         public void Set_position(LinkedListNode<Expr> pos)
         {
-            position = pos;
+            Position = pos;
         }
 
         public override void Build()
         {
-            if (tag == Tag.LBRACKETS)
+            if (Tag == LexicalAnalysis.Tag.LBRACKETS)
             {
-                if (position.Previous != null && position.Previous.Value.tag == Tag.ID) should_destory = false;
-                BuildTree(position, end_position);
-                if (should_destory)
+                if (Position.Previous != null && Position.Previous.Value.Tag == LexicalAnalysis.Tag.ID) ShouldDestory = false;
+                BuildTree(Position, EndPosition);
+                if (ShouldDestory)
                 {
-                    position.List.Remove(end_position);
-                    position.List.Remove(position);
+                    Position.List.Remove(EndPosition);
+                    Position.List.Remove(Position);
                 }
             }
         }
 
         public override void Check()
         {
-            if (tag != Tag.ID) return;
+            if (Tag != LexicalAnalysis.Tag.ID) return;
             //@class == null意味着是这一串对象中是第一个
             //获取class和statement
-            if (@class == null)
+            if (Class == null)
             {
-                @class = Parser.AnalyzingClass;
-                statement = @class.GetStatement(name);
+                Class = Parser.AnalyzingClass;
+                Statement = Class.GetStatement(Name);
                 if (Parser.AnalyzingFunction != null)
                 {
-                    statement = Parser.AnalyzingFunction.GetStatement(name);
-                    type = Parser.AnalyzingFunction.GetTypeByLocalName(name);
-                    if (statement == null)
+                    Statement = Parser.AnalyzingFunction.GetStatement(Name);
+                    Type = Parser.AnalyzingFunction.GetTypeByLocalName(Name);
+                    if (Statement == null)
                     {
-                        is_head = true;
-                        statement = @class.GetStatement(name);
-                        type = @class.GetTypeByLocalName(name);
-                        if (statement == null)
+                        IsHead = true;
+                        Statement = Class.GetStatement(Name);
+                        Type = Class.GetTypeByLocalName(Name);
+                        if (Statement == null)
                         {
-                            @class = GetClass(name);
-                            varType = VarType.Class;
+                            Class = GetClass(Name);
+                            VarType = VarType.Class;
                             return;
                         }
                     }
@@ -71,39 +71,39 @@ namespace FPL.Parse.Expression
             }
             else
             {
-                statement = @class.GetStatement(name);
+                Statement = Class.GetStatement(Name);
             }
 
-            varType = statement.varType;
-            if (type == null) Error(this, "类型\"" + @class.name + "\"中未包含\"" + name + "\"的定义");
+            VarType = Statement.VarType;
+            if (Type == null) Error(this, "类型\"" + Class.Name + "\"中未包含\"" + Name + "\"的定义");
         }
 
         public override void Code()
         {
-            if (tag == Tag.NUM) Encoder.Write(InstructionType.pushval, (int) content.GetValue());
-            if (tag == Tag.ID) ObjectCode();
+            if (Tag == LexicalAnalysis.Tag.NUM) Encoder.Write(InstructionType.pushval, (int) Content.GetValue());
+            if (Tag == LexicalAnalysis.Tag.ID) ObjectCode();
         }
 
         public void ObjectCode()
         {
-            if (varType == VarType.Class) return;
-            ID = statement.ID;
-            if (varType == VarType.Static)
+            if (VarType == VarType.Class) return;
+            ID = Statement.ID;
+            if (VarType == VarType.Static)
             {
                 Encoder.Write(InstructionType.pushsta, ID);
                 return;
             }
 
-            if (is_head && varType == VarType.Field)
+            if (IsHead && VarType == VarType.Field)
             {
-                if (Parser.AnalyzingFunction.func_type == FuncType.Static)
-                    Error(this, "对象引用对于非静态的字段、方法或属性\"" + name + "\"是必须的");
+                if (Parser.AnalyzingFunction.FuncType == FuncType.Static)
+                    Error(this, "对象引用对于非静态的字段、方法或属性\"" + Name + "\"是必须的");
                 Encoder.Write(InstructionType.pusharg); //this
                 Encoder.Write(InstructionType.pushfield, ID);
                 return;
             }
 
-            switch (varType)
+            switch (VarType)
             {
                 case VarType.Arg:
                     Encoder.Write(InstructionType.pusharg, ID);

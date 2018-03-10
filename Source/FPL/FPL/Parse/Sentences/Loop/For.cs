@@ -7,12 +7,12 @@ namespace FPL.Parse.Sentences.Loop
 {
     public class For : Sentence
     {
-        private Sentence assign;
-        public int end_line;
-        private Rel rel;
-        public List<Sentence> sentences;
-        private Statement statement;
-        public CodingUnit to_rel;
+        private Sentence Assign;
+        public int EndLine;
+        private Rel Rel;
+        public List<Sentence> Sentences;
+        private Statement Statement;
+        public CodingUnit ToRel;
 
         public For(int tag) : base(tag)
         {
@@ -22,25 +22,25 @@ namespace FPL.Parse.Sentences.Loop
         {
             NewScope();
             Lexer.Next();
-            if (Lexer.Peek.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
             Lexer.Next();
-            statement = new Statement(VarType.Local, Tag.STATEMENT);
-            statement.Build();
-            rel = new Rel();
-            rel = rel.BuildStart();
-            assign = new Assign(new Expr().BuildStart(), Tag.ASSIGN);
-            assign = assign.Build();
-            if (Lexer.Peek.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            Statement = new Statement(VarType.Local, Tag.STATEMENT);
+            Statement.Build();
+            Rel = new Rel();
+            Rel = Rel.BuildStart();
+            Assign = new Assign(new Expr().BuildStart(), Tag.ASSIGN);
+            Assign = Assign.Build();
+            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
             Lexer.Next();
-            if (Lexer.Peek.tag == Tag.LBRACE)
+            if (Lexer.NextToken.tag == Tag.LBRACE)
             {
-                sentences = BuildMethod();
-                if (Lexer.Peek.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Sentences = BuildMethod();
+                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
             }
             else
             {
                 Lexer.Back();
-                sentences = new List<Sentence>
+                Sentences = new List<Sentence>
                 {
                     BuildOne()
                 };
@@ -52,12 +52,12 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Check()
         {
-            statement.Check();
-            if (rel != null)
-                rel.Check();
-            if (assign != null)
-                assign.Check();
-            foreach (Sentence item in sentences)
+            Statement.Check();
+            if (Rel != null)
+                Rel.Check();
+            if (Assign != null)
+                Assign.Check();
+            foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;
                 item.Check();
@@ -68,24 +68,24 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Code()
         {
-            statement.Code();
-            to_rel = Encoder.Write(InstructionType.jmp);
-            foreach (Sentence item in sentences) item.Code();
-            if (assign != null)
-                assign.Code();
-            to_rel.parameter = Encoder.line + 1;
-            if (rel != null)
-                rel.Code(0);
+            Statement.Code();
+            ToRel = Encoder.Write(InstructionType.jmp);
+            foreach (Sentence item in Sentences) item.Code();
+            if (Assign != null)
+                Assign.Code();
+            ToRel.parameter = Encoder.Line + 1;
+            if (Rel != null)
+                Rel.Code(0);
             else
                 Encoder.Write(InstructionType.jmp);
-            CodingUnit u = Encoder.code[Encoder.code.Count - 1];
-            u.parameter = to_rel.line_num + 1;
-            end_line = u.line_num;
+            CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
+            u.parameter = ToRel.line_num + 1;
+            EndLine = u.line_num;
         }
 
         public override void CodeSecond()
         {
-            foreach (Sentence item in sentences) item.CodeSecond();
+            foreach (Sentence item in Sentences) item.CodeSecond();
         }
     }
 }
