@@ -36,8 +36,12 @@ namespace FPL.Parse.Expression
 
         public override void Check()
         {
+            Type = symbols.Type.Bool;
             Left.Check();
             Right.Check();
+            if ((Left.Type.type_name != symbols.Type.Bool.type_name ||
+                 Right.Type.type_name != symbols.Type.Bool.type_name) &&
+                (tag == Tag.OR || tag == Tag.AND)) Error(LogContent.ExprError);
             if (Left.Type.type_name != Right.Type.type_name) Error(LogContent.NoOverload);
         }
 

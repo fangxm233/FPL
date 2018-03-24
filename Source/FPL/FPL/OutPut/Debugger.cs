@@ -37,6 +37,8 @@ namespace FPL.OutPut
             "该类型不存在 {0} 个参数的构造函数",
             "没有要中断或继续的循环",
             "只有赋值，函数调用和new 对象表达式可用作语句",
+            "需要一个类型可转换为 {0} 的对象",
+
         };
 
         public static void LogError(string s, LogContent content, params object[] parm)
@@ -229,5 +231,10 @@ namespace FPL.OutPut
         /// 只有赋值，函数调用和new 对象表达式可用作语句
         /// </summary>
         NotSentence,
+
+        /// <summary>
+        /// 需要一个类型可转换为 {0} 的对象
+        /// </summary>
+        ReturnValueMissing,
     }
 }

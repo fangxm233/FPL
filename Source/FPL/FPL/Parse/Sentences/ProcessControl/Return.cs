@@ -12,6 +12,7 @@ namespace FPL.Parse.Sentences.ProcessControl
         public Expr Expr;
         private Function Function;
         private readonly string FunctionName;
+        private Type RetrunType;
 
         public Return(int tag) : base(tag)
         {
@@ -34,11 +35,16 @@ namespace FPL.Parse.Sentences.ProcessControl
         public override void Check()
         {
             Function = Class.GetFunction(FunctionName);
-            if (Expr == null) return;
+            RetrunType = Function.ReturnType;
+            if (Expr == null)
+            {
+                if (RetrunType != Type.Void) Error(LogContent.ReturnValueMissing, RetrunType);
+                return;
+            }
             Expr.Check();
-            if (Expr.Type != Class.GetFunction(FunctionName).ReturnType)
+            if (Expr.Type != RetrunType)
                 Error(LogContent.UnableToConvertType, Expr.Type,
-                    Class.GetFunction(FunctionName).ReturnType);
+                    RetrunType);
         }
 
         public override void Code()
@@ -49,7 +55,7 @@ namespace FPL.Parse.Sentences.ProcessControl
                 return;
             }
 
-            if (Class.GetFunction(FunctionName).ReturnType != Type.Void)
+            if (RetrunType != Type.Void)
             {
                 Expr.Code();
                 Encoder.Write(InstructionType.popEAX);
