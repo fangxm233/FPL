@@ -1,18 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPL", "FPL\FPL.csproj", "{5553224E-23AA-4256-B0A5-6BBE9DF0624D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPL_Interpreter", "FPL_Interpreter\FPL_Interpreter.csproj", "{99A26FE0-1138-4EDC-B5E5-48743A27485B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FPL_Interpreter c++", "FPL_Interpreter c++\FPL_Interpreter c++.vcxproj", "{2C43B997-1627-4E8C-A442-2E953A77E6A4}"
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -34,18 +29,6 @@ Global
 		{5553224E-23AA-4256-B0A5-6BBE9DF0624D}.Release|x64.Build.0 = Release|Any CPU
 		{5553224E-23AA-4256-B0A5-6BBE9DF0624D}.Release|x86.ActiveCfg = Release|Any CPU
 		{5553224E-23AA-4256-B0A5-6BBE9DF0624D}.Release|x86.Build.0 = Release|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Debug|x64.Build.0 = Debug|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Debug|x86.Build.0 = Debug|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Release|x64.ActiveCfg = Release|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Release|x64.Build.0 = Release|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Release|x86.ActiveCfg = Release|Any CPU
-		{99A26FE0-1138-4EDC-B5E5-48743A27485B}.Release|x86.Build.0 = Release|Any CPU
 		{2C43B997-1627-4E8C-A442-2E953A77E6A4}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{2C43B997-1627-4E8C-A442-2E953A77E6A4}.Debug|Any CPU.Build.0 = Debug|Win32
 		{2C43B997-1627-4E8C-A442-2E953A77E6A4}.Debug|x64.ActiveCfg = Debug|x64
@@ -64,6 +47,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D0FB3F59-F571-4505-8DF2-BC949A95D40F}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

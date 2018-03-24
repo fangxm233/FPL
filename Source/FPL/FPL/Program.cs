@@ -30,8 +30,8 @@ namespace FPL
 
             if (Compile(args))
             {
-                //Console.WriteLine("启动解释器");
-                //Process.Start("FPL_Interpreter c++.exe");
+                Console.WriteLine("启动解释器");
+                Process.Start("FPL_Interpreter c++.exe");
             }
 
             Console.ReadKey();

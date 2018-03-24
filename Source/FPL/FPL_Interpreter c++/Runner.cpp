@@ -217,65 +217,37 @@ start:;
 		code_ptr++;
 		EBP = i + (*stack_ptr--) / 4;
 		goto start;
-	case InstructionType::eqt:
-		if (*(stack_ptr - 1) == *stack_ptr)
-		{
-			code_ptr = code_ptr_start + *parameter_ptr - 1;
-			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			stack_ptr -= 2;
-			goto start;
-		}
+	case InstructionType::eq:
+		*++stack_ptr = *(stack_ptr - 1) == *stack_ptr ? 1 : 0;
 		stack_ptr -= 2;
 		break;
-	case InstructionType::eqf:
-		if (*(stack_ptr - 1) != *stack_ptr)
-		{
-			code_ptr = code_ptr_start + *parameter_ptr - 1;
-			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			stack_ptr -= 2;
-			goto start;
-		}
+	case InstructionType::le:
+		*++stack_ptr = *(stack_ptr - 1) < *stack_ptr ? 1 : 0;
 		stack_ptr -= 2;
 		break;
-	case InstructionType::let:
-		if (*(stack_ptr - 1) < *stack_ptr)
-		{
-			code_ptr = code_ptr_start + *parameter_ptr - 1;
-			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			stack_ptr -= 2;
-			goto start;
-		}
+	case InstructionType::mo:
+		*++stack_ptr = *(stack_ptr - 1) > *stack_ptr ? 1 : 0;
 		stack_ptr -= 2;
 		break;
-	case InstructionType::lef:
-		if (*(stack_ptr - 1) >= *stack_ptr)
+	case InstructionType::jt:
+		if (*stack_ptr == 1)
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			stack_ptr -= 2;
+			stack_ptr--;
 			goto start;
 		}
-		stack_ptr -= 2;
+		stack_ptr--;
 		break;
-	case InstructionType::mot:
-		if (*(stack_ptr - 1) > *stack_ptr)
+	case InstructionType::jf:
+		if (*stack_ptr == 0)
 		{
 			code_ptr = code_ptr_start + *parameter_ptr - 1;
 			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			stack_ptr -= 2;
+			stack_ptr--;
 			goto start;
 		}
-		stack_ptr -= 2;
-		break;
-	case InstructionType::mof:
-		if (*(stack_ptr - 1) <= *stack_ptr)
-		{
-			code_ptr = code_ptr_start + *parameter_ptr - 1;
-			parameter_ptr = parameter_ptr_start + *parameter_ptr - 1;
-			stack_ptr -= 2;
-			goto start;
-		}
-		stack_ptr -= 2;
+		stack_ptr--;
 		break;
 	case InstructionType::newobjc:
 		*heap_ptr = *parameter_ptr;

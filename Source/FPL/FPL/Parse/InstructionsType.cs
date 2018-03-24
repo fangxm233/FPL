@@ -10,6 +10,7 @@
         pushEAX,
 
         pop,
+        popEAX,
 
         storeloc,
         storearg,
