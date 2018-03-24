@@ -9,7 +9,6 @@
         pushsta,
         pushEAX,
 
-        popEAX,
         pop,
 
         storeloc,

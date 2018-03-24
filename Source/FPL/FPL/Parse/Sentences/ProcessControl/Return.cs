@@ -55,11 +55,9 @@ namespace FPL.Parse.Sentences.ProcessControl
                 return;
             }
 
-            if (RetrunType != Type.Void)
-            {
+            if (Expr != null)
                 Expr.Code();
-                Encoder.Write(InstructionType.popEAX);
-            }
+            else Encoder.Write(InstructionType.pushval);
 
             for (int i = 0; i < Function.Statements.Count; i++) Encoder.Write(InstructionType.pop);
             Encoder.Write(InstructionType.ret);

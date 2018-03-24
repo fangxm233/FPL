@@ -15,7 +15,7 @@
 
 	static int pp(int a, int ssss)
 	{
-		return ;
+		return 0;
 	}
 }
 

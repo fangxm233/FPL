@@ -92,11 +92,11 @@ namespace FPL.Encoding
             {
                 if (Code[i].ins_type == InstructionType.endF)
                 {
-                    StreamWriter.Write(/*(int)*/ Code[i].ins_type + " " + Code[i].parameter);
+                    StreamWriter.Write((int)Code[i].ins_type + " " + Code[i].parameter);
                     continue;
                 }
 
-                StreamWriter.WriteLine(/*(int)*/ Code[i].ins_type + " " + Code[i].parameter);
+                StreamWriter.WriteLine((int)Code[i].ins_type + " " + Code[i].parameter);
             }
 
             StreamWriter.Flush();

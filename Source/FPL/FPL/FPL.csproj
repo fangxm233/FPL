@@ -56,7 +56,7 @@
     <Compile Include="Parse\Expression\Unary.cs" />
     <Compile Include="Parse\Sentences\Loop\For.cs" />
     <Compile Include="Parse\Structure\Function.cs" />
-    <Compile Include="Parse\Sentences\FunctionCall.cs" />
+    <Compile Include="Parse\Sentences\ProcessControl\FunctionCall.cs" />
     <Compile Include="Parse\Sentences\ProcessControl\If.cs" />
     <Compile Include="Parse\InstructionsType.cs" />
     <Compile Include="Parse\Sentences\New.cs" />

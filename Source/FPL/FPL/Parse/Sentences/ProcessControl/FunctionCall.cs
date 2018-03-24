@@ -6,7 +6,7 @@ using FPL.Parse.Expression;
 using FPL.Parse.Structure;
 using FPL.symbols;
 
-namespace FPL.Parse.Sentences
+namespace FPL.Parse.Sentences.ProcessControl
 {
     public class FunctionCall_s : Sentence
     {
