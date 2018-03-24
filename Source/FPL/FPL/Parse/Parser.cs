@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Sentences;
 using FPL.Parse.Structure;
 using Type = FPL.symbols.Type;
@@ -169,7 +170,7 @@ namespace FPL.Parse
             }
 
             Encoder.Write(InstructionType.endF);
-            if (entrance_line.parameter == -1) Node.Error("未找到程序入口点");
+            if (entrance_line.parameter == -1) Node.Error(LogContent.NoEntranceMethod);
         }
 
         public void CodeSecond()

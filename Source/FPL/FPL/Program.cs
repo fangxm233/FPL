@@ -19,7 +19,6 @@ namespace FPL
          * 函数
          */
         //TODO:把bool表达式整合进expr
-        //TODO:更改报错文本位置，使用单独的类
         private static void Main(string[] args)
         {
             if (args.Length == 0)

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Sentences;
 using FPL.Parse.Sentences.ProcessControl;
 using FPL.symbols;
@@ -24,35 +25,34 @@ namespace FPL.Parse.Structure
         public Function(FuncType type, int tag) : base(tag)
         {
             FuncType = type;
-            TypeName = ((Word) Lexer.NextToken).Lexeme;
-            //return_type = (symbols.Type)Lexer.Peek;
+            TypeName = Lexer.NextToken.ToString();
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.ID)
-                Name = ((Word) Lexer.NextToken).Lexeme;
-            else Error("\"" + ((Word) Lexer.NextToken).Lexeme + "\"无效");
+                Name = Lexer.NextToken.ToString();
+            else Error(LogContent.SthUseless, Lexer.NextToken);
         }
 
         public Function(FuncType type, int tag, string name) : base(tag)
         {
             FuncType = type;
-            this.Name = name;
+            Name = name;
         }
 
         public Function(FuncType type, Type return_type, int tag) : base(tag)
         {
             FuncType = type;
-            this.ReturnType = return_type;
+            ReturnType = return_type;
             if (Lexer.NextToken.tag == Tag.ID)
                 Name = ((Word) Lexer.NextToken).Lexeme;
-            else Error("\"" + ((Word) Lexer.NextToken).Lexeme + "\"无效");
+            else Error(LogContent.SthUseless, Lexer.NextToken);
         }
 
         public Function(FuncType type, Type return_type, string name, int tag) : base(tag)
         {
             FuncType = type;
             Class = GetClass(name);
-            this.ReturnType = return_type;
-            this.Name = name;
+            ReturnType = return_type;
+            Name = name;
         }
 
         public override Sentence Build()
@@ -61,8 +61,7 @@ namespace FPL.Parse.Structure
             Parser.AnalyzingClass.AddFunction(Name, this);
             NewScope();
             Parser.AnalyzingFunction = this;
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Match("(");
             Lexer.Next();
             while (true)
             {
@@ -74,11 +73,10 @@ namespace FPL.Parse.Structure
                     break;
             }
 
-            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACE) Error("应输入\"{\"");
+            Match(")", false);
+            Match("{");
             Sentences = BuildMethod();
-            if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
+            Match("}", false);
             DestroyScope();
             Parser.AnalyzingFunction = null;
             return this;
@@ -98,7 +96,7 @@ namespace FPL.Parse.Structure
             if (Sentences.Count == 0)
                 if (ReturnType != Type.Void)
                 {
-                    Error(this, "不是所有路径都有返回值");
+                    Error(LogContent.NotAllPathHaveReturnValue);
                 }
                 else
                 {
@@ -108,12 +106,12 @@ namespace FPL.Parse.Structure
 
             if (Sentences[Sentences.Count - 1].tag != Tag.RETURN) //检查函数返回
             {
-                if (ReturnType != Type.Void) Error(this, "不是所有路径都有返回值");
+                if (ReturnType != Type.Void) Error(LogContent.NotAllPathHaveReturnValue);
                 Sentences.Add(new Return(Tag.RETURN, Name));
                 ((Return) Sentences[Sentences.Count - 1]).Class = Class;
             }
 
-            if (ParStatements.Count != 0 && Name == "Main") Error(this, "入口函数不允许有参数");
+            if (ParStatements.Count != 0 && Name == "Main") Error(LogContent.HaveParmUnallowed);
             foreach (Statement item in ParStatements) item.Check();
             foreach (Sentence item in Sentences) item.Check();
             Parser.AnalyzingFunction = null;

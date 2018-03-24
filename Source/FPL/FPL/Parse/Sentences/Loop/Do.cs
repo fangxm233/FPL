@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 
 namespace FPL.Parse.Sentences.Loop
@@ -24,7 +25,7 @@ namespace FPL.Parse.Sentences.Loop
             if (Lexer.NextToken.tag == Tag.LBRACE)
             {
                 Sentences = BuildMethod();
-                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Match("}", false);
             }
             else
             {
@@ -36,13 +37,11 @@ namespace FPL.Parse.Sentences.Loop
             }
 
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.WHILE) Error("应输入\"while\"");
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            if (Lexer.NextToken.tag != Tag.WHILE) Error(LogContent.SthExpect, "while");
+            Match("(");
             Rel = new Rel().BuildStart();
-            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            Match(")", false);
+            Match(";");
             DestroyScope();
             return this;
         }

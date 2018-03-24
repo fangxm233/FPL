@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.Parse.Structure;
 using FPL.symbols;
@@ -25,15 +26,14 @@ namespace FPL.Parse.Sentences
 
         public override Sentence Build()
         {
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Match("(");
             while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
                 Parameters.Add(new Expr().BuildStart());
                 if (Parameters[Parameters.Count - 1] == null)
                 {
-                    if (Lexer.NextToken.tag == Tag.COMMA) Error("缺少参数");
-                    if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
+                    if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                    Match(")", false);
                     Parameters.RemoveAt(Parameters.Count - 1);
                     break;
                 }
@@ -42,7 +42,7 @@ namespace FPL.Parse.Sentences
             Lexer.Next();
             if (Lexer.NextToken.tag != Tag.DOT)
             {
-                if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
+                Match(";", false);
                 return this;
             }
 
@@ -53,7 +53,7 @@ namespace FPL.Parse.Sentences
         public Sentence BuildNext()
         {
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.ID) Error("\"" + Lexer.NextToken + "\"无效");
+            if (Lexer.NextToken.tag != Tag.ID) Error(LogContent.SthUnexpect, Lexer.NextToken);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACKETS)
             {
@@ -68,13 +68,13 @@ namespace FPL.Parse.Sentences
         public override void Check()
         {
             Function = Class.GetFunction(Name);
-            if (Function == null) Error(this, "类型\"" + Class.Name + "\"中未包含\"" + Name + "\"的定义");
+            if (Function == null) Error(LogContent.NotExistingDefinitionInType, Class.Name, Name);
             if (Parameters.Count != Function.ParStatements.Count)
-                Error("\"" + Name + "\"方法没有采用" + Parameters.Count + "个参数的重载");
+                Error(LogContent.NumberOfParamDoesNotMatch, Name, Parameters.Count);
             ReturnType = Function.ReturnType;
             if (Next != null)
             {
-                if (ReturnType.tag == Tag.VOID) Error(Next, "运算符\".\"无法应用于\"void\"类型的操作数");
+                if (ReturnType.tag == Tag.VOID) Error(Next, LogContent.OperandNonsupport, ".", "void");
                 if (Next.tag == Tag.FUNCTIONCALL)
                 {
                     ((FunctionCall_s) Next).Class = GetClass(ReturnType.type_name);
@@ -91,7 +91,7 @@ namespace FPL.Parse.Sentences
             }
 
             foreach (Expr item in Parameters) item.Check();
-            if (Next == null) return;
+            //if (Next == null) return;
         }
 
         public override void Code()
@@ -118,20 +118,19 @@ namespace FPL.Parse.Sentences
 
         public FunctionCall_e(int tag)
         {
-            this.Tag = tag;
+            this.tag = tag;
             Name = ((Word) Lexer.NextToken).Lexeme;
         }
 
         public override void Build()
         {
-            Lexer.Next();
-            if (Lexer.NextToken.tag != LexicalAnalysis.Tag.LBRACKETS) Error("应输入\"(\"");
-            while (Lexer.NextToken.tag != LexicalAnalysis.Tag.RBRACKETS)
+            Match("(");
+            while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
                 parameters.Add(new Expr().BuildStart());
                 if (parameters[parameters.Count - 1] != null) continue;
-                if (Lexer.NextToken.tag == LexicalAnalysis.Tag.COMMA) Error("缺少参数");
-                if (Lexer.NextToken.tag != LexicalAnalysis.Tag.RBRACKETS) Error("应输入\")\"");
+                if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                Match(")", false);
                 parameters.RemoveAt(parameters.Count - 1);
                 break;
             }
@@ -142,9 +141,9 @@ namespace FPL.Parse.Sentences
             if (Class == null) Class = Parser.AnalyzingClass;
             local_class = Class;
             function = local_class.GetFunction(Name);
-            if (function == null) Error(this, "类型\"" + local_class.Name + "\"中未包含\"" + Name + "\"的定义");
+            if (function == null) Error(LogContent.NotExistingDefinitionInType, local_class.Name, Name);
             if (parameters.Count != function.ParStatements.Count)
-                Error("\"" + Name + "\"方法没有采用" + parameters.Count + "个参数的重载");
+                Error(LogContent.NumberOfParamDoesNotMatch, Name, parameters.Count);
             return_type = function.ReturnType;
             Class = GetClass(return_type.type_name);
             Type = return_type;

@@ -1,5 +1,6 @@
 ﻿using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Sentences.Loop;
 
 namespace FPL.Parse.Sentences.ProcessControl
@@ -15,14 +16,13 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override Sentence Build()
         {
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            Match(";");
             return this;
         }
 
         public override void Check()
         {
-            if (Parser.AnalyzingLoop == null) Error(this, "没有要中断或继续的循环");
+            if (Parser.AnalyzingLoop == null) Error(LogContent.NoLoopToBreakOrContinue);
             Loop = Parser.AnalyzingLoop;
         }
 

@@ -7,7 +7,7 @@ namespace FPL.Parse.Sentences.ProcessControl
 {
     public class If : Sentence
     {
-        private Rel Rel;
+        private Expr Rel;
         private List<Sentence> Sentences;
         private List<Sentence> SentencesElse;
         private CodingUnit ToEnd;
@@ -19,15 +19,14 @@ namespace FPL.Parse.Sentences.ProcessControl
         public override Sentence Build()
         {
             NewScope();
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
-            Rel = new Rel().BuildStart();
-            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            Match("(");
+            Rel = new Expr().BuildStart();
+            Match(")", false);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACE)
             {
                 Sentences = BuildMethod();
-                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Match("}", false);
             }
             else
             {
@@ -47,7 +46,7 @@ namespace FPL.Parse.Sentences.ProcessControl
                 if (Lexer.NextToken.tag == Tag.LBRACKETS)
                 {
                     SentencesElse = BuildMethod();
-                    if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
+                    Match("}", false);
                 }
                 else
                 {
@@ -78,7 +77,7 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Code()
         {
-            Rel.Code(0);
+            Rel.Code();
             CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
             u.parameter = Encoder.Line + 2;
             ToEnd = Encoder.Write(InstructionType.jmp);

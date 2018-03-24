@@ -61,19 +61,19 @@
 
         //符号的tag
         public const int
-            SEMICOLON = 281,
-            LBRACKETS = 282,
-            RBRACKETS = 283,
-            LBRACE = 285,
-            RBRACE = 286,
-            COMMA = 297,
-            DOT = 300,
-            LSQUBRACKETS = 305,
-            RSQUBRACKETS = 306,
+            SEMICOLON = ';',
+            LBRACKETS = '(',
+            RBRACKETS = ')',
+            LBRACE = '{',
+            RBRACE = '}',
+            COMMA = ',',
+            DOT = ',',
+            LSQUBRACKETS = '[',
+            RSQUBRACKETS = ']',
             INCREASE = 307,
             DECLINE = 308,
-            MODULO = 309,
-            NOT = 312;
+            MODULO = '%',
+            NOT = '!';
 
         //其他
         public const int

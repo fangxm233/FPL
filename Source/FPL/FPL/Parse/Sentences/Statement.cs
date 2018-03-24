@@ -1,4 +1,5 @@
 ﻿using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.Parse.Structure;
 
@@ -15,7 +16,7 @@ namespace FPL.Parse.Sentences
 
         public Statement(VarType varType, int tag) : base(tag)
         {
-            this.VarType = varType;
+            VarType = varType;
         }
 
         public override Sentence Build()
@@ -58,12 +59,12 @@ namespace FPL.Parse.Sentences
             //        }
             //}
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.ID) Error("应输入标识符");
+            if (Lexer.NextToken.tag != Tag.ID) Error(LogContent.IDExpect);
             Name = Lexer.NextToken.ToString();
             AddVar(this, VarType);
             Lexer.Back();
             Class = Parser.AnalyzingClass;
-            TypeName = ((Word) Lexer.NextToken).Lexeme;
+            TypeName = Lexer.NextToken.ToString();
             Assign = (Assign) new Assign(new Expr().BuildStart(), Tag.ASSIGN).Build();
             if (Parser.AnalyzingFunction != null)
                 Parser.AnalyzingFunction.Statements.Add(this);
@@ -71,7 +72,7 @@ namespace FPL.Parse.Sentences
                 Class.Statement.Add(this);
             if (Lexer.NextToken.tag == Tag.COMMA) return this;
             if (Lexer.NextToken.tag == Tag.RBRACKETS) return this;
-            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            Match(";", false);
             return this;
         }
 

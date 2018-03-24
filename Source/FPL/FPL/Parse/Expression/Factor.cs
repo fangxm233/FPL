@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Sentences;
 
 namespace FPL.Parse.Expression
@@ -12,15 +13,16 @@ namespace FPL.Parse.Expression
         public bool IsHead;
         public LinkedListNode<Expr> Position;
         public bool ShouldDestory = true;
+        private bool isBuilt;
 
         public Statement Statement;
         public VarType VarType;
 
         public Factor(int tag, Token c)
         {
-            this.Tag = tag;
+            this.tag = tag;
             Content = c;
-            if (tag == LexicalAnalysis.Tag.ID) Name = Content.ToString();
+            if (tag == Tag.ID) Name = Content.ToString();
         }
 
         public void Set_position(LinkedListNode<Expr> pos)
@@ -30,9 +32,10 @@ namespace FPL.Parse.Expression
 
         public override void Build()
         {
-            if (Tag == LexicalAnalysis.Tag.LBRACKETS)
+            if (isBuilt) return;
+            if (tag == Tag.LBRACKETS)
             {
-                if (Position.Previous != null && Position.Previous.Value.Tag == LexicalAnalysis.Tag.ID) ShouldDestory = false;
+                if (Position.Previous != null && Position.Previous.Value.tag == Tag.ID) ShouldDestory = false;
                 BuildTree(Position, EndPosition);
                 if (ShouldDestory)
                 {
@@ -40,11 +43,13 @@ namespace FPL.Parse.Expression
                     Position.List.Remove(Position);
                 }
             }
+
+            isBuilt = true;
         }
 
         public override void Check()
         {
-            if (Tag != LexicalAnalysis.Tag.ID) return;
+            if (tag != Tag.ID) return;
             //@class == null意味着是这一串对象中是第一个
             //获取class和statement
             if (Class == null)
@@ -75,13 +80,13 @@ namespace FPL.Parse.Expression
             }
 
             VarType = Statement.VarType;
-            if (Type == null) Error(this, "类型\"" + Class.Name + "\"中未包含\"" + Name + "\"的定义");
+            if (Type == null) Error(LogContent.NotExistingDefinitionInType, Class.Name, Name);
         }
 
         public override void Code()
         {
-            if (Tag == LexicalAnalysis.Tag.NUM) Encoder.Write(InstructionType.pushval, (int) Content.GetValue());
-            if (Tag == LexicalAnalysis.Tag.ID) ObjectCode();
+            if (tag == Tag.NUM) Encoder.Write(InstructionType.pushval, (int) Content.GetValue());
+            if (tag == Tag.ID) ObjectCode();
         }
 
         public void ObjectCode()
@@ -97,7 +102,7 @@ namespace FPL.Parse.Expression
             if (IsHead && VarType == VarType.Field)
             {
                 if (Parser.AnalyzingFunction.FuncType == FuncType.Static)
-                    Error(this, "对象引用对于非静态的字段、方法或属性\"" + Name + "\"是必须的");
+                    Error(LogContent.ShouldBeingInstanced);
                 Encoder.Write(InstructionType.pusharg); //this
                 Encoder.Write(InstructionType.pushfield, ID);
                 return;

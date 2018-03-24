@@ -1,5 +1,6 @@
 ﻿using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.Parse.Structure;
 using FPL.symbols;
@@ -27,7 +28,7 @@ namespace FPL.Parse.Sentences.ProcessControl
         {
             Class = Parser.AnalyzingClass;
             Expr = new Expr().BuildStart();
-            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            Match(";", false);
             return this;
         }
 
@@ -37,7 +38,8 @@ namespace FPL.Parse.Sentences.ProcessControl
             if (Expr == null) return;
             Expr.Check();
             if (Expr.Type != Class.GetFunction(FunctionName).ReturnType)
-                Error(this, "无法将\"" + Expr.Type.Lexeme + "\"类型作为返回值");
+                Error(LogContent.UnableToConvertType, Expr.Type,
+                    Class.GetFunction(FunctionName).ReturnType);
         }
 
         public override void Code()

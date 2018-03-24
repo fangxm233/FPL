@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 
 namespace FPL.Parse.Sentences.Loop
@@ -19,15 +20,14 @@ namespace FPL.Parse.Sentences.Loop
         public override Sentence Build()
         {
             NewScope();
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Match("(");
             Rel = new Rel().BuildStart();
-            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            Match(")", false);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACE)
             {
                 Sentences = BuildMethod();
-                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Match("}", false);
             }
             else
             {
@@ -44,7 +44,7 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Check()
         {
-            if (Rel == null) Error(this, "条件判断无效");
+            if (Rel == null) Error(LogContent.ExprError);
             Rel.Check();
             foreach (Sentence item in Sentences)
             {

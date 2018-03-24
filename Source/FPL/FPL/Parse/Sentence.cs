@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.Parse.Sentences;
 using FPL.Parse.Sentences.Loop;
@@ -105,7 +106,7 @@ namespace FPL.Parse
                             break;
                         }
 
-                        Error("语法错误");
+                        Error(LogContent.GarmmarError);
                         break;
                     }
                     case Tag.NEW:
@@ -120,7 +121,7 @@ namespace FPL.Parse
                     }
                     default:
                     {
-                        Error("语句错误或大括号不匹配");
+                        Error(LogContent.SentenceErrorOrRBraceDoesNotMatch);
                         return sentences;
                     }
                 }
@@ -196,7 +197,7 @@ namespace FPL.Parse
                             return sentence;
                         }
 
-                        Error("语法错误");
+                        Error(LogContent.GarmmarError);
                         return null;
                     }
                 }
@@ -206,7 +207,7 @@ namespace FPL.Parse
                 }
                 default:
                 {
-                    Error("语句错误或大括号不匹配");
+                    Error(LogContent.SentenceErrorOrRBraceDoesNotMatch);
                     return null;
                 }
             }
@@ -263,7 +264,7 @@ namespace FPL.Parse
                         if (Lexer.NextToken.tag == Tag.LBRACKETS)
                         {
                             Lexer.Back();
-                            if (Lexer.NextToken.ToString() != Parser.AnalyzingClass.Name) Error("应输入类型");
+                            if (Lexer.NextToken.ToString() != Parser.AnalyzingClass.Name) Error(LogContent.InPutType);
                             sentences.Add(new Function(FuncType.Constructor, Type.Void, Tag.CONSTRUCTOR).Build());
                             break;
                         }
@@ -290,7 +291,7 @@ namespace FPL.Parse
                     }
                     default:
                     {
-                        Error("语句错误");
+                        Error(LogContent.SentenceError);
                         return sentences;
                     }
                 }
@@ -316,12 +317,12 @@ namespace FPL.Parse
                     }
                     case Tag.RBRACE:
                     {
-                        Error("应输入类型或文件尾");
+                        Error(LogContent.InPutTypeOrFileEnd);
                         break;
                     }
                     default:
                     {
-                        Error("语句错误");
+                        Error(LogContent.SentenceError);
                         return classes;
                     }
                 }

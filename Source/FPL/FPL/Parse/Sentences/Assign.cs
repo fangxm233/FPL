@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.symbols;
 
@@ -29,7 +30,7 @@ namespace FPL.Parse.Sentences
                     return this;
             }
 
-            if (Lexer.NextToken.tag != Tag.ASSIGN) Error("应输入\"=\"");
+            Match("=",false);
             Right = new Expr().BuildStart();
             return this;
         }
@@ -37,12 +38,12 @@ namespace FPL.Parse.Sentences
         public override void Check()
         {
             if (TypeName != null) Type = Type.GetType(TypeName);
-            if (Type == null && TypeName != null) Error(this, "当前上下文中不存在名称" + TypeName);
+            if (Type == null && TypeName != null) Error(LogContent.NotExistingDefinition, TypeName);
             Left.Check();
             Type = Left.Type;
             if (Right == null) return;
             Right.Check();
-            if (Type != Right.Type) Error(this, "无法将类型\"" + Right.Type.type_name + "\"转换为类型\"" + Type.type_name + "\"");
+            if (Type != Right.Type) Error(LogContent.UnableToConvertType, Right.Type.type_name, Type.type_name);
         }
 
         public override void Code()

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.Parse.Structure;
 using FPL.symbols;
@@ -25,15 +26,14 @@ namespace FPL.Parse.Sentences
         public override Sentence Build()
         {
             Class = GetClass(TypeName);
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Match("(");
             while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
                 Parameters.Add(new Expr().BuildStart());
                 if (Parameters[Parameters.Count - 1] == null)
                 {
-                    if (Lexer.NextToken.tag == Tag.COMMA) Error("缺少参数");
-                    if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
+                    if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                    Match(")", false);
                     Parameters.RemoveAt(Parameters.Count - 1);
                     break;
                 }
@@ -42,7 +42,7 @@ namespace FPL.Parse.Sentences
             Lexer.Next();
             if (Lexer.NextToken.tag != Tag.DOT)
             {
-                if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
+                Match(";", false);
                 return this;
             }
 
@@ -53,9 +53,9 @@ namespace FPL.Parse.Sentences
 
         public override void Check()
         {
-            if (Parameters.Count != 0) Error(this, "暂不支持构造函数重载");
+            if (Parameters.Count != 0) Error(LogContent.NoOverride);
             Function = Class.GetFunction(TypeName);
-            if (Function == null) Error(this, "该类型不存在构造函数");
+            if (Function == null) Error(LogContent.HaventConstructor);
             Type = Type.GetType(Class.Name);
             if (Next != null)
             {
@@ -88,7 +88,7 @@ namespace FPL.Parse.Sentences
         public Sentence BuildNext()
         {
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.ID) Error(this, "\"" + Lexer.NextToken + "\"无效");
+            if (Lexer.NextToken.tag != Tag.ID) Error(LogContent.SthUseless, Lexer.NextToken);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACKETS)
             {
@@ -109,7 +109,7 @@ namespace FPL.Parse.Sentences
 
         public New_e()
         {
-            Tag = LexicalAnalysis.Tag.NEW;
+            tag = Tag.NEW;
             Lexer.Next();
             TypeName = ((Word) Lexer.NextToken).Lexeme;
         }
@@ -117,14 +117,13 @@ namespace FPL.Parse.Sentences
         public override void Build()
         {
             Class = GetClass(TypeName);
-            Lexer.Next();
-            if (Lexer.NextToken.tag != LexicalAnalysis.Tag.LBRACKETS) Error("应输入\"(\"");
-            while (Lexer.NextToken.tag != LexicalAnalysis.Tag.RBRACKETS)
+            Match("(");
+            while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
                 Parameters.Add(new Expr().BuildStart());
                 if (Parameters[Parameters.Count - 1] != null) continue;
-                if (Lexer.NextToken.tag == LexicalAnalysis.Tag.COMMA) Error("缺少参数");
-                if (Lexer.NextToken.tag != LexicalAnalysis.Tag.RBRACKETS) Error("应输入\")\"");
+                if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                Match(")", false);
                 Parameters.RemoveAt(Parameters.Count - 1);
                 break;
             }
@@ -133,10 +132,10 @@ namespace FPL.Parse.Sentences
         public override void Check()
         {
             if (Class.GetFunction(Class.Name).ParStatements.Count != Parameters.Count)
-                Error(this, "该类型不存在" + Parameters.Count + "个参数的构造函数");
+                Error(LogContent.ConstructorParmDoesNotMatch, Parameters.Count);
             Class = GetClass(TypeName);
             Function = Class.GetFunction(TypeName);
-            if (Function == null) Error(this, "该类型不存在构造函数");
+            if (Function == null) Error(LogContent.HaventConstructor);
             Type = Type.GetType(Class.Name);
         }
 

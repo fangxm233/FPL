@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FPL.OutPut;
 using FPL.Parse;
 using Type = FPL.symbols.Type;
 
@@ -241,7 +242,7 @@ namespace FPL.LexicalAnalysis
 
                     if (Peek == '\n')
                     {
-                        Node.Error("应输入\"\"\"");
+                        Node.Error(LogContent.SthExpect, "\"");
                         Str str = new Str(s);
                         Readch();
                         Peeks.Add(str);
@@ -269,7 +270,7 @@ namespace FPL.LexicalAnalysis
                     }
                     catch (Exception)
                     {
-                        Node.Error("整数超出范围");
+                        Node.Error(LogContent.NumberOutOfRange);
                     }
 
                     return;
@@ -290,7 +291,7 @@ namespace FPL.LexicalAnalysis
                 }
                 catch (Exception)
                 {
-                    Node.Error("浮点数超出范围");
+                    Node.Error(LogContent.FloatOutOfRange);
                 }
 
                 return;
@@ -321,7 +322,7 @@ namespace FPL.LexicalAnalysis
                 return;
             }
 
-            Node.Error("意外的字符" + "\"" + Peek + "\"");
+            Node.Error(LogContent.SthUnexpect, Peek);
         }
 
         public static void AddBackup()

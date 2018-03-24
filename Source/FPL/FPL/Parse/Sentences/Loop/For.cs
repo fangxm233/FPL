@@ -21,8 +21,7 @@ namespace FPL.Parse.Sentences.Loop
         public override Sentence Build()
         {
             NewScope();
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACKETS) Error("应输入\"(\"");
+            Match("(");
             Lexer.Next();
             Statement = new Statement(VarType.Local, Tag.STATEMENT);
             Statement.Build();
@@ -30,12 +29,12 @@ namespace FPL.Parse.Sentences.Loop
             Rel = Rel.BuildStart();
             Assign = new Assign(new Expr().BuildStart(), Tag.ASSIGN);
             Assign = Assign.Build();
-            if (Lexer.NextToken.tag != Tag.RBRACKETS) Error("应输入\")\"");
+            Match(")", false);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACE)
             {
                 Sentences = BuildMethod();
-                if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
+                Match("}");
             }
             else
             {

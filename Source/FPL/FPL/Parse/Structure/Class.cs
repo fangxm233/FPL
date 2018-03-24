@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Sentences;
 using FPL.symbols;
 
@@ -21,8 +22,8 @@ namespace FPL.Parse.Structure
         {
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.ID)
-                Name = ((Word) Lexer.NextToken).Lexeme;
-            else Error("\"" + ((Word) Lexer.NextToken).Lexeme + "\"无效");
+                Name = Lexer.NextToken.ToString();
+            else Error(LogContent.SthUseless, Lexer.NextToken);
         }
 
         public override Sentence Build()
@@ -30,10 +31,9 @@ namespace FPL.Parse.Structure
             AddClass(Name, this);
             NewScope();
             Parser.AnalyzingClass = this;
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.LBRACE) Error("应输入\"{\"");
+            Match("{");
             BuildClass();
-            if (Lexer.NextToken.tag != Tag.RBRACE) Error("应输入\"}\"");
+            Match("}", false);
             DestroyScope();
             if (GetFunction(Name) == null) Functions.Add(new Function(FuncType.Constructor, Tag.CONSTRUCTOR, Name));
             InitFunction = new Function(FuncType.InitFunction, Tag.INIT_FUNCTION, ".init");

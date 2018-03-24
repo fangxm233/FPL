@@ -1,5 +1,6 @@
 ﻿using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Structure;
 using FPL.symbols;
 
@@ -75,8 +76,8 @@ namespace FPL.Parse.Sentences
             }
 
             Type = Class.GetTypeByLocalName(Name);
-            if (Type == null) Error(this, "类型\"" + Class.Name + "\"中未包含\"" + Name + "\"的定义");
-            if (Next == null) Error(this, "只有赋值，函数调用和new 对象表达式可用作语句");
+            if (Type == null) Error(LogContent.NotExistingDefinitionInType, Class.Name, Name);
+            if (Next == null) Error(LogContent.NotSentence);
             if (Next.tag == Tag.FUNCTIONCALL) ((FunctionCall_s) Next).Class = GetClass(Type.type_name);
             if (Next.tag == Tag.OBJECT) ((Object_s) Next).Class = GetClass(Type.type_name);
             Class = GetClass(Type.type_name);
@@ -97,7 +98,7 @@ namespace FPL.Parse.Sentences
             if (IsHead && VarType == VarType.Field)
             {
                 if (Parser.AnalyzingFunction.FuncType == FuncType.Static)
-                    Error(this, "对象引用对于非静态的字段、方法或属性\"" + Name + "\"是必须的");
+                    Error(LogContent.ShouldBeingInstanced);
                 Encoder.Write(InstructionType.pusharg); //this
                 Encoder.Write(InstructionType.pushfield, ID);
                 return;
@@ -120,7 +121,7 @@ namespace FPL.Parse.Sentences
         public Sentence BuildNext()
         {
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.ID) Error(this, "\"" + Lexer.NextToken + "\"无效");
+            if (Lexer.NextToken.tag != Tag.ID) Error(LogContent.SthUseless, Lexer.NextToken);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACKETS)
             {

@@ -25,13 +25,12 @@ namespace FPL.Parse.Sentences
                 }
                 default:
                 {
-                    Error("未知的引用");
+                    //Error("未知的引用");
                     break;
                 }
             }
 
-            Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.SEMICOLON) Error("应输入\";\"");
+            Match(";");
             return this;
         }
     }
