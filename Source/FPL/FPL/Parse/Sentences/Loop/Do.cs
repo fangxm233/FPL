@@ -10,7 +10,7 @@ namespace FPL.Parse.Sentences.Loop
     {
         public int EndLine;
         private int HeadLine;
-        private Rel Rel;
+        private Expr Expr;
         public int RelLine;
         public List<Sentence> Sentences;
 
@@ -39,7 +39,8 @@ namespace FPL.Parse.Sentences.Loop
             Lexer.Next();
             if (Lexer.NextToken.tag != Tag.WHILE) Error(LogContent.SthExpect, "while");
             Match("(");
-            Rel = new Rel().BuildStart();
+            Expr = new Expr().BuildStart();
+            if (Expr == null) Error(LogContent.ExprError);
             Match(")", false);
             Match(";");
             DestroyScope();
@@ -48,7 +49,10 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Check()
         {
-            Rel.Check();
+            if (Expr == null) Error(LogContent.ExprError);
+            Expr.Check();
+            if (Expr.Type.type_name != symbols.Type.Bool.type_name)
+                Error(LogContent.UnableToConvertType, Expr.Type.type_name, symbols.Type.Bool.type_name);
             foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;
@@ -64,7 +68,7 @@ namespace FPL.Parse.Sentences.Loop
             foreach (Sentence item in Sentences) item.Code();
             if (Encoder.Line == HeadLine) return;
             RelLine = Encoder.Line + 1;
-            Rel.Code(0);
+            Expr.Code();
             CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
             u.parameter = HeadLine;
             EndLine = u.line_num;

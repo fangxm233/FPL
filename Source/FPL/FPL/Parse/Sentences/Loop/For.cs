@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FPL.Encoding;
 using FPL.LexicalAnalysis;
+using FPL.OutPut;
 using FPL.Parse.Expression;
 
 namespace FPL.Parse.Sentences.Loop
@@ -9,7 +10,7 @@ namespace FPL.Parse.Sentences.Loop
     {
         private Sentence Assign;
         public int EndLine;
-        private Rel Rel;
+        private Expr Expr;
         public List<Sentence> Sentences;
         private Statement Statement;
         public CodingUnit ToRel;
@@ -25,8 +26,7 @@ namespace FPL.Parse.Sentences.Loop
             Lexer.Next();
             Statement = new Statement(VarType.Local, Tag.STATEMENT);
             Statement.Build();
-            Rel = new Rel();
-            Rel = Rel.BuildStart();
+            Expr = new Expr().BuildStart();
             Assign = new Assign(new Expr().BuildStart(), Tag.ASSIGN);
             Assign = Assign.Build();
             Match(")", false);
@@ -52,10 +52,10 @@ namespace FPL.Parse.Sentences.Loop
         public override void Check()
         {
             Statement.Check();
-            if (Rel != null)
-                Rel.Check();
-            if (Assign != null)
-                Assign.Check();
+            Expr?.Check();
+            Assign?.Check();
+            if (Expr.Type.type_name != symbols.Type.Bool.type_name)
+                Error(LogContent.UnableToConvertType, Expr.Type.type_name, symbols.Type.Bool.type_name);
             foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;
@@ -73,8 +73,8 @@ namespace FPL.Parse.Sentences.Loop
             if (Assign != null)
                 Assign.Code();
             ToRel.parameter = Encoder.Line + 1;
-            if (Rel != null)
-                Rel.Code(0);
+            if (Expr != null)
+                Expr.Code();
             else
                 Encoder.Write(InstructionType.jmp);
             CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];

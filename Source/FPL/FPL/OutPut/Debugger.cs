@@ -41,15 +41,36 @@ namespace FPL.OutPut
 
         public static void LogError(string s, LogContent content, params object[] parm)
         {
-            Console.WriteLine("错误：" + s + Contents[(int) content], parm);
+            if (parm.Length == 0)
+            {
+                Console.WriteLine("错误：" + s + Contents[(int)content]);
+            }
+            else
+            {
+                Console.WriteLine("错误：" + s + Contents[(int)content], parm);
+            }
         }
         public static void LogWarning(string s, LogContent content, params object[] parm)
         {
-            Console.WriteLine("警告：" + s + Contents[(int)content], parm);
+            if (parm.Length == 0)
+            {
+                Console.WriteLine("警告：" + s + Contents[(int)content]);
+            }
+            else
+            {
+                Console.WriteLine("警告：" + s + Contents[(int)content], parm);
+            }
         }
         public static void Log(string s, LogContent content, params object[] parm)
         {
-            Console.WriteLine("信息：" + s + Contents[(int)content], parm);
+            if (parm.Length == 0)
+            {
+                Console.WriteLine("信息：" + s + Contents[(int)content]);
+            }
+            else
+            {
+                Console.WriteLine("信息：" + s + Contents[(int)content], parm);
+            }
         }
     }
 

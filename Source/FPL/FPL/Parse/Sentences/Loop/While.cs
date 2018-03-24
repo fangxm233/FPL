@@ -9,7 +9,7 @@ namespace FPL.Parse.Sentences.Loop
     public class While : Sentence
     {
         public int EndLine;
-        private Rel Rel;
+        private Expr Expr;
         public List<Sentence> Sentences;
         public CodingUnit ToRel;
 
@@ -21,7 +21,7 @@ namespace FPL.Parse.Sentences.Loop
         {
             NewScope();
             Match("(");
-            Rel = new Rel().BuildStart();
+            Expr = new Expr().BuildStart();
             Match(")", false);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACE)
@@ -44,8 +44,10 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Check()
         {
-            if (Rel == null) Error(LogContent.ExprError);
-            Rel.Check();
+            if (Expr == null) Error(LogContent.ExprError);
+            Expr.Check();
+            if (Expr.Type.type_name != symbols.Type.Bool.type_name)
+                Error(LogContent.UnableToConvertType, Expr.Type.type_name, symbols.Type.Bool.type_name);
             foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;
@@ -66,7 +68,7 @@ namespace FPL.Parse.Sentences.Loop
             }
 
             ToRel.parameter = Encoder.Line + 1;
-            Rel.Code(0);
+            Expr.Code();
             CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
             u.parameter = ToRel.line_num + 1;
             EndLine = u.line_num;

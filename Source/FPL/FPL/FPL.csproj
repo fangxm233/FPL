@@ -64,7 +64,6 @@
     <Compile Include="Parse\Sentences\Object.cs" />
     <Compile Include="Parse\Parser.cs" />
     <Compile Include="Parse\Sentences\Quote.cs" />
-    <Compile Include="Parse\Expression\Rel.cs" />
     <Compile Include="Parse\Sentences\ProcessControl\Return.cs" />
     <Compile Include="Parse\Sentences\Statement.cs" />
     <Compile Include="Parse\Sentence.cs" />

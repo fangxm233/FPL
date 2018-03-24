@@ -1,7 +1,7 @@
 ﻿class Program
 {
 	//Program program;
-	int i;
+	static int i;
 	static void Main()
 	{
 		//int a = 666 + 555 * 1 / 666 * (555 + 1);

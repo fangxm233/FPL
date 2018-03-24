@@ -56,12 +56,11 @@
         call,
         ret,
 
-        eqt,
-        eqf,
-        let,
-        lef,
-        mot,
-        mof,
+        eq,
+        le,
+        mo,
+        jt,
+        jf,
 
         newobjc,
 

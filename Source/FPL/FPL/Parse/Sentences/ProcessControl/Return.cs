@@ -1,5 +1,4 @@
 ﻿using FPL.Encoding;
-using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.Parse.Structure;

@@ -52,6 +52,7 @@ namespace FPL.Parse.Expression
                     case Tag.SEMICOLON:
                     case Tag.COMMA:
                     case Tag.ASSIGN:
+                    case Tag.RBRACE:
                         return expr;
                     case Tag.ID:
                         Lexer.Next();

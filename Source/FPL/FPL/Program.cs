@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using FPL.Encoding;
 using FPL.LexicalAnalysis;
 using FPL.Parse;
 
@@ -18,7 +19,6 @@ namespace FPL
          * 强类型运算
          * 函数
          */
-        //TODO:把bool表达式整合进expr
         private static void Main(string[] args)
         {
             if (args.Length == 0)
@@ -47,10 +47,10 @@ namespace FPL
                 Lexer.Analysis(args);
                 Parser parser = new Parser();
                 parser.Compile();
-                //Encoder.Init("Program.fplc");
-                //parser.Code();
-                //parser.CodeSecond();
-                //Encoder.WriteToFile();
+                Encoder.Init("Program.fplc");
+                parser.Code();
+                parser.CodeSecond();
+                Encoder.WriteToFile();
 
                 watch.Stop();
                 TimeSpan timespan = watch.Elapsed;

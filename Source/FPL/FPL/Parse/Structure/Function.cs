@@ -119,6 +119,7 @@ namespace FPL.Parse.Structure
 
         public override void Code()
         {
+            Parser.AnalyzingFunction = this;
             if (tag == Tag.INIT_FUNCTION)
             {
                 ReturnType = Type.Void;
@@ -141,6 +142,7 @@ namespace FPL.Parse.Structure
                 item.Code();
             }
 
+            Parser.AnalyzingFunction = null;
             //if (name == "Main") Encoder.Write(InstructionsType.endP);
         }
 
