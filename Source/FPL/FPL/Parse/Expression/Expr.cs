@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FPL.DataStorager;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Sentences;
 using FPL.Parse.Sentences.ProcessControl;
 using FPL.Parse.Structure;
-using FPL.symbols;
 
 namespace FPL.Parse.Expression
 {
@@ -44,7 +44,7 @@ namespace FPL.Parse.Expression
         {
             var expr = new LinkedList<Expr>();
             expr.AddFirst(new Expr());
-            var Brackets = new List<Factor>();
+            var brackets = new List<Factor>();
             while (true)
             {
                 Lexer.Next();
@@ -81,17 +81,17 @@ namespace FPL.Parse.Expression
                         Factor f = new Factor(Lexer.NextToken.tag, Lexer.NextToken);
                         expr.AddLast(f);
                         f.Set_position(expr.Last);
-                        if (Lexer.NextToken.tag == Tag.LBRACKETS) Brackets.Add((Factor) expr.Last());
+                        if (Lexer.NextToken.tag == Tag.LBRACKETS) brackets.Add((Factor) expr.Last());
                         if (Lexer.NextToken.tag == Tag.RBRACKETS)
                         {
-                            if (Brackets.Count == 0)
+                            if (brackets.Count == 0)
                             {
                                 expr.RemoveLast();
                                 return expr;
                             }
 
-                            Brackets.Last().EndPosition = expr.Last;
-                            Brackets.RemoveAt(Brackets.Count - 1);
+                            brackets.Last().EndPosition = expr.Last;
+                            brackets.RemoveAt(brackets.Count - 1);
                         }
 
                         break;

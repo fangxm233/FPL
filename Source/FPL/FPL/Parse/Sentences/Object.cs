@@ -1,9 +1,9 @@
-﻿using FPL.Generator;
+﻿using FPL.DataStorager;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Sentences.ProcessControl;
 using FPL.Parse.Structure;
-using FPL.symbols;
 
 namespace FPL.Parse.Sentences
 {

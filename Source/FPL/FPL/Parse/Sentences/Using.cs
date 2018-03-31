@@ -1,4 +1,5 @@
-﻿using FPL.LexicalAnalysis;
+﻿using FPL.DataStorager;
+using FPL.LexicalAnalysis;
 
 namespace FPL.Parse.Sentences
 {

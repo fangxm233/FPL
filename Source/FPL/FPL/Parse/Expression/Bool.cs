@@ -3,6 +3,7 @@ using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using System.Collections.Generic;
 using System.Linq;
+using FPL.DataStorager;
 
 namespace FPL.Parse.Expression
 {
@@ -35,11 +36,11 @@ namespace FPL.Parse.Expression
 
         public override void Check()
         {
-            Type = symbols.Type.Bool;
+            Type = Type.Bool;
             Left.Check();
             Right.Check();
-            if ((Left.Type.type_name != symbols.Type.Bool.type_name ||
-                 Right.Type.type_name != symbols.Type.Bool.type_name) &&
+            if ((Left.Type.type_name != Type.Bool.type_name ||
+                 Right.Type.type_name != Type.Bool.type_name) &&
                 (tag == Tag.OR || tag == Tag.AND)) Error(LogContent.ExprError);
             if (Left.Type.type_name != Right.Type.type_name) Error(LogContent.NoOverload);
         }

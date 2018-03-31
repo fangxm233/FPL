@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using FPL.DataStorager;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Sentences;
 using FPL.Parse.Structure;
-using Type = FPL.symbols.Type;
+using Type = FPL.DataStorager.Type;
 
 namespace FPL.Parse
 {
@@ -43,12 +44,10 @@ namespace FPL.Parse
         private static readonly List<CodingUnit> ClassesUnit = new List<CodingUnit>();
 
         public static Dictionary<int, int>[] SymbolPriority = new Dictionary<int, int>[8];
-        public static Dictionary<int, int> TypeOfExpr = new Dictionary<int, int>();
         public static Dictionary<int, Dictionary<string, InstructionType>> InsTable;
 
         public void Compile()
         {
-            Fill_type_of_expr();
             Fill_symbol_priority();
             Fill_ins_table();
             new Sentence(1).BuildStsrt();
@@ -217,38 +216,6 @@ namespace FPL.Parse
             SymbolPriority[7].Add(Tag.STR, Tag.FACTOR);
             SymbolPriority[7].Add(Tag.NEW, Tag.FACTOR);
             SymbolPriority[7].Add(Tag.ID, Tag.FACTOR);
-        }
-
-        public void Fill_type_of_expr()
-        {
-            TypeOfExpr.Add(Tag.LSQUBRACKETS, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.RSQUBRACKETS, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.LBRACKETS, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.RBRACKETS, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.DOT, Tag.BINATY);
-            TypeOfExpr.Add(Tag.INCREASE, Tag.UNARY);
-            TypeOfExpr.Add(Tag.DECLINE, Tag.UNARY);
-            TypeOfExpr.Add(Tag.NOT, Tag.UNARY);
-            TypeOfExpr.Add(Tag.DIVIDE, Tag.BINATY);
-            TypeOfExpr.Add(Tag.MULTIPLY, Tag.BINATY);
-            TypeOfExpr.Add(Tag.MODULO, Tag.UNARY);
-            TypeOfExpr.Add(Tag.PLUS, Tag.BINATY);
-            TypeOfExpr.Add(Tag.MINUS, Tag.BINATY);
-            TypeOfExpr.Add(Tag.MORE, Tag.BOOL);
-            TypeOfExpr.Add(Tag.LESS, Tag.BOOL);
-            TypeOfExpr.Add(Tag.LE, Tag.BOOL);
-            TypeOfExpr.Add(Tag.GE, Tag.BOOL);
-            TypeOfExpr.Add(Tag.EQ, Tag.BOOL);
-            TypeOfExpr.Add(Tag.NE, Tag.BOOL);
-            TypeOfExpr.Add(Tag.AND, Tag.BOOL);
-            TypeOfExpr.Add(Tag.OR, Tag.BOOL);
-            TypeOfExpr.Add(Tag.NUM, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.REAL, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.TRUE, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.FALSE, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.STR, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.NEW, Tag.FACTOR);
-            TypeOfExpr.Add(Tag.ID, Tag.FACTOR);
         }
 
         public void Fill_ins_table()

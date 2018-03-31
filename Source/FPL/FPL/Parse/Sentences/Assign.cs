@@ -1,9 +1,9 @@
 ﻿using System.Linq;
+using FPL.DataStorager;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Expression;
-using FPL.symbols;
 
 namespace FPL.Parse.Sentences
 {

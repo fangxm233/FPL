@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataStorager\Parameter.cs" />
     <Compile Include="OutPut\Debugger.cs" />
     <Compile Include="Generator\FILGenerator.cs" />
     <Compile Include="Parse\Sentences\Assign.cs" />
@@ -70,12 +71,12 @@
     <Compile Include="Parse\Sentences\Using.cs" />
     <Compile Include="Parse\Sentences\Loop\While.cs" />
     <Compile Include="LexicalAnalysis\Lexer.cs" />
-    <Compile Include="LexicalAnalysis\Tag.cs" />
-    <Compile Include="LexicalAnalysis\Token.cs" />
-    <Compile Include="LexicalAnalysis\Word.cs" />
+    <Compile Include="DataStorager\Tag.cs" />
+    <Compile Include="DataStorager\Token.cs" />
+    <Compile Include="DataStorager\Word.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="symbols\Type.cs" />
+    <Compile Include="DataStorager\Type.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

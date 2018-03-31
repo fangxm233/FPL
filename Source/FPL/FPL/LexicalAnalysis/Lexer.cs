@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FPL.DataStorager;
 using FPL.OutPut;
 using FPL.Parse;
-using Type = FPL.symbols.Type;
+using Type = FPL.DataStorager.Type;
 
 namespace FPL.LexicalAnalysis
 {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FPL.DataStorager;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Expression;
@@ -6,7 +7,6 @@ using FPL.Parse.Sentences;
 using FPL.Parse.Sentences.Loop;
 using FPL.Parse.Sentences.ProcessControl;
 using FPL.Parse.Structure;
-using FPL.symbols;
 
 namespace FPL.Parse
 {
