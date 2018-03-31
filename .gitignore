@@ -12,3 +12,5 @@
 /Source/FPL/.vs/FPL/v15/Solution.VC.db-wal
 /Source/FPL/.vs/FPL/v15/Browse.VC.opendb
 /Source/FPL/.vs/FPL/v15/Server/sqlite3
+*.exe
+*.pdb

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
@@ -82,9 +83,17 @@ namespace FPL.Parse.Sentences.ProcessControl
         public override void Code()
         {
             Expr.Code();
-            CodingUnit u = FILGenerator.Code[FILGenerator.Code.Count - 1];
-            u.Parameter = FILGenerator.Line + 2;
+
+            if (Bool.AndString.Count != 0)
+                foreach (CodingUnit codingUnit in Bool.AndString)
+                    codingUnit.Parameter = FILGenerator.Line + 1;
+            else if (Bool.OrString.Count != 0)
+                foreach (CodingUnit codingUnit in Bool.OrString)
+                    codingUnit.Parameter = FILGenerator.Line + 2;
+            else
+                FILGenerator.Code.Last().Parameter = FILGenerator.Line + 2;
             ToEnd = FILGenerator.Write(InstructionType.jmp);
+
             foreach (Sentence item in Sentences) item.Code();
             ToEnd.Parameter = FILGenerator.Line + 1;
             if (SentencesElse == null) return;

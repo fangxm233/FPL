@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Channels;
-using FPL.Generator;
+﻿using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FPL.Parse.Expression
 {
     public class Bool : Expr
     {
-        static List<CodingUnit> AndString = new List<CodingUnit>();
-        static List<CodingUnit> OrString = new List<CodingUnit>();
+        public static List<CodingUnit> AndString = new List<CodingUnit>();
+        public static List<CodingUnit> OrString = new List<CodingUnit>();
         public LinkedListNode<Expr> Position;
         private bool isBuilt;
 
@@ -51,12 +50,21 @@ namespace FPL.Parse.Expression
             if (tag == Tag.AND)
             {
                 OrString = new List<CodingUnit>();
-                CodingUnit LE = FILGenerator.Code.Last();
+                CodingUnit LE;
+                if (Left.tag != Tag.AND)
+                {
+                    LE = FILGenerator.Code.Last();
+                    LE.InsType = LE.InsType == InstructionType.jt
+                        ? InstructionType.jf
+                        : InstructionType.jt;
+                    AndString.Add(LE);
+                }
+                Right.Code();
+                LE = FILGenerator.Code.Last();
                 LE.InsType = LE.InsType == InstructionType.jt
                     ? InstructionType.jf
                     : InstructionType.jt;
                 AndString.Add(LE);
-                Right.Code();
                 foreach (CodingUnit codingUnit in AndString)
                 {
                     codingUnit.Parameter = FILGenerator.Line + 1;
@@ -68,6 +76,7 @@ namespace FPL.Parse.Expression
                 AndString = new List<CodingUnit>();
                 OrString.Add(FILGenerator.Code.Last());
                 Right.Code();
+                OrString.Add(FILGenerator.Code.Last());
                 foreach (CodingUnit codingUnit in OrString)
                 {
                     codingUnit.Parameter = FILGenerator.Line + 1;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
@@ -69,9 +70,17 @@ namespace FPL.Parse.Sentences.Loop
 
             ToRel.Parameter = FILGenerator.Line + 1;
             Expr.Code();
-            CodingUnit u = FILGenerator.Code[FILGenerator.Code.Count - 1];
-            u.Parameter = ToRel.LineNum + 1;
-            EndLine = u.LineNum;
+
+            if (Bool.AndString.Count != 0)
+                foreach (CodingUnit codingUnit in Bool.AndString)
+                    codingUnit.Parameter = FILGenerator.Line + 1;
+            else if (Bool.OrString.Count != 0)
+                foreach (CodingUnit codingUnit in Bool.OrString)
+                    codingUnit.Parameter = ToRel.LineNum + 1;
+            else
+                FILGenerator.Code.Last().Parameter = ToRel.LineNum + 1;
+
+            EndLine = FILGenerator.Code.Last().LineNum;
         }
 
         public override void CodeSecond()

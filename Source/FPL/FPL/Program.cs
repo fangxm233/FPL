@@ -19,7 +19,6 @@ namespace FPL
          * 强类型运算
          * 函数
          */
-        //TODO:修改条件判断
         //TODO:修改解释器读取文件
         //TODO:修改编译器结构
         private static void Main(string[] args)

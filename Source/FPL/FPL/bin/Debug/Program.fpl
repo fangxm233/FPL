@@ -12,6 +12,8 @@
 		{
 			a = a + 1;
 		}
+		if(a == 0 || a == 1 && a == 2)
+			a = 666;
 	}
 
 	static int pp(int a, int ssss)

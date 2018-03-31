@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
@@ -69,9 +70,17 @@ namespace FPL.Parse.Sentences.Loop
             if (FILGenerator.Line == HeadLine) return;
             RelLine = FILGenerator.Line + 1;
             Expr.Code();
-            CodingUnit u = FILGenerator.Code[FILGenerator.Code.Count - 1];
-            u.Parameter = HeadLine;
-            EndLine = u.LineNum;
+
+            if (Bool.AndString.Count != 0)
+                foreach (CodingUnit codingUnit in Bool.AndString)
+                    codingUnit.Parameter = FILGenerator.Line + 1;
+            else if (Bool.OrString.Count != 0)
+                foreach (CodingUnit codingUnit in Bool.OrString)
+                    codingUnit.Parameter = HeadLine;
+            else
+                FILGenerator.Code.Last().Parameter = HeadLine;
+
+            EndLine = FILGenerator.Code.Last().LineNum;
         }
     }
 }
