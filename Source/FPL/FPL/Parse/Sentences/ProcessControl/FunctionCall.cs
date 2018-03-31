@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Expression;
@@ -96,25 +96,27 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Code()
         {
+            for (int i = Parameters.Count - 1; i >= 0; i--)
+                Parameters[i].Code();
             if (Function.FuncType != FuncType.Static)
-                Encoder.Write(InstructionType.pusharg);
-            if (Function.ParStatements.Count != 0)
-                for (int i = Parameters.Count - 1; i >= 0; i--)
-                    Parameters[i].Code();
-            Encoder.Write(InstructionType.call, Function.ID);
-            if (Function.ParStatements.Count != 0)
-                for (int i = Parameters.Count - 1; i >= 0; i--)
-                    Encoder.Write(InstructionType.pop);
+                FILGenerator.Write(InstructionType.pusharg);
+
+            FILGenerator.Write(InstructionType.call, Function.ID);
+
+            for (int i = Parameters.Count - 1; i >= 0; i--)
+                FILGenerator.Write(InstructionType.pop);
+            if (Function.FuncType != FuncType.Static)
+                FILGenerator.Write(InstructionType.pop);
         }
     }
 
     public class FunctionCall_e : Expr
     {
-        public Function function;
-        public bool is_head = true;
-        public Class local_class;
-        public List<Expr> parameters = new List<Expr>();
-        public Type return_type;
+        public Function Function;
+        public bool isHead = true;
+        public Class LocalClass;
+        public List<Expr> Parameters = new List<Expr>();
+        public Type ReturnType;
 
         public FunctionCall_e(int tag)
         {
@@ -127,11 +129,11 @@ namespace FPL.Parse.Sentences.ProcessControl
             Match("(");
             while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
-                parameters.Add(new Expr().BuildStart());
-                if (parameters[parameters.Count - 1] != null) continue;
+                Parameters.Add(new Expr().BuildStart());
+                if (Parameters[Parameters.Count - 1] != null) continue;
                 if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
                 Match(")", false);
-                parameters.RemoveAt(parameters.Count - 1);
+                Parameters.RemoveAt(Parameters.Count - 1);
                 break;
             }
         }
@@ -139,24 +141,30 @@ namespace FPL.Parse.Sentences.ProcessControl
         public override void Check()
         {
             if (Class == null) Class = Parser.AnalyzingClass;
-            local_class = Class;
-            function = local_class.GetFunction(Name);
-            if (function == null) Error(LogContent.NotExistingDefinitionInType, local_class.Name, Name);
-            if (parameters.Count != function.ParStatements.Count)
-                Error(LogContent.NumberOfParamDoesNotMatch, Name, parameters.Count);
-            return_type = function.ReturnType;
-            Class = GetClass(return_type.type_name);
-            Type = return_type;
-            foreach (Expr item in parameters) item.Check();
+            LocalClass = Class;
+            Function = LocalClass.GetFunction(Name);
+            if (Function == null) Error(LogContent.NotExistingDefinitionInType, LocalClass.Name, Name);
+            if (Parameters.Count != Function.ParStatements.Count)
+                Error(LogContent.NumberOfParamDoesNotMatch, Name, Parameters.Count);
+            ReturnType = Function.ReturnType;
+            Class = GetClass(ReturnType.type_name);
+            Type = ReturnType;
+            foreach (Expr item in Parameters) item.Check();
         }
 
         public override void Code()
         {
-            Encoder.Write(InstructionType.pusharg);
-            if (function.ParStatements.Count != 0)
-                for (int i = parameters.Count - 1; i >= 0; i--)
-                    parameters[i].Code();
-            Encoder.Write(InstructionType.call, function.ID);
+            for (int i = Parameters.Count - 1; i >= 0; i--)
+                Parameters[i].Code();
+            if (Function.FuncType != FuncType.Static)
+                FILGenerator.Write(InstructionType.pusharg);
+
+            FILGenerator.Write(InstructionType.call, Function.ID);
+
+            for (int i = Parameters.Count - 1; i >= 0; i--)
+                FILGenerator.Write(InstructionType.pop);
+            if (Function.FuncType != FuncType.Static)
+                FILGenerator.Write(InstructionType.pop);
         }
     }
 }

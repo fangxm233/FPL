@@ -1,4 +1,4 @@
-﻿using FPL.Encoding;
+﻿using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Sentences.Loop;
@@ -28,7 +28,7 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Code()
         {
-            Unit = Encoder.Write(InstructionType.jmp);
+            Unit = FILGenerator.Write(InstructionType.jmp);
         }
 
         public override void CodeSecond()
@@ -36,13 +36,13 @@ namespace FPL.Parse.Sentences.ProcessControl
             switch (Loop.tag)
             {
                 case Tag.WHILE:
-                    Unit.parameter = ((While) Loop).EndLine + 1;
+                    Unit.Parameter = ((While) Loop).EndLine + 1;
                     break;
                 case Tag.FOR:
-                    Unit.parameter = ((For) Loop).EndLine + 1;
+                    Unit.Parameter = ((For) Loop).EndLine + 1;
                     break;
                 case Tag.DO:
-                    Unit.parameter = ((Do) Loop).EndLine + 1;
+                    Unit.Parameter = ((Do) Loop).EndLine + 1;
                     break;
             }
         }

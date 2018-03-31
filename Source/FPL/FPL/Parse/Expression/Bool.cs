@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 
@@ -51,26 +51,26 @@ namespace FPL.Parse.Expression
             if (tag == Tag.AND)
             {
                 OrString = new List<CodingUnit>();
-                CodingUnit LE = Encoder.Code.Last();
-                LE.ins_type = LE.ins_type == InstructionType.jt
+                CodingUnit LE = FILGenerator.Code.Last();
+                LE.InsType = LE.InsType == InstructionType.jt
                     ? InstructionType.jf
                     : InstructionType.jt;
                 AndString.Add(LE);
                 Right.Code();
                 foreach (CodingUnit codingUnit in AndString)
                 {
-                    codingUnit.parameter = Encoder.Line + 1;
+                    codingUnit.Parameter = FILGenerator.Line + 1;
                 }
                 return;
             }
             if (tag == Tag.OR)
             {
                 AndString = new List<CodingUnit>();
-                OrString.Add(Encoder.Code.Last());
+                OrString.Add(FILGenerator.Code.Last());
                 Right.Code();
                 foreach (CodingUnit codingUnit in OrString)
                 {
-                    codingUnit.parameter = Encoder.Line + 1;
+                    codingUnit.Parameter = FILGenerator.Line + 1;
                 }
                 return;
             }
@@ -78,28 +78,28 @@ namespace FPL.Parse.Expression
             switch (tag)
             {
                 case Tag.EQ:
-                    Encoder.Write(InstructionType.eq);
-                    Encoder.Write(InstructionType.jt);
+                    FILGenerator.Write(InstructionType.eq);
+                    FILGenerator.Write(InstructionType.jt);
                     break;
                 case Tag.NE:
-                    Encoder.Write(InstructionType.eq);
-                    Encoder.Write(InstructionType.jf);
+                    FILGenerator.Write(InstructionType.eq);
+                    FILGenerator.Write(InstructionType.jf);
                     break;
                 case Tag.LE:
-                    Encoder.Write(InstructionType.mo);
-                    Encoder.Write(InstructionType.jf);
+                    FILGenerator.Write(InstructionType.mo);
+                    FILGenerator.Write(InstructionType.jf);
                     break;
                 case Tag.GE:
-                    Encoder.Write(InstructionType.le);
-                    Encoder.Write(InstructionType.jf);
+                    FILGenerator.Write(InstructionType.le);
+                    FILGenerator.Write(InstructionType.jf);
                     break;
                 case Tag.LESS:
-                    Encoder.Write(InstructionType.le);
-                    Encoder.Write(InstructionType.jt);
+                    FILGenerator.Write(InstructionType.le);
+                    FILGenerator.Write(InstructionType.jt);
                     break;
                 case Tag.MORE:
-                    Encoder.Write(InstructionType.mo);
-                    Encoder.Write(InstructionType.jt);
+                    FILGenerator.Write(InstructionType.mo);
+                    FILGenerator.Write(InstructionType.jt);
                     break;
             }
         }

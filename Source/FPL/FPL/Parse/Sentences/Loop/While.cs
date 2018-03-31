@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Expression;
@@ -59,19 +59,19 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Code()
         {
-            ToRel = Encoder.Write(InstructionType.jmp);
+            ToRel = FILGenerator.Write(InstructionType.jmp);
             foreach (Sentence item in Sentences) item.Code();
-            if (Encoder.Line == ToRel.line_num)
+            if (FILGenerator.Line == ToRel.LineNum)
             {
                 ToRel.Remove();
                 return;
             }
 
-            ToRel.parameter = Encoder.Line + 1;
+            ToRel.Parameter = FILGenerator.Line + 1;
             Expr.Code();
-            CodingUnit u = Encoder.Code[Encoder.Code.Count - 1];
-            u.parameter = ToRel.line_num + 1;
-            EndLine = u.line_num;
+            CodingUnit u = FILGenerator.Code[FILGenerator.Code.Count - 1];
+            u.Parameter = ToRel.LineNum + 1;
+            EndLine = u.LineNum;
         }
 
         public override void CodeSecond()

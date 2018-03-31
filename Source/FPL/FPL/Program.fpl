@@ -1,15 +1,16 @@
 ﻿class Program
 {
 	//Program program;
-	static int i;
+	//static int i;
 	static void Main()
 	{
 		//int a = 666 + 555 * 1 / 666 * (555 + 1);
 		//int b = a + 1 + pp(555, new Program().i);
 		//program.i = 0;
-		if(i == 0 && (i != (1)))
+		int a;
+		for (int i = 0; i <10000000; i = i + 1)
 		{
-			
+			a = a + 1;
 		}
 	}
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Sentences;
@@ -85,7 +85,7 @@ namespace FPL.Parse.Expression
 
         public override void Code()
         {
-            if (tag == Tag.NUM) Encoder.Write(InstructionType.pushval, (int) Content.GetValue());
+            if (tag == Tag.NUM) FILGenerator.Write(InstructionType.pushval, (int) Content.GetValue());
             if (tag == Tag.ID) ObjectCode();
         }
 
@@ -95,7 +95,7 @@ namespace FPL.Parse.Expression
             ID = Statement.ID;
             if (VarType == VarType.Static)
             {
-                Encoder.Write(InstructionType.pushsta, ID);
+                FILGenerator.Write(InstructionType.pushsta, ID);
                 return;
             }
 
@@ -103,21 +103,21 @@ namespace FPL.Parse.Expression
             {
                 if (Parser.AnalyzingFunction.FuncType == FuncType.Static)
                     Error(LogContent.ShouldBeingInstanced);
-                Encoder.Write(InstructionType.pusharg); //this
-                Encoder.Write(InstructionType.pushfield, ID);
+                FILGenerator.Write(InstructionType.pusharg); //this
+                FILGenerator.Write(InstructionType.pushfield, ID);
                 return;
             }
 
             switch (VarType)
             {
                 case VarType.Arg:
-                    Encoder.Write(InstructionType.pusharg, ID);
+                    FILGenerator.Write(InstructionType.pusharg, ID);
                     break;
                 case VarType.Field:
-                    Encoder.Write(InstructionType.pushfield, ID);
+                    FILGenerator.Write(InstructionType.pushfield, ID);
                     break;
                 case VarType.Local:
-                    Encoder.Write(InstructionType.pushloc, ID);
+                    FILGenerator.Write(InstructionType.pushloc, ID);
                     break;
             }
         }

@@ -2,12 +2,12 @@
 #include "Lexer.h"
 #include <sstream>
 
-vector<InstructionType> Lexer::instructions_v;
+vector<int> Lexer::instructions_v;
 vector<int> Lexer::parameters_v;
 vector<int> Lexer::methods_v;
 vector<int> Lexer::classes_v;
-list<InstructionType> Lexer::instructions;
-list<int> Lexer::parameters;
+list<int> Lexer::instructions;
+//list<int> Lexer::parameters;
 list<int> Lexer::methods;
 list<int> Lexer::classes;
 ifstream Lexer::infile;
@@ -18,10 +18,10 @@ int peek_int;
 char peek_char;
 string peek_string;
 
-void Lexer::Analysis(string filename)
+void Lexer::Analysis(const string filename)
 {
-	instructions = list<InstructionType>();
-	parameters = list<int>();
+	instructions = list<int>();
+	//parameters = list<int>();
 	methods = list<int>();
 	infile = ifstream(filename);
 	if (!infile.good())
@@ -77,7 +77,7 @@ void Lexer::AnalysisFilehead()
 void Lexer::Scan()
 {
 	ReadchInt();
-	instructions.push_back((InstructionType)peek_int);
+	instructions.push_back(peek_int);
 	//if (instructions.back() == InstructionType::func) 
 	//{
 	//	instructions.pop_back();
@@ -86,25 +86,25 @@ void Lexer::Scan()
 	//	return;
 	//}
 	ReadchInt();
-	parameters.push_back(peek_int);
+	instructions.push_back(peek_int);
 	line++;
 }
 
 void  Lexer::TurnToVec()
 {
-	list<InstructionType>::iterator itor_ins = instructions.begin();
-	instructions_v = vector<InstructionType>(instructions.size());
-	for (int i = 0; itor_ins != instructions.end(); i++)
+	list<int>::iterator itor_i = instructions.begin();
+	instructions_v = vector<int>(instructions.size());
+	for (int i = 0; itor_i != instructions.end(); i++)
 	{
-		instructions_v[i] = *itor_ins++;
+		instructions_v[i] = *itor_i++;
 	}
 
-	list<int>::iterator itor_i = parameters.begin();
-	parameters_v = vector<int>(parameters.size());
-	for (int i = 0; itor_i != parameters.end(); i++)
-	{
-		parameters_v[i] = *itor_i++;
-	}
+	//itor_i = parameters.begin();
+	//parameters_v = vector<int>(parameters.size());
+	//for (int i = 0; itor_i != parameters.end(); i++)
+	//{
+	//	parameters_v[i] = *itor_i++;
+	//}
 
 	itor_i = methods.begin();
 	methods_v = vector<int>(methods.size());

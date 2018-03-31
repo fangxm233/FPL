@@ -1,36 +1,35 @@
 #pragma once
-#include "Lexer.h"
 
 class Runner
 {
 public:
 	static void RunStart();
 private:
-	static vector<InstructionType> Instructions;
-	static vector<int> parameters;
-	static vector<int> stack;
-	static vector<int> methods;
-	static vector<int> classes;
-	static vector<int> heap;
+	static vector<int> instructions_;
+	//static vector<int> parameters_;
+	static vector<int> stack_;
+	static vector<int> methods_;
+	static vector<int> classes_;
+	static vector<int> heap_;
 
-	static InstructionType* code_ptr;
-	static InstructionType* code_ptr_start;
-	static int* parameter_ptr;
-	static int* parameter_ptr_start;
-	static int* stack_ptr;
-	static int* methods_ptr_start;
-	static int* heap_ptr;
-	static int* heap_ptr_start;
-	static int* class_ptr_start;
-	static int* static_ptr_start;
+	static int* code_ptr_;
+	static int* code_ptr_start_;
+	//static int* parameter_ptr_;
+	//static int* parameter_ptr_start_;
+	static int* stack_ptr_;
+	static int* methods_ptr_start_;
+	static int* heap_ptr_;
+	static int* heap_ptr_start_;
+	static int* class_ptr_start_;
+	static int* static_ptr_start_;
 
-	static int static_count;
+	static int static_count_;
 
 	static int* EBP;
 	static int EAX;
 
 	static void RunInstructions();
-	static void ExpansionStack();
-	static void ExpansionHeap();
+	static void ExpandStack();
+	static void ExpandHeap();
 };
 

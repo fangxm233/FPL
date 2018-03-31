@@ -1,4 +1,4 @@
-﻿using FPL.Encoding;
+﻿using FPL.Generator;
 using FPL.OutPut;
 using FPL.Parse.Expression;
 using FPL.Parse.Structure;
@@ -49,19 +49,19 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Code()
         {
-            if (FunctionName == "Main")
-            {
-                Encoder.Write(InstructionType.endP);
-                return;
-            }
+            //if (FunctionName == "Main")
+            //{
+            //    Encoder.Write(InstructionType.endP);
+            //    return;
+            //}
 
             if (Expr != null)
                 Expr.Code();
-            else Encoder.Write(InstructionType.pushval);
-            Encoder.Write(InstructionType.pushEAX);
+            else FILGenerator.Write(InstructionType.pushval);
+            //Encoder.Write(InstructionType.popEAX);
 
-            for (int i = 0; i < Function.Statements.Count; i++) Encoder.Write(InstructionType.pop);
-            Encoder.Write(InstructionType.ret);
+            //for (int i = 0; i < Function.Statements.Count; i++) Encoder.Write(InstructionType.pop);
+            FILGenerator.Write(InstructionType.ret);
         }
     }
 }

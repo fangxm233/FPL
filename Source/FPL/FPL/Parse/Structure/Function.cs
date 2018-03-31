@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Sentences;
@@ -126,16 +126,20 @@ namespace FPL.Parse.Structure
                 AddSentence(new Return(Tag.RETURN, Name));
             }
 
-            HeadLine = Encoder.Line + 1;
+            HeadLine = FILGenerator.Line + 1;
             foreach (Object_s item in objects_s) item.IsHead = false;
-            for (int i = 1; i < ParStatements.Count + 1; i++) ParStatements[i - 1].ID = i;
-            for (int i = ParStatements.Count + 2; i < Statements.Count; i++) Statements[i].ID = i;
-            for (int i = 0; i < Statements.Count - ParStatements.Count; i++) Encoder.Write(InstructionType.pushval);
+            for (int i = 1; i < ParStatements.Count + (FuncType == FuncType.Static ? 0 : 1); i++)
+                ParStatements[i - (FuncType == FuncType.Static ? 0 : 1)].ID = i;
+            for (int i = ParStatements.Count + 1;
+                i < Statements.Count + ParStatements.Count + (FuncType == FuncType.Static ? 0 : 1);
+                i++)
+                Statements[i - ParStatements.Count - (FuncType == FuncType.Static ? 0 : 1)].ID = i;
+            for (int i = 0; i < Statements.Count - ParStatements.Count; i++) FILGenerator.Write(InstructionType.pushval);
             foreach (Sentence item in Sentences)
             {
                 if (item.tag == Tag.RETURN && tag == Tag.INIT_FUNCTION || tag == Tag.CONSTRUCTOR)
                 {
-                    Encoder.Write(InstructionType.ret);
+                    FILGenerator.Write(InstructionType.ret);
                     continue;
                 }
 

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Expression;
@@ -51,21 +51,21 @@ namespace FPL.Parse.Sentences
             if (Right == null) return;
             Right.Code();
             Left.Code();
-            CodingUnit codingUnit = Encoder.Code.Last();
-            Encoder.Back();
-            switch (codingUnit.ins_type)
+            CodingUnit codingUnit = FILGenerator.Code.Last();
+            FILGenerator.Back();
+            switch (codingUnit.InsType)
             {
                 case InstructionType.pusharg:
-                    Encoder.Write(InstructionType.storearg, codingUnit.parameter);
+                    FILGenerator.Write(InstructionType.storearg, codingUnit.Parameter);
                     break;
                 case InstructionType.pushfield:
-                    Encoder.Write(InstructionType.storefield, codingUnit.parameter);
+                    FILGenerator.Write(InstructionType.storefield, codingUnit.Parameter);
                     break;
                 case InstructionType.pushloc:
-                    Encoder.Write(InstructionType.storeloc, codingUnit.parameter);
+                    FILGenerator.Write(InstructionType.storeloc, codingUnit.Parameter);
                     break;
                 case InstructionType.pushsta:
-                    Encoder.Write(InstructionType.storesta, codingUnit.parameter);
+                    FILGenerator.Write(InstructionType.storesta, codingUnit.Parameter);
                     break;
             }
         }

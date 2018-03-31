@@ -7,10 +7,10 @@
         pushfield,
         pushval,
         pushsta,
-        pushEAX,
+        //pushEAX,
 
         pop,
-        popEAX,
+        //popEAX,
 
         storeloc,
         storearg,

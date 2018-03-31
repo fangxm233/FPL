@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.Parse;
 
@@ -19,8 +19,15 @@ namespace FPL
          * 强类型运算
          * 函数
          */
+        //TODO:修改条件判断
+        //TODO:修改解释器读取文件
+        //TODO:修改编译器结构
         private static void Main(string[] args)
         {
+            //args = new[]
+            //{
+            //    "Program.fpl", "System.fpl"
+            //};
             if (args.Length == 0)
             {
                 Console.WriteLine("未指明文件");
@@ -30,8 +37,8 @@ namespace FPL
 
             if (Compile(args))
             {
-                Console.WriteLine("启动解释器");
-                Process.Start("FPL_Interpreter c++.exe");
+                //Console.WriteLine("启动解释器");
+                //Process.Start("FPL_Interpreter c++.exe");
             }
 
             Console.ReadKey();
@@ -47,10 +54,10 @@ namespace FPL
                 Lexer.Analysis(args);
                 Parser parser = new Parser();
                 parser.Compile();
-                Encoder.Init("Program.fplc");
+                FILGenerator.Init("Program.fplc");
                 parser.Code();
                 parser.CodeSecond();
-                Encoder.WriteToFile();
+                FILGenerator.WriteToFile(true);
 
                 watch.Stop();
                 TimeSpan timespan = watch.Elapsed;

@@ -13,3 +13,4 @@ C:\f\FPL\FPL\obj\Release\FPL.csprojResolveAssemblyReference.cache
 C:\f\FPL\FPL\obj\Release\FPL.csproj.CoreCompileInputs.cache
 C:\f\FPL\FPL\obj\Release\FPL.exe
 C:\f\FPL\FPL\obj\Release\FPL.pdb
+G:\GIT\FPL\Source\FPL\FPL\obj\Release\FPL.csprojResolveAssemblyReference.cache

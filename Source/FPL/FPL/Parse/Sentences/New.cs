@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Expression;
@@ -78,12 +78,12 @@ namespace FPL.Parse.Sentences
 
         public override void Code()
         {
-            Encoder.Write(InstructionType.newobjc, Class.ID);
-            Encoder.Write(InstructionType.call, Class.GetFunction(".init").ID);
+            FILGenerator.Write(InstructionType.newobjc, Class.ID);
+            FILGenerator.Write(InstructionType.call, Class.GetFunction(".init").ID);
             if (Function.ParStatements.Count != 0)
                 for (int i = Parameters.Count - 1; i >= 0; i--)
                     Parameters[i].Code();
-            Encoder.Write(InstructionType.call, Class.GetFunction(Class.Name).ID);
+            FILGenerator.Write(InstructionType.call, Class.GetFunction(Class.Name).ID);
         }
 
         public Sentence BuildNext()
@@ -142,12 +142,12 @@ namespace FPL.Parse.Sentences
 
         public override void Code()
         {
-            Encoder.Write(InstructionType.newobjc, Class.ID);
-            Encoder.Write(InstructionType.call, Class.GetFunction(".init").ID);
+            FILGenerator.Write(InstructionType.newobjc, Class.ID);
+            FILGenerator.Write(InstructionType.call, Class.GetFunction(".init").ID);
             if (Function.ParStatements.Count != 0)
                 for (int i = Parameters.Count - 1; i >= 0; i--)
                     Parameters[i].Code();
-            Encoder.Write(InstructionType.call, Class.GetFunction(Class.Name).ID);
+            FILGenerator.Write(InstructionType.call, Class.GetFunction(Class.Name).ID);
         }
     }
 }

@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OutPut\Debugger.cs" />
-    <Compile Include="Encoding\Encoder.cs" />
+    <Compile Include="Generator\FILGenerator.cs" />
     <Compile Include="Parse\Sentences\Assign.cs" />
     <Compile Include="Parse\Sentences\ProcessControl\Break.cs" />
     <Compile Include="Parse\Structure\Class.cs" />

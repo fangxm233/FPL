@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 
@@ -75,7 +75,7 @@ namespace FPL.Parse.Expression
             if (tag == Tag.DOT) return;
             if (Parser.InsTable.ContainsKey(tag))
                 if (Parser.InsTable[tag].ContainsKey(Type.type_name))
-                    Encoder.Write(Parser.InsTable[tag][Type.type_name]);
+                    FILGenerator.Write(Parser.InsTable[tag][Type.type_name]);
                 else
                     Error(LogContent.NoOverride);
             else

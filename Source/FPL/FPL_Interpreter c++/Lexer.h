@@ -6,7 +6,7 @@ class Lexer
 {
 public:
 	static void Analysis(string filename);
-	static vector<InstructionType> instructions_v;
+	static vector<int> instructions_v;
 	static vector<int> parameters_v;
 	static vector<int> methods_v;
 	static vector<int> classes_v;
@@ -14,8 +14,8 @@ public:
 	static int static_count;
 private:
 	static int line;
-	static list<InstructionType> instructions;
-	static list<int> parameters;
+	static list<int> instructions;
+	//static list<int> parameters;
 	static list<int> methods;
 	static list<int> classes;
 	//static int peek_int;

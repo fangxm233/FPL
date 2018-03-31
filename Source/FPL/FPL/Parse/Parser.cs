@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using FPL.Encoding;
+using FPL.Generator;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
 using FPL.Parse.Sentences;
@@ -124,53 +124,61 @@ namespace FPL.Parse
 
         public void Code()
         {
-            Encoder.Write(0);
-            Encoder.Write(0);
-            CodingUnit entrance_line = Encoder.Write(-1);
-            CodingUnit static_count = Encoder.Write(0);
-            foreach (var @class in Classes)
-            foreach (Statement statement in @class.Value.Statement)
-            {
-                if (statement.VarType != VarType.Static) continue;
-                Encoder.Write(statement.Assign.Left.Type.type_name, statement.Name);
-                static_count.parameter++;
-            }
+            FILGenerator.Write(0);
+            FILGenerator.Write(0);
+            CodingUnit entranceLine = FILGenerator.Write(-1);
 
+            FILGenerator.Write(Classes.Count);
             foreach (var item in Classes)
             {
-                ClassesUnit.Add(Encoder.Write(item.Value.Name));
-                Encoder.Write(item.Value.Width);
-                foreach (Statement var in item.Value.Statement) Encoder.Write(var.Assign.Left.Type.type_name, var.Name);
-                foreach (Function func in item.Value.Functions) FunctionsUnit.Add(Encoder.Write(func.Name));
-                Encoder.Write(InstructionType.nop);
+                ClassesUnit.Add(FILGenerator.Write(item.Value.Name));
+                FILGenerator.Write(item.Value.Width);
+
+                FILGenerator.Write(item.Value.Statement.Count);
+                foreach (Statement statement in item.Value.Statement)
+                    if (statement.VarType != VarType.Static)
+                        FILGenerator.Write(statement.Assign.Left.Type.type_name, statement.Name);
+
+                FILGenerator.Write(item.Value.Functions.Count);
+                foreach (Function func in item.Value.Functions) FunctionsUnit.Add(FILGenerator.Write(func.Name, 0, 0));
+
+                CodingUnit staticCount = FILGenerator.Write(0);
+                foreach (Statement statement in item.Value.Statement)
+                {
+                    if (statement.VarType != VarType.Static) continue;
+                    FILGenerator.Write(statement.Assign.Left.Type.type_name, statement.Name);
+                    staticCount.Parameter++;
+                }
             }
 
-            Encoder.Write(InstructionType.define);
+            FILGenerator.Write(InstructionType.define);
             int class_i = 0;
             int func_i = 0;
             foreach (var item in Classes)
             {
-                Encoder.Write(InstructionType.@class);
-                ClassesUnit[class_i++].line_num = Encoder.Line;
+                FILGenerator.Write(InstructionType.@class);
+                ClassesUnit[class_i++].LineNum = FILGenerator.Line;
                 foreach (Function func in item.Value.Functions)
                 {
-                    Encoder.Write(InstructionType.func);
+                    FILGenerator.Write(InstructionType.func);
                     if (func.Name == "Main" && func.FuncType == FuncType.Static)
                     {
-                        entrance_line.parameter = Encoder.Line + 1;
-                        Encoder.Write(InstructionType.call, func.ID);
+                        entranceLine.Parameter = FILGenerator.Line + 1;
+                        FILGenerator.Write(InstructionType.call, func.ID);
+                        FILGenerator.Write(InstructionType.endP);
                     }
 
-                    FunctionsUnit[func_i++].line_num = Encoder.Line + 1;
+                    FunctionsUnit[func_i].Parameter = FILGenerator.Line + 1;
                     func.Code();
-                    Encoder.Write(InstructionType.funcEnd);
+                    FILGenerator.Write(InstructionType.funcEnd);
+                    FunctionsUnit[func_i++].Parameter2 = FILGenerator.GetStackFrameSize();
                 }
 
-                Encoder.Write(InstructionType.classEnd);
+                FILGenerator.Write(InstructionType.classEnd);
             }
 
-            Encoder.Write(InstructionType.endF);
-            if (entrance_line.parameter == -1) Node.Error(LogContent.NoEntranceMethod);
+            FILGenerator.Write(InstructionType.endF);
+            if (entranceLine.Parameter == -1) Node.Error(LogContent.NoEntranceMethod);
         }
 
         public void CodeSecond()
