@@ -16,12 +16,7 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public Return(int tag) : base(tag)
         {
-            FunctionName = Parser.AnalyzingFunction.Name;
-        }
-
-        public Return(int tag, string name) : base(tag)
-        {
-            FunctionName = name;
+            Function = Parser.AnalyzingFunction;
         }
 
         public override Sentence Build()
@@ -34,7 +29,6 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Check()
         {
-            Function = Class.GetFunction(FunctionName);
             RetrunType = Function.ReturnType;
             if (Expr == null)
             {

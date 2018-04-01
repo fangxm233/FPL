@@ -24,7 +24,7 @@ namespace FPL.Parse.Expression
         {
             if (isBuilt) return;
             Right = Position.Next.Value;
-            if (Parser.TypeOfExpr[Right.tag] != Tag.FACTOR) Error(LogContent.ExprError);
+            if (Tag.IsIncludedIn(ClassificateMethod.ExprType, Right.tag) != Tag.FACTOR) Error(LogContent.ExprError);
             Position.List.Remove(Position.Next);
             isBuilt = true;
         }

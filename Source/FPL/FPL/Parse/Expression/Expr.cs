@@ -37,10 +37,11 @@ namespace FPL.Parse.Expression
             foreach (var dictionary in Parser.SymbolPriority)
                 for (var node = start.Next; node != end.Next; node = node.Next)
                     if (dictionary.ContainsKey(node.Value.tag))
-                        node.Value.Build();
+                        if (node.Value.tag != Tag.ID && node.Value.tag != Tag.NEW)
+                            node.Value.Build();
         }
 
-        private LinkedList<Expr> MatchAll()
+        private static LinkedList<Expr> MatchAll()
         {
             var expr = new LinkedList<Expr>();
             expr.AddFirst(new Expr());
@@ -48,13 +49,9 @@ namespace FPL.Parse.Expression
             while (true)
             {
                 Lexer.Next();
+                if (Tag.IsIncludedIn(ClassificateMethod.ExprEnd, Lexer.NextToken.tag) == 1) return expr;
                 switch (Lexer.NextToken.tag)
                 {
-                    case Tag.SEMICOLON:
-                    case Tag.COMMA:
-                    case Tag.ASSIGN:
-                    case Tag.RBRACE:
-                        return expr;
                     case Tag.ID:
                         Lexer.Next();
                         if (Lexer.NextToken.tag == Tag.LBRACKETS)
@@ -73,9 +70,9 @@ namespace FPL.Parse.Expression
                         continue;
                 }
 
-                if (!Parser.TypeOfExpr.ContainsKey(Lexer.NextToken.tag))
+                if (Tag.IsIncludedIn(ClassificateMethod.ExprType, Lexer.NextToken.tag) == -1)
                     Error(LogContent.SthUnexpect, Lexer.NextToken);
-                switch (Parser.TypeOfExpr[Lexer.NextToken.tag])
+                switch (Tag.IsIncludedIn(ClassificateMethod.ExprType, Lexer.NextToken.tag))
                 {
                     case Tag.FACTOR:
                         Factor f = new Factor(Lexer.NextToken.tag, Lexer.NextToken);

@@ -63,22 +63,6 @@ namespace FPL.Parse
             foreach (var item in Classes)
             {
                 AnalyzingClass = item.Value;
-                //foreach (var item1 in item.Value.FunctionCalls_e)
-                //{
-                //    item1.@class = item.Value;
-                //}
-                //foreach (var item1 in item.Value.FunctionCalls_s)
-                //{
-                //    item1.@class = item.Value;
-                //}
-                //foreach (var item1 in item.Value.Objects_e)
-                //{
-                //    item1.@class = item.Value;
-                //}
-                //foreach (var item1 in item.Value.Objects_s)
-                //{
-                //    item1.@class = item.Value;
-                //}
                 item.Value.Width = item.Value.GetWidth();
                 Type.AddType(new Type(item.Value.Name, Tag.CLASS, item.Value.Width));
                 int s = 0;
@@ -111,9 +95,16 @@ namespace FPL.Parse
                 AnalyzingClass = item.Value;
                 foreach (Function item1 in item.Value.Functions)
                 {
-                    if (item1.tag == Tag.CONSTRUCTOR) continue;
+                    AnalyzingFunction = item1;
                     if (item1.tag == Tag.INIT_FUNCTION) continue;
+
+                    foreach (Parameter item1Parameter in item1.Parameters)
+                        item1Parameter.Check();
+
+                    if (item1.tag == Tag.CONSTRUCTOR) continue;
+
                     item1.ReturnType = Type.GetType(item1.TypeName);
+                    AnalyzingFunction = null;
                 }
 
                 foreach (Function item1 in item.Value.Functions) item1.Check();

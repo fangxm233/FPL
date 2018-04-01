@@ -14,9 +14,22 @@
 		}
 		if(a == 0 || a == 1 && a == 2)
 			a = 666;
+		pp();
+		pp(1,1);
+		int r = new Program(1);
+	}
+
+	Program(int a)
+	{
+		a = 0;
 	}
 
 	static int pp(int a, int ssss)
+	{
+		return 0;
+	}
+
+	static int pp()
 	{
 		return 0;
 	}
@@ -48,11 +61,8 @@ class类型
 
 将要支持:
 函数重载
-继承
-函数重写
 数组
 所有基本类型
 命名空间
-泛型
 简单的代码优化
 */

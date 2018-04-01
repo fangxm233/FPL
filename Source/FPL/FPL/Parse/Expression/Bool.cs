@@ -1,9 +1,8 @@
-﻿using FPL.Generator;
-using FPL.LexicalAnalysis;
+﻿using FPL.DataStorager;
+using FPL.Generator;
 using FPL.OutPut;
 using System.Collections.Generic;
 using System.Linq;
-using FPL.DataStorager;
 
 namespace FPL.Parse.Expression
 {

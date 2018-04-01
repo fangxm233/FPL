@@ -38,6 +38,8 @@ namespace FPL.OutPut
             "没有要中断或继续的循环",
             "只有赋值，函数调用和new 对象表达式可用作语句",
             "需要一个类型可转换为 {0} 的对象",
+            "类型 {0} 已定义了一个名为 {1} 的具有相同参数类型的成员",
+            "类型 {0} 中没有名为 {1} 的符合的函数重载",
 
         };
 
@@ -236,5 +238,13 @@ namespace FPL.OutPut
         /// 需要一个类型可转换为 {0} 的对象
         /// </summary>
         ReturnValueMissing,
+
+        ///类型 {0} 已定义了一个名为 {1} 的具有相同参数类型的成员
+        ExistingDefinitionInTypeWithParm,
+
+        /// <summary>
+        /// 类型 {0} 中没有名为 {1} 的符合的函数重载
+        /// </summary>
+        NotExistingMatchOverload,
     }
 }

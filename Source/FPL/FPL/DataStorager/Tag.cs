@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Data;
 
 namespace FPL.DataStorager
 {
@@ -143,22 +143,25 @@ namespace FPL.DataStorager
             return new Tag(i);
         }
 
-        public int IsIncludedIn(ClassificateMethod method)
+        public static int IsIncludedIn(ClassificateMethod method, int tag)
         {
+            if (ExprTagTable.Count == 0)
+                FillTable();
+            
             switch (method)
             {
                 case ClassificateMethod.ExprEnd:
-                    switch (TagDetail)
+                    switch (tag)
                     {
                         case SEMICOLON:
-                        case RBRACKETS:
+                        case ASSIGN:
                         case RBRACE:
                         case COMMA:
                             return 1;
                     }
                     break;
                 case ClassificateMethod.ExprType:
-                    if (ExprTagTable.ContainsKey(TagDetail)) return ExprTagTable[TagDetail];
+                    if (ExprTagTable.ContainsKey(tag)) return ExprTagTable[tag];
                     break;
             }
 

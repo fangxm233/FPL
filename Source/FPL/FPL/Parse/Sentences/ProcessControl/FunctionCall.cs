@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FPL.DataStorager;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
@@ -15,7 +16,7 @@ namespace FPL.Parse.Sentences.ProcessControl
         public bool isHead = true;
         public string Name;
         private Sentence Next;
-        public List<Expr> Parameters = new List<Expr>();
+        public List<Parameter> Parameters = new List<Parameter>();
         public Type ReturnType;
         public Type Type;
 
@@ -29,8 +30,8 @@ namespace FPL.Parse.Sentences.ProcessControl
             Match("(");
             while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
-                Parameters.Add(new Expr().BuildStart());
-                if (Parameters[Parameters.Count - 1] == null)
+                Parameters.Add(new Parameter(new Expr().BuildStart()));
+                if (Parameters.Last().Expr == null)
                 {
                     if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
                     Match(")", false);
@@ -67,10 +68,9 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Check()
         {
-            Function = Class.GetFunction(Name);
-            if (Function == null) Error(LogContent.NotExistingDefinitionInType, Class.Name, Name);
-            if (Parameters.Count != Function.ParStatements.Count)
-                Error(LogContent.NumberOfParamDoesNotMatch, Name, Parameters.Count);
+            if (Class == null) Class = Parser.AnalyzingClass;
+            foreach (Parameter item in Parameters) item.Check();
+            Function = Class.GetFunction(this, Name, Parameters);
             ReturnType = Function.ReturnType;
             if (Next != null)
             {
@@ -90,7 +90,6 @@ namespace FPL.Parse.Sentences.ProcessControl
                 Next.Check();
             }
 
-            foreach (Expr item in Parameters) item.Check();
             //if (Next == null) return;
         }
 
@@ -115,7 +114,7 @@ namespace FPL.Parse.Sentences.ProcessControl
         public Function Function;
         public bool isHead = true;
         public Class LocalClass;
-        public List<Expr> Parameters = new List<Expr>();
+        public List<Parameter> Parameters = new List<Parameter>();
         public Type ReturnType;
 
         public FunctionCall_e(int tag)
@@ -129,8 +128,8 @@ namespace FPL.Parse.Sentences.ProcessControl
             Match("(");
             while (Lexer.NextToken.tag != Tag.RBRACKETS)
             {
-                Parameters.Add(new Expr().BuildStart());
-                if (Parameters[Parameters.Count - 1] != null) continue;
+                Parameters.Add(new Parameter(new Expr().BuildStart()));
+                if (Parameters.Last().Expr != null) continue;
                 if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
                 Match(")", false);
                 Parameters.RemoveAt(Parameters.Count - 1);
@@ -142,14 +141,14 @@ namespace FPL.Parse.Sentences.ProcessControl
         {
             if (Class == null) Class = Parser.AnalyzingClass;
             LocalClass = Class;
-            Function = LocalClass.GetFunction(Name);
+            Function = LocalClass.GetFunction(this, Name, Parameters);
             if (Function == null) Error(LogContent.NotExistingDefinitionInType, LocalClass.Name, Name);
-            if (Parameters.Count != Function.ParStatements.Count)
+            if (Parameters.Count != Function.Parameters.Count)
                 Error(LogContent.NumberOfParamDoesNotMatch, Name, Parameters.Count);
             ReturnType = Function.ReturnType;
             Class = GetClass(ReturnType.type_name);
             Type = ReturnType;
-            foreach (Expr item in Parameters) item.Check();
+            foreach (Parameter item in Parameters) item.Check();
         }
 
         public override void Code()

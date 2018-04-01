@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FPL.DataStorager;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
@@ -36,7 +37,8 @@ namespace FPL.Parse.Structure
             BuildClass();
             Match("}", false);
             DestroyScope();
-            if (GetFunction(Name) == null) Functions.Add(new Function(FuncType.Constructor, Tag.CONSTRUCTOR, Name));
+            if (ContainsFunction(Name, out bool h) == false && h == false)
+                Functions.Add(new Function(FuncType.Constructor, Tag.CONSTRUCTOR, Name));
             InitFunction = new Function(FuncType.InitFunction, Tag.INIT_FUNCTION, ".init");
             Functions.Add(InitFunction);
             Parser.AnalyzingClass = null;
@@ -48,12 +50,68 @@ namespace FPL.Parse.Structure
             Functions.Add(f);
         }
 
-        public Function GetFunction(string name)
+        public Function GetFunction(Node n, string name, params Parameter[] parameters)
         {
+            bool hasSameName = false;
             foreach (Function item in Functions)
                 if (item.Name == name)
-                    return item;
+                {
+                    hasSameName = true;
+                    if (parameters.Length != item.Parameters.Count) continue;
+                    if (!parameters.Where((t, i) => t != item.Parameters[i]).Any())
+                        return item;
+                }
+
+            Error(n, hasSameName ? LogContent.NotExistingMatchOverload : LogContent.NotExistingDefinitionInType, Name,
+                name);
             return null;
+        }
+
+        public Function GetFunction(Node n, string name, List<Parameter> parameters)
+        {
+            bool hasSameName = false;
+            foreach (Function item in Functions)
+                if (item.Name == name)
+                {
+                    hasSameName = true;
+                    if (parameters.Count != item.Parameters.Count) continue;
+                    if (!parameters.Where((t, i) => t != item.Parameters[i]).Any())
+                        return item;
+                }
+
+            Error(n, hasSameName ? LogContent.NotExistingMatchOverload : LogContent.NotExistingDefinitionInType, Name,
+                name);
+            return null;
+        }
+
+        public bool ContainsFunction(string name, out bool hasSameName, params Parameter[] parameters)
+        {
+            hasSameName = false;
+            foreach (Function item in Functions)
+                if (item.Name == name)
+                {
+                    hasSameName = true;
+                    if (parameters.Length != item.Parameters.Count) continue;
+                    if (!parameters.Where((t, i) => t != item.Parameters[i]).Any())
+                        return true;
+                }
+
+            return false;
+        }
+
+        public bool ContainsFunction(string name, out bool hasSameName, List<Parameter> parameters)
+        {
+            hasSameName = false;
+            foreach (Function item in Functions)
+                if (item.Name == name)
+                {
+                    hasSameName = true;
+                    if (parameters.Count != item.Parameters.Count) continue;
+                    if (!parameters.Where((t, i) => t != item.Parameters[i]).Any())
+                        return true;
+                }
+
+            return false;
         }
 
         public Statement GetStatement(string name)

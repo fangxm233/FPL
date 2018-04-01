@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FPL.DataStorager;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
@@ -16,7 +17,7 @@ namespace FPL.Parse.Structure
         public int ID;
         public string Name;
         public List<Object_s> objects_s = new List<Object_s>();
-        public List<Statement> ParStatements = new List<Statement>();
+        public List<Parameter> Parameters = new List<Parameter>();
         public Type ReturnType;
         private List<Sentence> Sentences = new List<Sentence>();
         public List<Statement> Statements = new List<Statement>();
@@ -38,20 +39,20 @@ namespace FPL.Parse.Structure
             Name = name;
         }
 
-        public Function(FuncType type, Type return_type, int tag) : base(tag)
+        public Function(FuncType type, Type returnType, int tag) : base(tag)
         {
             FuncType = type;
-            ReturnType = return_type;
+            ReturnType = returnType;
             if (Lexer.NextToken.tag == Tag.ID)
                 Name = ((Word) Lexer.NextToken).Lexeme;
             else Error(LogContent.SthUseless, Lexer.NextToken);
         }
 
-        public Function(FuncType type, Type return_type, string name, int tag) : base(tag)
+        public Function(FuncType type, Type returnType, string name, int tag) : base(tag)
         {
             FuncType = type;
             Class = GetClass(name);
-            ReturnType = return_type;
+            ReturnType = returnType;
             Name = name;
         }
 
@@ -66,7 +67,7 @@ namespace FPL.Parse.Structure
             while (true)
             {
                 if (Lexer.NextToken.tag == Tag.RBRACKETS) break;
-                ParStatements.Add((Statement) new Statement(VarType.Arg, Tag.STATEMENT).Build());
+                Parameters.Add(new Parameter((Statement) new Statement(VarType.Arg, Tag.STATEMENT).Build()));
                 if (Lexer.NextToken.tag == Tag.COMMA)
                     Lexer.Next();
                 else
@@ -88,7 +89,7 @@ namespace FPL.Parse.Structure
             if (tag == Tag.CONSTRUCTOR && Sentences.Count == 0)
             {
                 ReturnType = Type.Void;
-                AddSentence(new Return(Tag.RETURN, Name));
+                AddSentence(new Return(Tag.RETURN));
                 return;
             }
 
@@ -100,19 +101,19 @@ namespace FPL.Parse.Structure
                 }
                 else
                 {
-                    Sentences.Add(new Return(Tag.RETURN, Name));
+                    Sentences.Add(new Return(Tag.RETURN));
                     ((Return) Sentences[Sentences.Count - 1]).Class = Class;
                 }
 
-            if (Sentences[Sentences.Count - 1].tag != Tag.RETURN) //检查函数返回
+            if (Sentences.Last().tag != Tag.RETURN) //检查函数返回
             {
                 if (ReturnType != Type.Void) Error(LogContent.NotAllPathHaveReturnValue);
-                Sentences.Add(new Return(Tag.RETURN, Name));
+                Sentences.Add(new Return(Tag.RETURN));
                 ((Return) Sentences[Sentences.Count - 1]).Class = Class;
             }
 
-            if (ParStatements.Count != 0 && Name == "Main") Error(LogContent.HaveParmUnallowed);
-            foreach (Statement item in ParStatements) item.Check();
+            if (Parameters.Count != 0 && Name == "Main") Error(LogContent.HaveParmUnallowed);
+            foreach (Parameter item in Parameters) item.Check();
             foreach (Sentence item in Sentences) item.Check();
             Parser.AnalyzingFunction = null;
         }
@@ -123,18 +124,22 @@ namespace FPL.Parse.Structure
             if (tag == Tag.INIT_FUNCTION)
             {
                 ReturnType = Type.Void;
-                AddSentence(new Return(Tag.RETURN, Name));
+                AddSentence(new Return(Tag.RETURN));
             }
 
             HeadLine = FILGenerator.Line + 1;
             foreach (Object_s item in objects_s) item.IsHead = false;
-            for (int i = 1; i < ParStatements.Count + (FuncType == FuncType.Static ? 0 : 1); i++)
-                ParStatements[i - (FuncType == FuncType.Static ? 0 : 1)].ID = i;
-            for (int i = ParStatements.Count + 1;
-                i < Statements.Count + ParStatements.Count + (FuncType == FuncType.Static ? 0 : 1);
+
+            for (int i = 1; i < Parameters.Count + (FuncType == FuncType.Static ? 0 : 1); i++)
+                Parameters[i - (FuncType == FuncType.Static ? 0 : 1)].Statement.ID = i;
+
+            for (int i = Parameters.Count + 1;
+                i < Statements.Count + Parameters.Count + (FuncType == FuncType.Static ? 0 : 1);
                 i++)
-                Statements[i - ParStatements.Count - (FuncType == FuncType.Static ? 0 : 1)].ID = i;
-            for (int i = 0; i < Statements.Count - ParStatements.Count; i++) FILGenerator.Write(InstructionType.pushval);
+                Statements[i - Parameters.Count - (FuncType == FuncType.Static ? 0 : 1)].ID = i;
+
+            for (int i = 0; i < Statements.Count - Parameters.Count; i++) FILGenerator.Write(InstructionType.pushval);
+
             foreach (Sentence item in Sentences)
             {
                 if (item.tag == Tag.RETURN && tag == Tag.INIT_FUNCTION || tag == Tag.CONSTRUCTOR)
