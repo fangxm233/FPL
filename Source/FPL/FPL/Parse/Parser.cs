@@ -26,7 +26,9 @@ namespace FPL.Parse
         Member,
         Static,
         Constructor,
-        InitFunction
+        InitFunction,
+        OperatorFunc,
+
     }
 
     public class Parser
@@ -101,9 +103,8 @@ namespace FPL.Parse
                     foreach (Parameter item1Parameter in item1.Parameters)
                         item1Parameter.Check();
 
-                    if (item1.tag == Tag.CONSTRUCTOR) continue;
-
-                    item1.ReturnType = Type.GetType(item1.TypeName);
+                    if (item1.tag != Tag.CONSTRUCTOR)
+                        item1.ReturnType = Type.GetType(item1.TypeName);
                     AnalyzingFunction = null;
                 }
 
@@ -168,7 +169,7 @@ namespace FPL.Parse
             }
 
             FILGenerator.Write(InstructionType.endF);
-            if (entranceLine.Parameter == -1) Node.Error(LogContent.NoEntranceMethod);
+            if (entranceLine.Parameter == -1) Node.ErrorSta(LogContent.NoEntranceMethod);
         }
 
         public void CodeSecond()

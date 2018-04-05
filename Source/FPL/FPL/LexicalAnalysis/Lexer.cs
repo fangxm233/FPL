@@ -53,6 +53,7 @@ namespace FPL.LexicalAnalysis
             Reserve(new Word("class", Tag.CLASS));
             Reserve(new Word("new", Tag.NEW));
             Reserve(new Word("static", Tag.STATIC));
+            Reserve(new Word("operator", Tag.OPERATOR));
             Reserve(Word.True);
             Reserve(Word.False);
             Reserve(Type.Int);
@@ -243,7 +244,7 @@ namespace FPL.LexicalAnalysis
 
                     if (Peek == '\n')
                     {
-                        Node.Error(LogContent.SthExpect, "\"");
+                        Node.ErrorSta(LogContent.SthExpect, "\"");
                         Str str = new Str(s);
                         Readch();
                         Peeks.Add(str);
@@ -271,7 +272,7 @@ namespace FPL.LexicalAnalysis
                     }
                     catch (Exception)
                     {
-                        Node.Error(LogContent.NumberOutOfRange);
+                        Node.ErrorSta(LogContent.NumberOutOfRange);
                     }
 
                     return;
@@ -292,7 +293,7 @@ namespace FPL.LexicalAnalysis
                 }
                 catch (Exception)
                 {
-                    Node.Error(LogContent.FloatOutOfRange);
+                    Node.ErrorSta(LogContent.FloatOutOfRange);
                 }
 
                 return;
@@ -323,7 +324,7 @@ namespace FPL.LexicalAnalysis
                 return;
             }
 
-            Node.Error(LogContent.SthUnexpect, Peek);
+            Node.ErrorSta(LogContent.SthUnexpect, Peek);
         }
 
         public static void AddBackup()

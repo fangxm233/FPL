@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FPL.Classification;
 using FPL.DataStorager;
 using FPL.LexicalAnalysis;
 using FPL.OutPut;
@@ -49,7 +50,7 @@ namespace FPL.Parse.Expression
             while (true)
             {
                 Lexer.Next();
-                if (Tag.IsIncludedIn(ClassificateMethod.ExprEnd, Lexer.NextToken.tag) == 1) return expr;
+                if (Classifier.ClassificateIn(ClassificateMethod.ExprEnd, Lexer.NextToken.tag) == 1) return expr;
                 switch (Lexer.NextToken.tag)
                 {
                     case Tag.ID:
@@ -70,9 +71,9 @@ namespace FPL.Parse.Expression
                         continue;
                 }
 
-                if (Tag.IsIncludedIn(ClassificateMethod.ExprType, Lexer.NextToken.tag) == -1)
-                    Error(LogContent.SthUnexpect, Lexer.NextToken);
-                switch (Tag.IsIncludedIn(ClassificateMethod.ExprType, Lexer.NextToken.tag))
+                if (Classifier.ClassificateIn(ClassificateMethod.ExprType, Lexer.NextToken.tag) == -1)
+                    ErrorSta(LogContent.SthUnexpect, Lexer.NextToken);
+                switch (Classifier.ClassificateIn(ClassificateMethod.ExprType, Lexer.NextToken.tag))
                 {
                     case Tag.FACTOR:
                         Factor f = new Factor(Lexer.NextToken.tag, Lexer.NextToken);

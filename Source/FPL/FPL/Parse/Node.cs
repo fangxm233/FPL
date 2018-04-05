@@ -22,10 +22,14 @@ namespace FPL.Parse
         }
 
         #region Error
-
-        public static void Error(LogContent c, params object[] parm)
+        public static void ErrorSta(LogContent c, params object[] parm)
         {
             Debugger.LogError("文件 " + Lexer.NowFileName + ": " + "行 " + Lexer.Line + ": ", c, parm);
+            throw new CompileException();
+        }
+        public void Error(LogContent c, params object[] parm)
+        {
+            Debugger.LogError("文件 " + Lexer.NowFileName + ": " + "行 " + Line + ": ", c, parm);
             throw new CompileException();
         }
         public static void Error(Token c, LogContent l, params object[] parm)

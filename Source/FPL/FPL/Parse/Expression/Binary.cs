@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using FPL.DataStorager;
+﻿using FPL.DataStorager;
 using FPL.Generator;
-using FPL.LexicalAnalysis;
 using FPL.OutPut;
+using System.Collections.Generic;
+using FPL.Classification;
+using FPL.LexicalAnalysis;
+using FPL.Parse.Structure;
 
 namespace FPL.Parse.Expression
 {
@@ -10,9 +12,12 @@ namespace FPL.Parse.Expression
     {
         public LinkedListNode<Expr> Position;
         private bool isBuilt;
+        private bool isOverloaded;
+        private Function OverloadFunction;
 
         public Binary(int tag)
         {
+            Name = Lexer.NextToken.ToString();
             this.tag = tag;
         }
 
@@ -42,21 +47,24 @@ namespace FPL.Parse.Expression
             if (Left == null || Right == null) Error(LogContent.ExprError);
             Left.Check();
             Right.Check();
-            switch (Left.Type.type_name)
+            if (Classifier.ClassificateIn(ClassificateMethod.VarType, Left.Type.type_name) != Tag.BASIC ||
+                Classifier.ClassificateIn(ClassificateMethod.VarType, Right.Type.type_name) != Tag.BASIC)
             {
-                case "int":
-                case "float":
-                case "bool":
-                case "string":
-                    break;
-                default:
-                    Error(LogContent.NoOverload);
-                    break;
+                Parameter[] parameters = {
+                    new Parameter(Left.Type, Left.Name),
+                    new Parameter(Right.Type, Right.Name)
+                };
+                if (GetClass(Left.Type.type_name).ContainsFunction(Name, parameters))
+                    OverloadFunction = GetClass(Left.Type.type_name).GetFunction(this, Name, parameters);
+                else if (GetClass(Right.Type.type_name).ContainsFunction(Name, parameters))
+                    OverloadFunction = GetClass(Right.Type.type_name).GetFunction(this, Name, parameters);
+                else
+                    Error(LogContent.OperandNonsupportD, Name, Left.Type, Right.Type);
+                isOverloaded = true;
+                Type = OverloadFunction.ReturnType;
             }
-
-            if (Left.Type != Right.Type)
-                Error(LogContent.OperandNonsupport, "+", Left.Type.type_name, Right.Type.type_name);
-            Type = Left.Type;
+            if (!isOverloaded)
+                Type = Left.Type;
         }
 
         public void DotCheck()
@@ -74,11 +82,18 @@ namespace FPL.Parse.Expression
             Right.Code();
 
             if (tag == Tag.DOT) return;
+            if (isOverloaded)
+            {
+                FILGenerator.Write(InstructionType.call, OverloadFunction.ID);
+                FILGenerator.Write(InstructionType.pop);
+                FILGenerator.Write(InstructionType.pop);
+                return;
+            }
             if (Parser.InsTable.ContainsKey(tag))
                 if (Parser.InsTable[tag].ContainsKey(Type.type_name))
                     FILGenerator.Write(Parser.InsTable[tag][Type.type_name]);
                 else
-                    Error(LogContent.NoOverride);
+                    Error(LogContent.NoOverride); //要改..
             else
                 Error(LogContent.ExprError);
         }

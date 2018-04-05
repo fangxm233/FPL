@@ -114,6 +114,32 @@ namespace FPL.Parse.Structure
             return false;
         }
 
+        public bool ContainsFunction(string name, params Parameter[] parameters)
+        {
+            foreach (Function item in Functions)
+                if (item.Name == name)
+                {
+                    if (parameters.Length != item.Parameters.Count) continue;
+                    if (!parameters.Where((t, i) => t != item.Parameters[i]).Any())
+                        return true;
+                }
+
+            return false;
+        }
+
+        public bool ContainsFunction(string name, List<Parameter> parameters)
+        {
+            foreach (Function item in Functions)
+                if (item.Name == name)
+                {
+                    if (parameters.Count != item.Parameters.Count) continue;
+                    if (!parameters.Where((t, i) => t != item.Parameters[i]).Any())
+                        return true;
+                }
+
+            return false;
+        }
+
         public Statement GetStatement(string name)
         {
             foreach (Statement item in Statement)

@@ -3,6 +3,9 @@ using FPL.Generator;
 using FPL.OutPut;
 using System.Collections.Generic;
 using System.Linq;
+using FPL.Classification;
+using FPL.LexicalAnalysis;
+using FPL.Parse.Structure;
 
 namespace FPL.Parse.Expression
 {
@@ -11,10 +14,13 @@ namespace FPL.Parse.Expression
         public static List<CodingUnit> AndString = new List<CodingUnit>();
         public static List<CodingUnit> OrString = new List<CodingUnit>();
         public LinkedListNode<Expr> Position;
+        private Function OverloadFunction;
         private bool isBuilt;
+        private bool isOverloaded;
 
         public Bool(int tag)
         {
+            Name = Lexer.NextToken.ToString();
             this.tag = tag;
         }
 
@@ -38,10 +44,22 @@ namespace FPL.Parse.Expression
             Type = Type.Bool;
             Left.Check();
             Right.Check();
-            if ((Left.Type.type_name != Type.Bool.type_name ||
-                 Right.Type.type_name != Type.Bool.type_name) &&
-                (tag == Tag.OR || tag == Tag.AND)) Error(LogContent.ExprError);
-            if (Left.Type.type_name != Right.Type.type_name) Error(LogContent.NoOverload);
+            if (Classifier.ClassificateIn(ClassificateMethod.VarType, Left.Type.type_name) != Tag.BASIC ||
+                Classifier.ClassificateIn(ClassificateMethod.VarType, Right.Type.type_name) != Tag.BASIC)
+            {
+                Parameter[] parameters = {
+                    new Parameter(Left.Type, Left.Name),
+                    new Parameter(Right.Type, Right.Name)
+                };
+                if (GetClass(Left.Type.type_name).ContainsFunction(Name, parameters))
+                    OverloadFunction = GetClass(Left.Type.type_name).GetFunction(this, Name, parameters);
+                else if (GetClass(Right.Type.type_name).ContainsFunction(Name, parameters))
+                    OverloadFunction = GetClass(Right.Type.type_name).GetFunction(this, Name, parameters);
+                else
+                    Error(LogContent.OperandNonsupportD, Name, Left.Type, Right.Type);
+                isOverloaded = true;
+                Type = OverloadFunction.ReturnType;
+            }
         }
 
         public override void Code()

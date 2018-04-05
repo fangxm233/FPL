@@ -3,16 +3,9 @@ using System.Data;
 
 namespace FPL.DataStorager
 {
-    public enum ClassificateMethod
-    {
-        ExprEnd,
-        ExprType,
-
-    }
-
     internal class Tag
     {
-        //目前最大tag：318
+        //目前最大tag：320
         //语句的tag
         public const int
             SENTENCE = 316,
@@ -23,7 +16,8 @@ namespace FPL.DataStorager
             QUOTE = 295,
             OBJECT = 301,
             CONSTRUCTOR = 302,
-            INIT_FUNCTION = 303;
+            INIT_FUNCTION = 303,
+            OPERATORFUNC = 320;
 
         //标识符的tag
         public const int
@@ -42,7 +36,8 @@ namespace FPL.DataStorager
             VOID = 296,
             CLASS = 298,
             NEW = 299,
-            STATIC = 304;
+            STATIC = 304,
+            OPERATOR = 319;
 
         //表达式的tag
         public const int
@@ -95,77 +90,15 @@ namespace FPL.DataStorager
 
         public int TagDetail { get; }
 
-        private static readonly Dictionary<int, int> ExprTagTable = new Dictionary<int, int>();
 
         public Tag(int i)
         {
             TagDetail = i;
-
-            if (ExprTagTable.Count == 0)
-                FillTable();
-        }
-
-        private static void FillTable()
-        {
-            ExprTagTable.Add(LSQUBRACKETS, FACTOR);
-            ExprTagTable.Add(RSQUBRACKETS, FACTOR);
-            ExprTagTable.Add(LBRACKETS, FACTOR);
-            ExprTagTable.Add(RBRACKETS, FACTOR);
-            ExprTagTable.Add(DOT, BINATY);
-            ExprTagTable.Add(INCREASE, UNARY);
-            ExprTagTable.Add(DECLINE, UNARY);
-            ExprTagTable.Add(NOT, UNARY);
-            ExprTagTable.Add(DIVIDE, BINATY);
-            ExprTagTable.Add(MULTIPLY, BINATY);
-            ExprTagTable.Add(MODULO, UNARY);
-            ExprTagTable.Add(PLUS, BINATY);
-            ExprTagTable.Add(MINUS, BINATY);
-            ExprTagTable.Add(NUM, FACTOR);
-            ExprTagTable.Add(REAL, FACTOR);
-            ExprTagTable.Add(TRUE, FACTOR);
-            ExprTagTable.Add(FALSE, FACTOR);
-            ExprTagTable.Add(STR, FACTOR);
-            ExprTagTable.Add(NEW, FACTOR);
-            ExprTagTable.Add(ID, FACTOR);
-
-            ExprTagTable.Add(MORE, BOOL);
-            ExprTagTable.Add(LESS, BOOL);
-            ExprTagTable.Add(LE, BOOL);
-            ExprTagTable.Add(GE, BOOL);
-            ExprTagTable.Add(EQ, BOOL);
-            ExprTagTable.Add(NE, BOOL);
-            ExprTagTable.Add(AND, BOOL);
-            ExprTagTable.Add(OR, BOOL);
         }
 
         public static explicit operator Tag(int i)
         {
             return new Tag(i);
-        }
-
-        public static int IsIncludedIn(ClassificateMethod method, int tag)
-        {
-            if (ExprTagTable.Count == 0)
-                FillTable();
-            
-            switch (method)
-            {
-                case ClassificateMethod.ExprEnd:
-                    switch (tag)
-                    {
-                        case SEMICOLON:
-                        case ASSIGN:
-                        case RBRACE:
-                        case COMMA:
-                            return 1;
-                    }
-                    break;
-                case ClassificateMethod.ExprType:
-                    if (ExprTagTable.ContainsKey(tag)) return ExprTagTable[tag];
-                    break;
-            }
-
-            return -1;
         }
     }
 }

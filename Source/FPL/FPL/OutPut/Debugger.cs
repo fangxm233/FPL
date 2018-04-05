@@ -4,7 +4,7 @@ namespace FPL.OutPut
 {
     public class Debugger
     {
-        public static readonly string[] Contents =
+        public static readonly string[] ErrorContents =
         {
             "应输入 {0}",
             "应输入类型或文件尾",
@@ -40,6 +40,10 @@ namespace FPL.OutPut
             "需要一个类型可转换为 {0} 的对象",
             "类型 {0} 已定义了一个名为 {1} 的具有相同参数类型的成员",
             "类型 {0} 中没有名为 {1} 的符合的函数重载",
+            "应输入可重载运算符",
+            "重载 {0} 需要 {1} 个参数",
+            "重载 {0} 需要符合的 {1} 重载",
+            "运算符之一必须是包含类型",
 
         };
 
@@ -47,33 +51,33 @@ namespace FPL.OutPut
         {
             if (parm.Length == 0)
             {
-                Console.WriteLine("错误：" + s + Contents[(int)content]);
+                Console.WriteLine("错误：" + s + ErrorContents[(int)content]);
             }
             else
             {
-                Console.WriteLine("错误：" + s + Contents[(int)content], parm);
+                Console.WriteLine("错误：" + s + ErrorContents[(int)content], parm);
             }
         }
         public static void LogWarning(string s, LogContent content, params object[] parm)
         {
             if (parm.Length == 0)
             {
-                Console.WriteLine("警告：" + s + Contents[(int)content]);
+                Console.WriteLine("警告：" + s + ErrorContents[(int)content]);
             }
             else
             {
-                Console.WriteLine("警告：" + s + Contents[(int)content], parm);
+                Console.WriteLine("警告：" + s + ErrorContents[(int)content], parm);
             }
         }
         public static void Log(string s, LogContent content, params object[] parm)
         {
             if (parm.Length == 0)
             {
-                Console.WriteLine("信息：" + s + Contents[(int)content]);
+                Console.WriteLine("信息：" + s + ErrorContents[(int)content]);
             }
             else
             {
-                Console.WriteLine("信息：" + s + Contents[(int)content], parm);
+                Console.WriteLine("信息：" + s + ErrorContents[(int)content], parm);
             }
         }
     }
@@ -246,5 +250,25 @@ namespace FPL.OutPut
         /// 类型 {0} 中没有名为 {1} 的符合的函数重载
         /// </summary>
         NotExistingMatchOverload,
+
+        /// <summary>
+        /// 应输入可重载运算符
+        /// </summary>
+        ExpectOverloadableOperator,
+
+        /// <summary>
+        /// 重载 {0} 需要 {1} 个参数
+        /// </summary>
+        OverloadSthNeedParmCount,
+
+        /// <summary>
+        /// 重载 {0} 需要符合的 {1} 重载
+        /// </summary>
+        NeedMatchOverload,
+
+        /// <summary>
+        /// 运算符之一必须是包含类型
+        /// </summary>
+        MustBeInchudeType,
     }
 }

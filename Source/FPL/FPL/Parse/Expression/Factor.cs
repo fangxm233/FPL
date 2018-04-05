@@ -50,7 +50,17 @@ namespace FPL.Parse.Expression
 
         public override void Check()
         {
-            if (tag != Tag.ID) return;
+            if (tag != Tag.ID)
+            {
+                switch (tag)
+                {
+                    case Tag.TRUE:
+                    case Tag.FALSE:
+                        Type = Type.Bool;
+                        break;
+                }
+                return;
+            }
             //@class == null意味着是这一串对象中是第一个
             //获取class和statement
             if (Class == null)

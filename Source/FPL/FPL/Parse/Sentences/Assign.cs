@@ -40,7 +40,8 @@ namespace FPL.Parse.Sentences
             if (TypeName != null) Type = Type.GetType(TypeName);
             if (Type == null && TypeName != null) Error(LogContent.NotExistingDefinition, TypeName);
             Left.Check();
-            Type = Left.Type;
+            if (Type == null)
+                Type = Left.Type;
             if (Right == null) return;
             Right.Check();
             if (Type != Right.Type) Error(LogContent.UnableToConvertType, Right.Type.type_name, Type.type_name);
@@ -66,6 +67,9 @@ namespace FPL.Parse.Sentences
                     break;
                 case InstructionType.pushsta:
                     FILGenerator.Write(InstructionType.storesta, codingUnit.Parameter);
+                    break;
+                default:
+                    Error(this, LogContent.ExprError);
                     break;
             }
         }

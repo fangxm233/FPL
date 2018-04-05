@@ -8,17 +8,6 @@ namespace FPL
 {
     internal class Program
     {
-        /* 目前支持
-         * for
-         * if
-         * if else
-         * while
-         * do while
-         * break
-         * 强类型声明
-         * 强类型运算
-         * 函数
-         */
         //TODO:修改解释器读取文件
         //TODO:修改编译器结构
         private static void Main(string[] args)

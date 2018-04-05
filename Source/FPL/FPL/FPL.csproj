@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classification\Classifier.cs" />
     <Compile Include="DataStorager\Parameter.cs" />
     <Compile Include="OutPut\Debugger.cs" />
     <Compile Include="Generator\FILGenerator.cs" />

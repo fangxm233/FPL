@@ -1,6 +1,6 @@
 ﻿class Program
 {
-	//Program program;
+	static Program program;
 	//static int i;
 	static void Main()
 	{
@@ -8,15 +8,31 @@
 		//int b = a + 1 + pp(555, new Program().i);
 		//program.i = 0;
 		int a;
+		Program p;
 		for (int i = 0; i <10000000; i = i + 1)
 		{
-			a = a + 1;
+			p = program + 1;
 		}
+		if(p == p)a = 1;
 		if(a == 0 || a == 1 && a == 2)
 			a = 666;
 		pp();
 		pp(1,1);
-		int r = new Program(1);
+		//int r = new Program(1);
+	}
+
+	static Program operator +(Program p, int i)
+	{
+		return p;
+	}
+
+	static bool operator ==(Program p, Program i)
+	{
+		return true;
+	}
+	static bool operator !=(Program p, Program i)
+	{
+		return false;
 	}
 
 	Program(int a)
@@ -50,8 +66,9 @@ new
 强类型运算
 class类型
 函数
+函数重载
 支持参数，返回值
-多文件（那个System文件是声明基本类型，别改啊）
+多文件
 静态变量和函数
 
 运算符:
@@ -60,9 +77,12 @@ class类型
 单行注释和多行注释
 
 将要支持:
-函数重载
+符号重载
 数组
 所有基本类型
+继承
+函数重写
 命名空间
+泛型
 简单的代码优化
 */

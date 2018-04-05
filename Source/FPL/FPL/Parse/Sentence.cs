@@ -121,7 +121,7 @@ namespace FPL.Parse
                     }
                     default:
                     {
-                        Error(LogContent.SentenceErrorOrRBraceDoesNotMatch);
+                        ErrorSta(LogContent.SentenceErrorOrRBraceDoesNotMatch);
                         return sentences;
                     }
                 }
@@ -243,6 +243,12 @@ namespace FPL.Parse
                     {
                         Lexer.Next();
                         Lexer.Next();
+                        if (Lexer.NextToken.tag == Tag.OPERATOR)
+                        {
+                            Lexer.Back();
+                            sentences.Add(new Function(FuncType.OperatorFunc, Tag.OPERATORFUNC).Build());
+                            break;
+                        }
                         Lexer.Next();
                         if (Lexer.NextToken.tag == Tag.LBRACKETS)
                         {

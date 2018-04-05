@@ -67,8 +67,8 @@ namespace FPL.DataStorager
         public static bool operator ==(Type l, Type r)
         {
             if (ReferenceEquals(l, r)) return true;
-            if (ReferenceEquals(l, null)) return false;
-            if (ReferenceEquals(r, null)) return false;
+            if (l is null) return false;
+            if (r is null) return false;
             return l.type_name == r.type_name;
         }
 

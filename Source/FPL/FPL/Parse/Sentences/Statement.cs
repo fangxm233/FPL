@@ -45,6 +45,7 @@ namespace FPL.Parse.Sentences
         public override void Check()
         {
             Assign.TypeName = TypeName;
+            Assign.Type = Type.GetType(TypeName);
             Assign.Check();
         }
 

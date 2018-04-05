@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FPL.Classification;
 using FPL.DataStorager;
 using FPL.Generator;
 using FPL.LexicalAnalysis;
@@ -28,9 +29,10 @@ namespace FPL.Parse.Structure
             FuncType = type;
             TypeName = Lexer.NextToken.ToString();
             Lexer.Next();
-            if (Lexer.NextToken.tag == Tag.ID)
-                Name = Lexer.NextToken.ToString();
-            else Error(LogContent.SthUseless, Lexer.NextToken);
+            if(type == FuncType.OperatorFunc)Lexer.Next();
+            if (Lexer.NextToken.tag != Tag.ID && type != FuncType.OperatorFunc)
+                Error(LogContent.SthUseless, Lexer.NextToken);
+            Name = Lexer.NextToken.ToString();
         }
 
         public Function(FuncType type, int tag, string name) : base(tag)
@@ -44,7 +46,7 @@ namespace FPL.Parse.Structure
             FuncType = type;
             ReturnType = returnType;
             if (Lexer.NextToken.tag == Tag.ID)
-                Name = ((Word) Lexer.NextToken).Lexeme;
+                Name = Lexer.NextToken.ToString();
             else Error(LogContent.SthUseless, Lexer.NextToken);
         }
 
@@ -94,6 +96,7 @@ namespace FPL.Parse.Structure
             }
 
             Parser.AnalyzingFunction = this;
+            if (tag == Tag.OPERATORFUNC) CheckOpeFunc();
             if (Sentences.Count == 0)
                 if (ReturnType != Type.Void)
                 {
@@ -113,9 +116,51 @@ namespace FPL.Parse.Structure
             }
 
             if (Parameters.Count != 0 && Name == "Main") Error(LogContent.HaveParmUnallowed);
-            foreach (Parameter item in Parameters) item.Check();
+            //foreach (Parameter item in Parameters) item.Check();
             foreach (Sentence item in Sentences) item.Check();
             Parser.AnalyzingFunction = null;
+        }
+
+        public void CheckOpeFunc()
+        {
+            if (Parameters.Count != Classifier.ClassificateIn(ClassificateMethod.ReloadOpeNeedParmCount, Name))
+                Error(LogContent.OverloadSthNeedParmCount, Name,
+                    Classifier.ClassificateIn(ClassificateMethod.ReloadOpeNeedParmCount, Name));
+            bool s = false;
+            foreach (Parameter parameter in Parameters)
+            {
+                if (parameter.Type.type_name == Class.Name) s = true;
+            }
+
+            if (s == false) Error(LogContent.MustBeInchudeType);
+            switch (Name)
+            {
+                case "==":
+                    if (!Class.ContainsFunction("!=", Parameters))
+                        Error(LogContent.NeedMatchOverload, "==", "!=");
+                    break;
+                case "!=":
+                    if (!Class.ContainsFunction("==", Parameters))
+                        Error(LogContent.NeedMatchOverload, "!=", "==");
+                    break;
+                case ">=":
+                    if (!Class.ContainsFunction(">=", Parameters))
+                        Error(LogContent.NeedMatchOverload, ">=", "<=");
+                    break;
+                case "<=":
+                    if (!Class.ContainsFunction("<=", Parameters))
+                        Error(LogContent.NeedMatchOverload, "<=", ">=");
+                    break;
+                case "+":
+                case "-":
+                case "*":
+                case "/":
+                case "!":
+                    break;
+                default:
+                    Error(LogContent.ExpectOverloadableOperator);
+                    break;
+            }
         }
 
         public override void Code()
