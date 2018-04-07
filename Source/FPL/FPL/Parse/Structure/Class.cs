@@ -25,7 +25,7 @@ namespace FPL.Parse.Structure
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.ID)
                 Name = Lexer.NextToken.ToString();
-            else Error(LogContent.SthUseless, Lexer.NextToken);
+            else ErrorSta(LogContent.SthUseless, Lexer.NextToken);
         }
 
         public override Sentence Build()

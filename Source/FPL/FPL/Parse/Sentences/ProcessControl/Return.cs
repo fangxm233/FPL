@@ -37,7 +37,7 @@ namespace FPL.Parse.Sentences.ProcessControl
             }
             Expr.Check();
             if (Expr.Type != RetrunType)
-                Error(LogContent.UnableToConvertType, Expr.Type,
+                Error(Expr, LogContent.UnableToConvertType, Expr.Type,
                     RetrunType);
         }
 

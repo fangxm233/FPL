@@ -33,7 +33,7 @@ namespace FPL.Parse.Sentences.ProcessControl
                 Parameters.Add(new Parameter(new Expr().BuildStart()));
                 if (Parameters.Last().Expr == null)
                 {
-                    if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                    if (Lexer.NextToken.tag == Tag.COMMA) ErrorSta(LogContent.MissingParam);
                     Match(")", false);
                     Parameters.RemoveAt(Parameters.Count - 1);
                     break;
@@ -54,7 +54,7 @@ namespace FPL.Parse.Sentences.ProcessControl
         public Sentence BuildNext()
         {
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.ID) Error(LogContent.SthUnexpect, Lexer.NextToken);
+            if (Lexer.NextToken.tag != Tag.ID) ErrorSta(LogContent.SthUnexpect, Lexer.NextToken);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACKETS)
             {
@@ -130,7 +130,7 @@ namespace FPL.Parse.Sentences.ProcessControl
             {
                 Parameters.Add(new Parameter(new Expr().BuildStart()));
                 if (Parameters.Last().Expr != null) continue;
-                if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                if (Lexer.NextToken.tag == Tag.COMMA) ErrorSta(LogContent.MissingParam);
                 Match(")", false);
                 Parameters.RemoveAt(Parameters.Count - 1);
                 break;
@@ -141,10 +141,11 @@ namespace FPL.Parse.Sentences.ProcessControl
         {
             if (Class == null) Class = Parser.AnalyzingClass;
             LocalClass = Class;
+            foreach (Parameter parameter in Parameters)
+            {
+                parameter.Check();
+            }
             Function = LocalClass.GetFunction(this, Name, Parameters);
-            if (Function == null) Error(LogContent.NotExistingDefinitionInType, LocalClass.Name, Name);
-            if (Parameters.Count != Function.Parameters.Count)
-                Error(LogContent.NumberOfParamDoesNotMatch, Name, Parameters.Count);
             ReturnType = Function.ReturnType;
             Class = GetClass(ReturnType.type_name);
             Type = ReturnType;

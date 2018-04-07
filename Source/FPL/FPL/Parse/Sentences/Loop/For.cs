@@ -57,7 +57,7 @@ namespace FPL.Parse.Sentences.Loop
             Expr?.Check();
             Assign?.Check();
             if (Expr.Type.type_name != Type.Bool.type_name)
-                Error(LogContent.UnableToConvertType, Expr.Type.type_name, Type.Bool.type_name);
+                Error(Expr, LogContent.UnableToConvertType, Expr.Type.type_name, Type.Bool.type_name);
             foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;

@@ -1,51 +1,29 @@
 ﻿class Program
 {
-	static Program program;
+	//static Program program;
 	//static int i;
 	static void Main()
 	{
+	    int a = 0;
+		int c =1+a-(3*4)+b(1+2);
 		//int a = 666 + 555 * 1 / 666 * (555 + 1);
 		//int b = a + 1 + pp(555, new Program().i);
 		//program.i = 0;
-		int a;
-		Program p;
-		for (int i = 0; i <10000000; i = i + 1)
-		{
-			p = program + 1;
-		}
-		if(p == p)a = 1;
-		if(a == 0 || a == 1 && a == 2)
-			a = 666;
-		pp();
-		pp(1,1);
-		//int r = new Program(1);
+		//int a;
+		//Program p;
+		//for (int i = 0; i <10000000; i = i + 1)
+		//{
+			//p = program + 1;
+		//}
+		//if(p == p)a = 1;
+		//if(a == 0 || a == 1 && a == 2)
+			//a = 666;
+		//pp();
+		//pp(1,1);
+		int r = new Program(1);
 	}
 
-	static Program operator +(Program p, int i)
-	{
-		return p;
-	}
-
-	static bool operator ==(Program p, Program i)
-	{
-		return true;
-	}
-	static bool operator !=(Program p, Program i)
-	{
-		return false;
-	}
-
-	Program(int a)
-	{
-		a = 0;
-	}
-
-	static int pp(int a, int ssss)
-	{
-		return 0;
-	}
-
-	static int pp()
+	static int b(int a)
 	{
 		return 0;
 	}
@@ -67,6 +45,7 @@ new
 class类型
 函数
 函数重载
+符号重载
 支持参数，返回值
 多文件
 静态变量和函数
@@ -77,12 +56,11 @@ class类型
 单行注释和多行注释
 
 将要支持:
-符号重载
-数组
 所有基本类型
 继承
 函数重写
 命名空间
 泛型
+数组
 简单的代码优化
 */

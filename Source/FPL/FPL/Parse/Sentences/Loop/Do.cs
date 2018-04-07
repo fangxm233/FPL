@@ -39,7 +39,7 @@ namespace FPL.Parse.Sentences.Loop
             }
 
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.WHILE) Error(LogContent.SthExpect, "while");
+            if (Lexer.NextToken.tag != Tag.WHILE) ErrorSta(LogContent.SthExpect, "while");
             Match("(");
             Expr = new Expr().BuildStart();
             if (Expr == null) Error(LogContent.ExprError);

@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using FPL.DataStorager;
+using FPL.LexicalAnalysis;
 
 namespace FPL.OutPut
 {
@@ -47,17 +51,37 @@ namespace FPL.OutPut
 
         };
 
-        public static void LogError(string s, LogContent content, params object[] parm)
+        public static void LogError(string s, int line, int TokenNum, int length, string fileName, LogContent content,
+            params object[] parm)
         {
+            List<Token> tokens = Lexer.GetLineTokens(line, fileName);
+            Console.WriteLine("错误：" + s);
+            for (int i = 0; i < tokens.Count; i++)
+            {
+                if (i < TokenNum || i >= TokenNum + length)
+                {
+                    Console.ResetColor();
+                    Console.Write(tokens[i] + " ");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(tokens[i] + " ");
+                }
+            }
+            Console.WriteLine();
+            Console.ResetColor();
+
             if (parm.Length == 0)
             {
-                Console.WriteLine("错误：" + s + ErrorContents[(int)content]);
+                Console.WriteLine(ErrorContents[(int) content]);
             }
             else
             {
-                Console.WriteLine("错误：" + s + ErrorContents[(int)content], parm);
+                Console.WriteLine(ErrorContents[(int) content], parm);
             }
         }
+
         public static void LogWarning(string s, LogContent content, params object[] parm)
         {
             if (parm.Length == 0)

@@ -3,46 +3,41 @@
 3
 5
 Program 1
-1
-1
-8
+0
+0
+4
 Main 5 5
-+ 53 1
-== 57 0
-!= 60 0
-Program 63 0
-pp 67 1
-pp 71 1
-.init 75 0
-1
-int program
-Int 78
+b 27 1
+Program 31 0
+.init 34 0
+0
+Int 37
 0
 0
 2
-Int 80 0
-.init 83 0
+Int 39 0
+.init 42 0
 0
-Float 86
-0
-0
-2
-Float 88 0
-.init 91 0
-0
-String 94
+Float 45
 0
 0
 2
-String 96 0
-.init 99 0
+Float 47 0
+.init 50 0
 0
-Bool 102
+String 53
 0
 0
 2
-Bool 104 0
-.init 107 0
+String 55 0
+.init 58 0
+0
+Bool 61
+0
+0
+2
+Bool 63 0
+.init 66 0
 0
 56 0    define 0
 55 0    class 0
@@ -52,70 +47,29 @@ Bool 104 0
 3 0    pushval 0
 3 0    pushval 0
 3 0    pushval 0
-3 0    pushval 0
-6 2    storeloc 2
-42 21    jmp 21
-4 0    pushsta 0
+6 0    storeloc 0
 3 1    pushval 1
+0 0    pushloc 0
+10 0    add_i 0
+3 3    pushval 3
+3 4    pushval 4
+19 0    mul_i 0
+13 0    sub_i 0
+3 1    pushval 1
+3 2    pushval 2
+10 0    add_i 0
 43 1    call 1
 5 0    pop 0
-5 0    pop 0
-6 1    storeloc 1
-0 2    pushloc 2
-3 1    pushval 1
 10 0    add_i 0
-6 11    storeloc 11
-0 1    pushloc 1
-0 1    pushloc 1
-45 0    eq 0
-48 26    jt 26
-42 28    jmp 28
-3 1    pushval 1
-6 0    storeloc 0
-0 0    pushloc 0
-3 0    pushval 0
-45 0    eq 0
-48 36    jt 36
-0 0    pushloc 0
-3 1    pushval 1
-45 0    eq 0
-49 40    jf 40
-0 0    pushloc 0
-3 2    pushval 2
-45 0    eq 0
-49 40    jf 40
-42 43    jmp 43
-3 666    pushval 666
-6 0    storeloc 0
-43 6    call 6
-3 1    pushval 1
-3 1    pushval 1
-43 5    call 5
-5 0    pop 0
-5 0    pop 0
-3 0    pushval 0
-44 0    ret 0
-58 0    funcEnd 0
-54 0    func 0
-1 3    pusharg 3
-44 0    ret 0
-58 0    funcEnd 0
-54 0    func 0
-44 0    ret 0
-58 0    funcEnd 0
-54 0    func 0
-44 0    ret 0
-58 0    funcEnd 0
-54 0    func 0
-44 0    ret 0
-44 0    ret 0
-58 0    funcEnd 0
-54 0    func 0
+6 1    storeloc 1
 3 0    pushval 0
 44 0    ret 0
 58 0    funcEnd 0
 54 0    func 0
 3 0    pushval 0
+44 0    ret 0
+58 0    funcEnd 0
+54 0    func 0
 44 0    ret 0
 58 0    funcEnd 0
 54 0    func 0

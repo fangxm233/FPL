@@ -22,6 +22,7 @@ namespace FPL.Parse.Sentences
         public New_s(int tag) : base(tag)
         {
             Lexer.Next();
+            if (Lexer.NextToken.tag != Tag.ID) ErrorSta(LogContent.IDExpect);
             TypeName = Lexer.NextToken.ToString();
         }
 
@@ -34,7 +35,7 @@ namespace FPL.Parse.Sentences
                 Parameters.Add(new Parameter(new Expr().BuildStart()));
                 if (Parameters.Last().Expr == null)
                 {
-                    if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                    if (Lexer.NextToken.tag == Tag.COMMA) ErrorSta(LogContent.MissingParam);
                     Match(")", false);
                     Parameters.RemoveAt(Parameters.Count - 1);
                     break;
@@ -87,7 +88,7 @@ namespace FPL.Parse.Sentences
         public Sentence BuildNext()
         {
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.ID) Error(LogContent.SthUseless, Lexer.NextToken);
+            if (Lexer.NextToken.tag != Tag.ID) ErrorSta(LogContent.SthUseless, Lexer.NextToken);
             Lexer.Next();
             if (Lexer.NextToken.tag == Tag.LBRACKETS)
             {
@@ -121,7 +122,7 @@ namespace FPL.Parse.Sentences
             {
                 Parameters.Add(new Parameter(new Expr().BuildStart()));
                 if (Parameters.Last().Expr != null) continue;
-                if (Lexer.NextToken.tag == Tag.COMMA) Error(LogContent.MissingParam);
+                if (Lexer.NextToken.tag == Tag.COMMA) ErrorSta(LogContent.MissingParam);
                 Match(")", false);
                 Parameters.RemoveAt(Parameters.Count - 1);
                 break;
@@ -148,6 +149,18 @@ namespace FPL.Parse.Sentences
                 for (int i = Parameters.Count - 1; i >= 0; i--)
                     Parameters[i].Code();
             FILGenerator.Write(InstructionType.call, Function.ID);
+        }
+
+        public override int GetTokenLength()
+        {
+            int l = 3;
+            foreach (Parameter parameter in Parameters)
+            {
+                l += parameter.GetTokenLength();
+                l++;
+            }
+
+            return l;
         }
     }
 }

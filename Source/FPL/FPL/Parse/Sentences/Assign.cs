@@ -38,7 +38,7 @@ namespace FPL.Parse.Sentences
         public override void Check()
         {
             if (TypeName != null) Type = Type.GetType(TypeName);
-            if (Type == null && TypeName != null) Error(LogContent.NotExistingDefinition, TypeName);
+            if (Type == null && TypeName != null) Error(Left, LogContent.NotExistingDefinition, TypeName);
             Left.Check();
             if (Type == null)
                 Type = Left.Type;
@@ -69,9 +69,15 @@ namespace FPL.Parse.Sentences
                     FILGenerator.Write(InstructionType.storesta, codingUnit.Parameter);
                     break;
                 default:
-                    Error(this, LogContent.ExprError);
+                    Error(Left, LogContent.ExprError);
                     break;
             }
+        }
+
+        public override int GetTokenLength()
+        {
+            if (Right != null) return Left.GetTokenLength() + Right.GetTokenLength() + 1;
+            return Left.GetTokenLength();
         }
     }
 }

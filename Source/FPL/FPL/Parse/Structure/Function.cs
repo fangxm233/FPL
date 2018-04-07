@@ -31,7 +31,7 @@ namespace FPL.Parse.Structure
             Lexer.Next();
             if(type == FuncType.OperatorFunc)Lexer.Next();
             if (Lexer.NextToken.tag != Tag.ID && type != FuncType.OperatorFunc)
-                Error(LogContent.SthUseless, Lexer.NextToken);
+                ErrorSta(LogContent.SthUseless, Lexer.NextToken);
             Name = Lexer.NextToken.ToString();
         }
 
@@ -47,7 +47,7 @@ namespace FPL.Parse.Structure
             ReturnType = returnType;
             if (Lexer.NextToken.tag == Tag.ID)
                 Name = Lexer.NextToken.ToString();
-            else Error(LogContent.SthUseless, Lexer.NextToken);
+            else ErrorSta(LogContent.SthUseless, Lexer.NextToken);
         }
 
         public Function(FuncType type, Type returnType, string name, int tag) : base(tag)

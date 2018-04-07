@@ -106,7 +106,7 @@ namespace FPL.Parse
                             break;
                         }
 
-                        Error(LogContent.GarmmarError);
+                        ErrorSta(LogContent.GarmmarError);
                         break;
                     }
                     case Tag.NEW:
@@ -197,7 +197,7 @@ namespace FPL.Parse
                             return sentence;
                         }
 
-                        Error(LogContent.GarmmarError);
+                        ErrorSta(LogContent.GarmmarError);
                         return null;
                     }
                 }
@@ -207,7 +207,7 @@ namespace FPL.Parse
                 }
                 default:
                 {
-                    Error(LogContent.SentenceErrorOrRBraceDoesNotMatch);
+                    ErrorSta(LogContent.SentenceErrorOrRBraceDoesNotMatch);
                     return null;
                 }
             }
@@ -270,7 +270,7 @@ namespace FPL.Parse
                         if (Lexer.NextToken.tag == Tag.LBRACKETS)
                         {
                             Lexer.Back();
-                            if (Lexer.NextToken.ToString() != Parser.AnalyzingClass.Name) Error(LogContent.InPutType);
+                            if (Lexer.NextToken.ToString() != Parser.AnalyzingClass.Name) ErrorSta(LogContent.InPutType);
                             sentences.Add(new Function(FuncType.Constructor, Type.Void, Tag.CONSTRUCTOR).Build());
                             break;
                         }
@@ -297,7 +297,7 @@ namespace FPL.Parse
                     }
                     default:
                     {
-                        Error(LogContent.SentenceError);
+                        ErrorSta(LogContent.SentenceError);
                         return sentences;
                     }
                 }
@@ -323,12 +323,12 @@ namespace FPL.Parse
                     }
                     case Tag.RBRACE:
                     {
-                        Error(LogContent.InPutTypeOrFileEnd);
+                        ErrorSta(LogContent.InPutTypeOrFileEnd);
                         break;
                     }
                     default:
                     {
-                        Error(LogContent.SentenceError);
+                        ErrorSta(LogContent.SentenceError);
                         return classes;
                     }
                 }

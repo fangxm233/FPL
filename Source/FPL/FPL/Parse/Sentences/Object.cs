@@ -20,7 +20,7 @@ namespace FPL.Parse.Sentences
 
         public Object_s(int tag) : base(tag)
         {
-            Name = ((Word) Lexer.NextToken).Lexeme;
+            Name = Lexer.NextToken.ToString();
         }
 
         public override Sentence Build()

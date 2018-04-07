@@ -6,6 +6,7 @@ namespace FPL.DataStorager
     {
         public readonly string File;
         public readonly int Line;
+        public readonly int TokenNum;
         public int tag;
 
         public Token(int i)
@@ -13,6 +14,7 @@ namespace FPL.DataStorager
             tag = i;
             Line = Lexer.Line;
             File = Lexer.NowFileName;
+            TokenNum = Lexer.TokenNum;
         }
 
         public override string ToString()

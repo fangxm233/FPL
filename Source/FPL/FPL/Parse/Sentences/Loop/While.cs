@@ -46,10 +46,10 @@ namespace FPL.Parse.Sentences.Loop
 
         public override void Check()
         {
-            if (Expr == null) Error(LogContent.ExprError);
+            if (Expr == null) ErrorSta(LogContent.ExprError);
             Expr.Check();
             if (Expr.Type.type_name != Type.Bool.type_name)
-                Error(LogContent.UnableToConvertType, Expr.Type.type_name, Type.Bool.type_name);
+                Error(this, LogContent.UnableToConvertType, Expr.Type.type_name, Type.Bool.type_name);
             foreach (Sentence item in Sentences)
             {
                 Parser.AnalyzingLoop = this;

@@ -15,6 +15,7 @@ namespace FPL.LexicalAnalysis
         public static Token NextToken;
         public static int Line = 1;
         public static string NowFileName;
+        public static int TokenNum;
         private static char Peek = ' ';
         private static readonly Dictionary<string, Word> Words = new Dictionary<string, Word>();
 
@@ -347,12 +348,18 @@ namespace FPL.LexicalAnalysis
 
         public static void Next()
         {
+            if (Line == 23)
+            {
+
+            }
+            TokenNum++;
             while (true)
             {
                 NextToken = Peeks[Index++];
                 switch (NextToken.tag)
                 {
                     case Tag.EOL:
+                        TokenNum = 0;
                         Line++;
                         continue;
                     case Tag.ID:
@@ -373,6 +380,7 @@ namespace FPL.LexicalAnalysis
 
         public static void Back()
         {
+            TokenNum--;
             while (true)
             {
                 Index -= 2;
@@ -398,6 +406,34 @@ namespace FPL.LexicalAnalysis
             if (Peek != c) return false;
             Peek = ' ';
             return true;
+        }
+
+        public static List<Token> GetLineTokens(int lineNum, string fileName)
+        {
+            int fileID = 0;
+            for (int i = 0; i < Files.Length; i++)
+                if (Files[i] == fileName)
+                {
+                    fileID = i;
+                    break;
+                }
+
+            List<Token> tokens = new List<Token>();
+            int line = 1;
+            int nowFileID = 0;
+            foreach (Token token in Peeks)
+            {
+                if (line == lineNum && nowFileID == fileID && token.tag == Tag.EOL)break;
+                if (token.tag == Tag.EOL)
+                {
+                    line++;
+                    continue;
+                }
+                if (token.tag == Tag.EOF) nowFileID++;
+                if (line == lineNum && fileID == nowFileID) tokens.Add(token);
+            }
+
+            return tokens;
         }
     }
 }

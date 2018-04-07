@@ -14,37 +14,38 @@ namespace FPL.Parse
     {
         public readonly string File;
         public readonly int Line;
+        public readonly int TokenNum;
 
         protected Node()
         {
             Line = Lexer.Line;
             File = Lexer.NowFileName;
+            TokenNum = Lexer.TokenNum;
         }
 
         #region Error
         public static void ErrorSta(LogContent c, params object[] parm)
         {
-            Debugger.LogError("文件 " + Lexer.NowFileName + ": " + "行 " + Lexer.Line + ": ", c, parm);
+            Debugger.LogError("文件 " + Lexer.NowFileName + ": " + "行 " + Lexer.Line + ": ", Lexer.Line, Lexer.TokenNum,
+                0, Lexer.NowFileName, c, parm);
             throw new CompileException();
         }
         public void Error(LogContent c, params object[] parm)
         {
-            Debugger.LogError("文件 " + Lexer.NowFileName + ": " + "行 " + Line + ": ", c, parm);
-            throw new CompileException();
-        }
-        public static void Error(Token c, LogContent l, params object[] parm)
-        {
-            Debugger.LogError("文件 " + c.File + ": " + "行 " + c.Line + ": ", l, parm);
+            Debugger.LogError("文件 " + File + ": " + "行 " + Line + ": ", Line, TokenNum, GetTokenLength(), File, c,
+                parm);
             throw new CompileException();
         }
         public static void Error(Expr c, LogContent l, params object[] parm)
         {
-            Debugger.LogError("文件 " + c.File + ": " + "行 " + c.Line + ": ", l, parm);
+            Debugger.LogError("文件 " + c.File + ": " + "行 " + c.Line + ": ", c.Line, c.TokenNum, c.GetTokenLength(),
+                c.File, l, parm);
             throw new CompileException();
         }
         public static void Error(Node c, LogContent l, params object[] parm)
         {
-            Debugger.LogError("文件 " + c.File + ": " + "行 " + c.Line + ": ", l, parm);
+            Debugger.LogError("文件 " + c.File + ": " + "行 " + c.Line + ": ", c.Line, c.TokenNum, c.GetTokenLength(),
+                c.File, l, parm);
             throw new CompileException();
         }
 
@@ -119,7 +120,7 @@ namespace FPL.Parse
             {
                 if (throwError)
                 {
-                    Error(LogContent.SthExpect, s);
+                    ErrorSta(LogContent.SthExpect, s);
                 }
                 else
                 {
@@ -128,6 +129,11 @@ namespace FPL.Parse
             }
 
             return true;
+        }
+
+        public virtual int GetTokenLength()
+        {
+            return 1;
         }
     }
 }

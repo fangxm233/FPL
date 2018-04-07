@@ -49,6 +49,11 @@ namespace FPL.DataStorager
             else Expr?.Code();
         }
 
+        public int GetTokenLength()
+        {
+            return Expr.GetTokenLength();
+        }
+
         #region operator
 
         public static bool operator ==(Parameter l, Type r)

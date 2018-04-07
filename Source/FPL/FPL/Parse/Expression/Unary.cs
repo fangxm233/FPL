@@ -14,6 +14,7 @@ namespace FPL.Parse.Expression
         public Unary(int tag)
         {
             this.tag = tag;
+            Name = Lexer.NextToken.ToString();
         }
 
         public void Set_position(LinkedListNode<Expr> pos)
@@ -28,6 +29,11 @@ namespace FPL.Parse.Expression
             if (Classifier.ClassificateIn(ClassificateMethod.ExprType, Right.tag) != Tag.FACTOR) Error(LogContent.ExprError);
             Position.List.Remove(Position.Next);
             isBuilt = true;
+        }
+
+        public override int GetTokenLength()
+        {
+            return Right.GetTokenLength() + 1;
         }
     }
 }

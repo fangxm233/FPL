@@ -72,10 +72,10 @@ namespace FPL.Parse.Sentences.ProcessControl
 
         public override void Check()
         {
-            if (Expr == null) Error(LogContent.ExprError);
+            if (Expr == null) Error(Expr, LogContent.ExprError);
             Expr.Check();
             if (Expr.Type.type_name != Type.Bool.type_name)
-                Error(LogContent.UnableToConvertType, Expr.Type.type_name, Type.Bool.type_name);
+                Error(Expr, LogContent.UnableToConvertType, Expr.Type.type_name, Type.Bool.type_name);
             foreach (Sentence item in Sentences) item.Check();
             if (SentencesElse == null) return;
             foreach (Sentence item in SentencesElse) item.Check();

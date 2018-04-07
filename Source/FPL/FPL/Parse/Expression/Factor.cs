@@ -132,5 +132,10 @@ namespace FPL.Parse.Expression
                     break;
             }
         }
+
+        public override int GetTokenLength()
+        {
+            return 1;
+        }
     }
 }

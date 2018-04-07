@@ -26,7 +26,7 @@ namespace FPL.Parse.Sentences
             TypeName = Lexer.NextToken.ToString();
 
             Lexer.Next();
-            if (Lexer.NextToken.tag != Tag.ID) Error(LogContent.IDExpect);
+            if (Lexer.NextToken.tag != Tag.ID) ErrorSta(LogContent.IDExpect);
             Name = Lexer.NextToken.ToString();
             AddVar(this, VarType);
 
@@ -52,6 +52,11 @@ namespace FPL.Parse.Sentences
         public override void Code()
         {
             Assign.Code();
+        }
+
+        public override int GetTokenLength()
+        {
+            return 1 + Assign.GetTokenLength();
         }
     }
 }

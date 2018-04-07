@@ -119,5 +119,10 @@ namespace FPL.Parse.Expression
         public virtual void Code()
         {
         }
+
+        public override int GetTokenLength()
+        {
+            return Left.GetTokenLength() + Right.GetTokenLength() + 1;
+        }
     }
 }
